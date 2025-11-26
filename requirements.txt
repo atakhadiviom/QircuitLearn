@@ -1,0 +1,6 @@
+Flask
+cirq
+numpy
+scipy
+pymysql
+python-dotenv

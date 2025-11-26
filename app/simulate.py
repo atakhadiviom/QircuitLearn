@@ -1,0 +1,52 @@
+import json
+import cirq
+import numpy as np
+
+def circuit_from_json(data):
+    n = data.get("qubits", 1)
+    qs = [cirq.LineQubit(i) for i in range(n)]
+    c = cirq.Circuit()
+    for g in data.get("gates", []):
+        t = g.get("type")
+        q = g.get("target", 0)
+        ctr = g.get("control")
+        p = g.get("params", {})
+        if t == "X":
+            c.append(cirq.X(qs[q]))
+        elif t == "Y":
+            c.append(cirq.Y(qs[q]))
+        elif t == "Z":
+            c.append(cirq.Z(qs[q]))
+        elif t == "H":
+            c.append(cirq.H(qs[q]))
+        elif t == "S":
+            c.append(cirq.S(qs[q]))
+        elif t == "T":
+            c.append(cirq.T(qs[q]))
+        elif t == "RX":
+            c.append(cirq.rx(p.get("theta", 0))(qs[q]))
+        elif t == "RY":
+            c.append(cirq.ry(p.get("theta", 0))(qs[q]))
+        elif t == "RZ":
+            c.append(cirq.rz(p.get("theta", 0))(qs[q]))
+        elif t == "CNOT" and ctr is not None:
+            c.append(cirq.CNOT(qs[ctr], qs[q]))
+        elif t == "SWAP":
+            c.append(cirq.SWAP(qs[q], qs[p.get("other", q)]))
+        elif t == "MEASURE":
+            c.append(cirq.measure(qs[q], key=f"m{q}"))
+    return c, qs
+
+def simulate(data, shots=0):
+    c, qs = circuit_from_json(data)
+    if shots and shots > 0:
+        sim = cirq.Simulator()
+        res = sim.run(c, repetitions=shots)
+        return {k: list(v) for k, v in res.measurements.items()}
+    sim = cirq.Simulator()
+    # qubit_order=qs ensures all qubits are included in the state vector
+    sv = sim.simulate(c, qubit_order=qs).final_state_vector
+    probs = np.abs(sv) ** 2
+    # Convert complex state vector to string representation for JSON serialization
+    sv_serializable = [str(x) for x in sv.tolist()]
+    return {"statevector": sv_serializable, "probabilities": probs.tolist()}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QircuitLearn - Quantum Computing for Humans</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body class="landing-page">
+    <nav class="landing-nav">
+        <div class="container nav-container">
+            <div class="brand">QircuitLearn</div>
+            <div class="nav-links">
+                <a href="#courses" class="btn sm">Courses</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container hero-content">
+            <h1>Quantum Computing <br><span class="highlight">Without the Math</span></h1>
+            <p class="subtitle">Stop drowning in linear algebra. Start understanding the concepts that actually matter. Interactive, visual, and no-nonsense.</p>
+            <div class="cta-group">
+                {% if courses %}
+                <a href="/learn/{{ courses[0]['slug'] }}" class="btn primary lg">Start Learning Now</a>
+                {% else %}
+                <a href="#" class="btn primary lg">Coming Soon</a>
+                {% endif %}
+                <a href="#features" class="btn lg">How it Works</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon">🧠</div>
+                    <h3>Concept First</h3>
+                    <p>We skip the matrix multiplication and focus on the "Why". Understand Superposition and Entanglement through analogies that stick.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">⚡️</div>
+                    <h3>Interactive Simulator</h3>
+                    <p>Don't just read. Drag, drop, and run quantum circuits in your browser. See the probabilities change in real-time.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🚀</div>
+                    <h3>Zero to Hero</h3>
+                    <p>From "What is a bit?" to "Breaking Encryption". A structured path to quantum literacy without the headache.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="courses" class="course-list-section">
+        <div class="container">
+            <h2 class="section-title">Available Courses</h2>
+            <div class="course-grid">
+                {% for course in courses %}
+                <div class="course-card">
+                    <h3>{{ course['title'] }}</h3>
+                    <p>{{ course['description'] }}</p>
+                    <a href="/learn/{{ course['slug'] }}" class="btn primary">Start Course &rarr;</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <footer class="landing-footer">
+        <div class="container">
+            <p>&copy; 2025 QircuitLearn. Open Source Education.</p>
+        </div>
+    </footer>
+</body>
+</html>

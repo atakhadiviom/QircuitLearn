@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ course['title'] if course else 'QircuitLearn' }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="/assets/js/editor.js"></script>
+</head>
+<body>
+  {% if error %}
+    <div class="container" style="text-align:center; margin-top: 50px;">
+      <h1>Welcome to QircuitLearn</h1>
+      <p>{{ error }}</p>
+      <p>Run <code>python seed.py</code> to initialize the curriculum.</p>
+    </div>
+  {% else %}
+  <div class="app-layout">
+    <nav class="sidebar">
+      <div class="brand"><a href="/">QircuitLearn</a></div>
+      <div class="course-title">{{ course['title'] }}</div>
+      <ul class="lesson-list">
+        {% for l in lessons %}
+          <li class="{{ 'active' if current_lesson and l['slug'] == current_lesson['slug'] else '' }}">
+            <a href="/learn/{{ course['slug'] }}/{{ l['slug'] }}">
+              <span class="num">{{ l['position'] }}</span>
+              <span class="text">{{ l['title'] }}</span>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+    <main class="main-content">
+      {% if current_lesson %}
+        <div class="lesson-pane">
+          <h1>{{ current_lesson['title'] }}</h1>
+          <div class="prose">
+            {{ current_lesson['content']|safe }}
+          </div>
+          
+          <div class="lesson-nav">
+            {% if prev_lesson %}
+              <a href="/learn/{{ course['slug'] }}/{{ prev_lesson['slug'] }}" class="btn">&larr; Previous</a>
+            {% else %}
+              <div></div>
+            {% endif %}
+            
+            {% if next_lesson %}
+              <a href="/learn/{{ course['slug'] }}/{{ next_lesson['slug'] }}" class="btn primary">Next Lesson &rarr;</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+      
+      <div class="editor-pane">
+        <div class="toolbar">
+            <div class="control-group">
+                <label>Qubits: <span id="qubit-count">2</span></label>
+                <button class="btn sm" id="add-qubit" title="Add Qubit">+</button>
+                <button class="btn sm" id="remove-qubit" title="Remove Qubit">-</button>
+            </div>
+            <div class="control-group">
+                <button class="btn sm danger" id="clear">Clear Circuit</button>
+            </div>
+        </div>
+        
+        <div class="gate-palette">
+            <div class="gate-btn" data-type="H" title="Hadamard Gate">H</div>
+            <div class="gate-btn" data-type="X" title="Pauli-X (NOT)">X</div>
+            <div class="gate-btn" data-type="Y" title="Pauli-Y">Y</div>
+            <div class="gate-btn" data-type="Z" title="Pauli-Z">Z</div>
+            <div class="gate-btn" data-type="S" title="Phase Gate (Z^1/2)">S</div>
+            <div class="gate-btn" data-type="T" title="T Gate (Z^1/4)">T</div>
+            <div class="gate-btn" data-type="CNOT" title="Controlled-NOT">CNOT</div>
+            <div class="gate-btn" data-type="SWAP" title="Swap Qubits">SWAP</div>
+            <div class="gate-btn" data-type="MEASURE" title="Measure">M</div>
+        </div>
+
+        <div id="editor" class="circuit-editor"></div>
+        
+        <div class="simulation-controls">
+            <button class="btn primary" id="simulate">Run Simulation</button>
+            <div id="loading" class="hidden">Running...</div>
+        </div>
+        
+        <div class="results-container">
+            <div id="output" class="output-console">
+                <div class="placeholder">Run simulation to see results...</div>
+            </div>
+            <div class="chart-container" style="position: relative; height:300px; width:100%; margin-top: 20px; display: none;">
+                <canvas id="resultsChart"></canvas>
+            </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  {% endif %}
+</body>
+</html>
