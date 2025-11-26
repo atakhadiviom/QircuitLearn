@@ -128,6 +128,76 @@ def seed():
 <p><strong>The Takeaway:</strong> Quantum computers are a potential threat to current cybersecurity, which is why governments and tech giants are racing to build them first—and to develop new "quantum-resistant" encryption.</p>
             """,
             "position": 7
+        },
+
+        # --- Phase 5: The "Killer Apps" (Where the Money Is) ---
+        {
+            "slug": "simulation-battery",
+            "title": "8. Simulation (Why Your Battery Sucks)",
+            "content": """
+<h2>Quantum Simulation</h2>
+<p>Classical computers are terrible at simulating chemistry because molecules follow quantum rules. To simulate a caffeine molecule perfectly on a classical computer, you’d need more memory than there are atoms in the universe.</p>
+<p><strong>The Takeaway:</strong> Quantum computers can simulate new materials (better batteries, carbon capture, new drugs) because they speak the same language as nature.</p>
+            """,
+            "position": 8
+        },
+        {
+            "slug": "traveling-salesman",
+            "title": "9. The Traveling Salesman from Hell (Optimization)",
+            "content": """
+<h2>Combinatorial Optimization</h2>
+<p>Imagine a delivery driver needs to visit 50 cities. Finding the perfect route is mathematically impossible for current supercomputers (too many combinations).</p>
+<p><strong>The Takeaway:</strong> Quantum computers can potentially look at the "energy landscape" of the problem and find the lowest point (the best route) much faster. This revolutionizes logistics, financial portfolios, and traffic flow.</p>
+            """,
+            "position": 9
+        },
+
+        # --- Phase 6: The Logic (How to "Speak" Quantum) ---
+        {
+            "slug": "rotations-not-switches",
+            "title": "10. Rotations, Not Switches (Quantum Gates)",
+            "content": """
+<h2>Quantum Gates (Hadamard, X-Gate)</h2>
+<h3>The Analogy: The Globe</h3>
+<p><strong>Classical Logic:</strong> A switch that flips up or down.</p>
+<p><strong>Quantum Logic:</strong> Imagine the qubit is a point on a globe. A "gate" isn't a flip; it's a <em>rotation</em>. You rotate the point from the North Pole (0) to the Equator (Superposition).</p>
+<p><strong>The Takeaway:</strong> Programming a quantum computer is like navigating a ship on a sphere, not flipping switches on a board.</p>
+            """,
+            "position": 10
+        },
+        {
+            "slug": "music-score-circuits",
+            "title": "11. The Music Score (Quantum Circuits)",
+            "content": """
+<h2>Algorithms & Circuits</h2>
+<p>Look at the simulator below. It looks like a musical score, right?</p>
+<p><strong>The Visual:</strong> Time moves from left to right. Each horizontal line is a qubit (an instrument). The boxes you drag onto them are the notes (operations) we play to create a result at the end.</p>
+<p><strong>The Takeaway:</strong> We compose quantum algorithms like music, sequencing operations in time to manipulate the state of the qubits.</p>
+            """,
+            "position": 11
+        },
+
+        # --- Phase 7: The "Valley of Death" (The Roadmap) ---
+        {
+            "slug": "math-wall",
+            "title": "12. The Math Wall (Linear Algebra)",
+            "content": """
+<h2>Linear Algebra: The Math Wall</h2>
+<p>The Brutal Truth: You cannot go further than this without Linear Algebra (Vectors and Matrices).</p>
+<p><strong>The Advice:</strong> If you want to be a practitioner, you must learn how to multiply matrices. If you just want to be a manager or investor, you can stop here.</p>
+            """,
+            "position": 12
+        },
+        {
+            "slug": "get-hands-dirty",
+            "title": "13. Get Your Hands Dirty (Coding)",
+            "content": """
+<h2>Get Your Hands Dirty</h2>
+<p>You can actually run a real quantum job on a real quantum computer in the cloud right now for free (usually small, 5-7 qubit machines) using libraries like <strong>IBM Qiskit</strong> or <strong>Google Cirq</strong>.</p>
+<p><strong>The Takeaway:</strong> Writing <code>Hadamard(qubit)</code> in Python makes the theory real. But here, you can do it with drag-and-drop!</p>
+<p><strong>Final Challenge:</strong> Use the simulator below to create a Bell Pair (Entanglement) one last time. H on q0, CNOT on q0-q1. Verify the probability matches 50% 00 and 50% 11. You are now a quantum practitioner!</p>
+            """,
+            "position": 13
         }
     ]
     
