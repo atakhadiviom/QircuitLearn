@@ -12,7 +12,7 @@ deployment:
     - /bin/cp seed.py $DEPLOYPATH
     - /bin/cp schema_sqlite.sql $DEPLOYPATH
     - /bin/cp schema_postgres.sql $DEPLOYPATH
-    - /bin/cp .htaccess $DEPLOYPATH/.htaccess
+    - /bin/cp .htaccess /home/qircuitc/public_html/.htaccess
     - export VENV_BASE=/home/qircuitc/virtualenv/qircuitapp
     - PIP=""; PYTHON=""; for v in 3.11 3.10 3.9 3.8; do if [ -x "$VENV_BASE/$v/bin/pip" ]; then PIP="$VENV_BASE/$v/bin/pip"; PYTHON="$VENV_BASE/$v/bin/python"; break; fi; done
     - if [ -n "$PIP" ]; then $PIP install -r $DEPLOYPATH/requirements.txt; fi
