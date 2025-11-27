@@ -3,7 +3,8 @@ import os
 import sqlite3
 
 def get_placeholder():
-    return "?" if os.getenv("DB_TYPE", "sqlite") != "mysql" else "%s"
+    t = os.getenv("DB_TYPE", "sqlite")
+    return "%s" if t in ("mysql", "postgres") else "?"
 
 def execute_script(conn, script):
     if isinstance(conn, sqlite3.Connection):

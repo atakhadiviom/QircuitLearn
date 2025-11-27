@@ -2,32 +2,53 @@ import sqlite3
 import os
 
 def seed():
-    db_path = "qircuit.db"
-    
-    # Clean slate for re-seeding
-    if os.path.exists(db_path):
-        os.remove(db_path)
-        print("Removed existing database for fresh seed.")
-
+    db_type = os.getenv("DB_TYPE", "sqlite")
     print("Initializing database (Zero to Hero Curriculum)...")
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    
-    # Create tables
-    with open("schema_sqlite.sql", "r") as f:
-        conn.executescript(f.read())
+    conn = None
+    cur = None
+    if db_type == "postgres":
+        import psycopg2
+        conn = psycopg2.connect(
+            host=os.getenv("DB_HOST", "localhost"),
+            user=os.getenv("DB_USER", "postgres"),
+            password=os.getenv("DB_PASS", ""),
+            dbname=os.getenv("DB_NAME", "qircuitlearn"),
+            port=int(os.getenv("DB_PORT", "5432"))
+        )
+        cur = conn.cursor()
+        with open("schema_postgres.sql", "r") as f:
+            statements = f.read().split(";")
+            for s in statements:
+                s = s.strip()
+                if s:
+                    cur.execute(s)
+        conn.commit()
+    else:
+        db_path = "qircuit.db"
+        if os.path.exists(db_path):
+            os.remove(db_path)
+            print("Removed existing database for fresh seed.")
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        with open("schema_sqlite.sql", "r") as f:
+            conn.executescript(f.read())
     
     # 1. Insert Course
     course_title = "Quantum Computing: The No-Nonsense Guide"
     course_slug = "quantum-no-nonsense"
     description = "A concept-first approach to understanding why quantum computing matters, without drowning in math."
     
-    cur.execute("INSERT INTO courses(slug, title, description) VALUES(?, ?, ?)", 
-                (course_slug, course_title, description))
+    if db_type == "postgres":
+        cur.execute("INSERT INTO courses(slug, title, description) VALUES(%s, %s, %s)", (course_slug, course_title, description))
+    else:
+        cur.execute("INSERT INTO courses(slug, title, description) VALUES(?, ?, ?)", (course_slug, course_title, description))
     
     # Get Course ID
-    cur.execute("SELECT id FROM courses WHERE slug=?", (course_slug,))
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM courses WHERE slug=%s", (course_slug,))
+    else:
+        cur.execute("SELECT id FROM courses WHERE slug= ?", (course_slug,))
     course_row = cur.fetchone()
     course_id = course_row['id']
     
@@ -202,8 +223,12 @@ def seed():
     ]
     
     for l in lessons:
-        cur.execute("INSERT INTO lessons(course_id, slug, title, content, position) VALUES(?, ?, ?, ?, ?)",
-                    (course_id, l["slug"], l["title"], l["content"], l["position"]))
+        if db_type == "postgres":
+            cur.execute("INSERT INTO lessons(course_id, slug, title, content, position) VALUES(%s, %s, %s, %s, %s)",
+                        (course_id, l["slug"], l["title"], l["content"], l["position"]))
+        else:
+            cur.execute("INSERT INTO lessons(course_id, slug, title, content, position) VALUES(?, ?, ?, ?, ?)",
+                        (course_id, l["slug"], l["title"], l["content"], l["position"]))
         
     conn.commit()
     conn.close()

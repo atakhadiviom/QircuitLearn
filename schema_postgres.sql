@@ -1,0 +1,35 @@
+CREATE TABLE IF NOT EXISTS courses (
+  id SERIAL PRIMARY KEY,
+  slug TEXT UNIQUE,
+  title TEXT NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS lessons (
+  id SERIAL PRIMARY KEY,
+  course_id INT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+  slug TEXT NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  position INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(course_id, slug)
+);
+
+CREATE TABLE IF NOT EXISTS progress (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  lesson_id INT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
+  status TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, lesson_id)
+);
+
+CREATE TABLE IF NOT EXISTS circuits (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  name TEXT NOT NULL,
+  data TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

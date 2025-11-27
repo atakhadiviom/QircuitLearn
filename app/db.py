@@ -14,9 +14,21 @@ def get_conn():
             cursorclass=pymysql.cursors.DictCursor,
             autocommit=True
         )
-    else:
-        # SQLite fallback for local dev
-        db_path = os.path.join(os.path.dirname(__file__), "../qircuit.db")
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row  # Access columns by name
+    if db_type == "postgres":
+        import psycopg2
+        from psycopg2.extras import RealDictCursor
+        conn = psycopg2.connect(
+            host=os.getenv("DB_HOST", "localhost"),
+            user=os.getenv("DB_USER", "postgres"),
+            password=os.getenv("DB_PASS", ""),
+            dbname=os.getenv("DB_NAME", "qircuitlearn"),
+            port=int(os.getenv("DB_PORT", "5432"))
+        )
+        conn.autocommit = True
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.close()
         return conn
+    db_path = os.path.join(os.path.dirname(__file__), "../qircuit.db")
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    return conn
