@@ -7,7 +7,10 @@ from .models import get_courses, get_lessons, get_course_by_slug, get_lesson_by_
 def register_routes(app):
     @app.get("/")
     def index():
-        courses = get_courses()
+        try:
+            courses = get_courses()
+        except Exception:
+            courses = []
         return render_template("landing.html", courses=courses)
 
     @app.get("/learn/<course_slug>")
