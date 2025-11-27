@@ -2,6 +2,7 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/qircuitc/public_html/Qircuit/
+    - /bin/mkdir -p $DEPLOYPATH/tmp
     - /bin/rsync -a --delete app/ $DEPLOYPATH/app/
     - /bin/rsync -a --delete static/ $DEPLOYPATH/static/
     - /bin/rsync -a --delete templates/ $DEPLOYPATH/templates/
