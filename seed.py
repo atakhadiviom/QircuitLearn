@@ -8,6 +8,7 @@ def seed():
     cur = None
     if db_type == "postgres":
         import psycopg2
+        from psycopg2.extras import RealDictCursor
         conn = psycopg2.connect(
             host=os.getenv("DB_HOST", "localhost"),
             user=os.getenv("DB_USER", "postgres"),
@@ -15,7 +16,7 @@ def seed():
             dbname=os.getenv("DB_NAME", "qircuitlearn"),
             port=int(os.getenv("DB_PORT", "5432"))
         )
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
         with open("schema_postgres.sql", "r") as f:
             statements = f.read().split(";")
             for s in statements:
@@ -34,23 +35,31 @@ def seed():
         with open("schema_sqlite.sql", "r") as f:
             conn.executescript(f.read())
     
+    def _row_get(row, key, index=0):
+        try:
+            return row[key]
+        except Exception:
+            try:
+                return row[index]
+            except Exception:
+                return None
+
     # 1. Insert Course
     course_title = "Quantum Computing: The No-Nonsense Guide"
     course_slug = "quantum-no-nonsense"
     description = "A concept-first approach to understanding why quantum computing matters, without drowning in math."
     
     if db_type == "postgres":
-        cur.execute("INSERT INTO courses(slug, title, description) VALUES(%s, %s, %s)", (course_slug, course_title, description))
+        cur.execute("INSERT INTO courses(slug, title, description) VALUES(%s, %s, %s) RETURNING id", (course_slug, course_title, description))
+        course_row = cur.fetchone()
+        course_id = _row_get(course_row, 'id', 0)
+        if course_id is None:
+            cur.execute("SELECT id FROM courses WHERE slug=%s", (course_slug,))
+            course_row = cur.fetchone()
+            course_id = _row_get(course_row, 'id', 0)
     else:
         cur.execute("INSERT INTO courses(slug, title, description) VALUES(?, ?, ?)", (course_slug, course_title, description))
-    
-    # Get Course ID
-    if db_type == "postgres":
-        cur.execute("SELECT id FROM courses WHERE slug=%s", (course_slug,))
-    else:
-        cur.execute("SELECT id FROM courses WHERE slug= ?", (course_slug,))
-    course_row = cur.fetchone()
-    course_id = course_row['id']
+        course_id = cur.lastrowid
     
     # 2. Define Lessons
     lessons = [
