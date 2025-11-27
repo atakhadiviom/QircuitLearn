@@ -1,0 +1,11 @@
+PassengerBaseURI /
+PassengerAppRoot /home/qircuitc/qircuitapp
+PassengerPython /home/qircuitc/virtualenv/qircuitapp/3.11/bin/python
+PassengerFriendlyErrorPages off
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ /$1 [QSA,PT]
+</IfModule>
