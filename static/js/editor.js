@@ -18,6 +18,7 @@ function init() {
 
     setupPalette();
     setupControls();
+    setupModalListeners();
     updateQubitCount();
     render();
 
@@ -74,6 +75,71 @@ function setupControls() {
     document.getElementById('simulate').onclick = callBackend;
 }
 
+function setupModalListeners() {
+    const slider = document.getElementById('angle-slider');
+    const input = document.getElementById('angle-input');
+    const presets = document.querySelectorAll('.preset-buttons button');
+
+    if (!slider || !input) return;
+
+    // Sync Slider -> Input
+    slider.addEventListener('input', () => {
+        input.value = slider.value;
+    });
+
+    // Sync Input -> Slider
+    input.addEventListener('input', () => {
+        slider.value = input.value;
+    });
+
+    // Presets
+    presets.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const val = btn.getAttribute('data-val');
+            slider.value = val;
+            input.value = val;
+        });
+    });
+}
+
+function openRotationModal(defaultValue) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('rotation-modal');
+        const slider = document.getElementById('angle-slider');
+        const input = document.getElementById('angle-input');
+        const confirmBtn = document.getElementById('modal-confirm');
+        const cancelBtn = document.getElementById('modal-cancel');
+
+        // Set initial values
+        slider.value = defaultValue;
+        input.value = defaultValue;
+        
+        modal.classList.remove('hidden');
+
+        // We need named functions to remove them later
+        function onConfirm() {
+            const val = parseFloat(input.value);
+            cleanup();
+            resolve(isNaN(val) ? 0 : val);
+        }
+
+        function onCancel() {
+            cleanup();
+            resolve(null);
+        }
+
+        function cleanup() {
+            confirmBtn.removeEventListener('click', onConfirm);
+            cancelBtn.removeEventListener('click', onCancel);
+            modal.classList.add('hidden');
+        }
+
+        // Add listeners
+        confirmBtn.addEventListener('click', onConfirm);
+        cancelBtn.addEventListener('click', onCancel);
+    });
+}
+
 function updateQubitCount() {
     document.getElementById('qubit-count').textContent = state.qubits;
 }
@@ -103,11 +169,12 @@ function handleDrop(e, qubit, step) {
         state.gates.push({ type: 'CNOT', target: qubit, step: step, control: null });
         render();
     } else if (['RX', 'RY', 'RZ'].includes(type)) {
-        const val = prompt(`Enter rotation angle for ${type} (in radians, e.g. 1.57 for π/2):`, "1.57");
-        let theta = parseFloat(val);
-        if (isNaN(theta)) theta = 0;
-        state.gates.push({ type: type, target: qubit, step: step, params: { theta } });
-        render();
+        openRotationModal(1.57).then(theta => {
+            if (theta !== null) {
+                state.gates.push({ type: type, target: qubit, step: step, params: { theta } });
+                render();
+            }
+        });
     } else {
         state.gates.push({ type: type, target: qubit, step: step });
         render();

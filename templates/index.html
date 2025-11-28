@@ -74,6 +74,34 @@
       {% endif %}
       
       <div class="editor-pane">
+        <!-- Rotation Modal -->
+        <div id="rotation-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3 id="modal-title">Set Rotation Angle</h3>
+                <div class="modal-body">
+                    <div class="slider-group">
+                        <label for="angle-slider">Angle (radians):</label>
+                        <input type="range" id="angle-slider" min="0" max="6.28" step="0.01" value="1.57">
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="angle-input" step="0.01" value="1.57">
+                        <span class="unit">rad</span>
+                    </div>
+                    <div class="preset-buttons">
+                        <button class="btn sm" data-val="0">0</button>
+                        <button class="btn sm" data-val="0.785">π/4</button>
+                        <button class="btn sm" data-val="1.571">π/2</button>
+                        <button class="btn sm" data-val="3.142">π</button>
+                        <button class="btn sm" data-val="6.283">2π</button>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button id="modal-cancel" class="btn secondary">Cancel</button>
+                    <button id="modal-confirm" class="btn primary">Confirm</button>
+                </div>
+            </div>
+        </div>
+
         <div class="toolbar">
             <div class="control-group">
                 <label>Qubits: <span id="qubit-count">2</span></label>
