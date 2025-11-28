@@ -117,3 +117,14 @@ If you have used cPanel's **Git Version Control** to clone your repository to a 
 
 *   **Database not found**:
     *   The app looks for `qircuit.db` in the parent directory of `app/`. Since you uploaded it to the application root, it should work.
+
+*   **"Update to latest version" Warning/Error**:
+    *   **Scenario**: You see a message about updating to the latest version when running `seed.py` or installing requirements.
+    *   **Cause**: This is often a warning from `pip` (Python's package installer) telling you a new version is available (e.g., `[notice] A new release of pip is available`).
+    *   **Solution**:
+        1.  **It's usually just a warning.** If the script (`seed.py`) still ran and printed "Initializing database...", you can ignore it.
+        2.  **If it blocks execution**: Run the upgrade command suggested in the message, usually:
+            ```bash
+            pip install --upgrade pip
+            ```
+        3.  **Check Python Version**: Ensure your cPanel Python App is set to **3.9+** (3.11 is ideal). Older versions might be deprecated.
