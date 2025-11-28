@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/qircuitc/qircuitapp
+    - export DEPLOYPATH=/home/qircuitc/repositories/QircuitLearn
     - /bin/mkdir -p $DEPLOYPATH
     - /bin/mkdir -p $DEPLOYPATH/tmp
     - /bin/rsync -a --delete app/ $DEPLOYPATH/app/

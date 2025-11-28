@@ -5,6 +5,8 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 paths = [
     APP_ROOT,
     os.path.join(APP_ROOT, "app"),
+    "/home/qircuitc/repositories/QircuitLearn",
+    "/home/qircuitc/repositories/QircuitLearn/app",
     "/home/qircuitc/qircuitapp",
     "/home/qircuitc/qircuitapp/app",
 ]
