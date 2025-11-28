@@ -5,6 +5,11 @@ from .simulate import simulate
 from .models import get_courses, get_lessons, get_course_by_slug, get_lesson_by_slug
 
 def register_routes(app):
+    def to_dict(row):
+        try:
+            return dict(row)
+        except Exception:
+            return row
     @app.get("/")
     def index():
         try:
@@ -87,3 +92,19 @@ def register_routes(app):
     @app.get("/health")
     def health():
         return jsonify({"status": "ok"})
+
+    @app.get("/debug/course/<slug>")
+    def debug_course(slug):
+        course = get_course_by_slug(slug)
+        if not course:
+            return jsonify({}), 404
+        return jsonify(to_dict(course))
+
+    @app.get("/debug/lessons/<course_slug>")
+    def debug_lessons(course_slug):
+        course = get_course_by_slug(course_slug)
+        if not course:
+            return jsonify({}), 404
+        course_id = course['id'] if isinstance(course, dict) else course['id']
+        lessons = get_lessons(course_id)
+        return jsonify([to_dict(l) for l in lessons])
