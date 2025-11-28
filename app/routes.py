@@ -83,3 +83,7 @@ def register_routes(app):
     @app.get("/assets/<path:path>")
     def assets(path):
         return send_from_directory(os.path.join(os.path.dirname(__file__), "../static"), path)
+
+    @app.get("/health")
+    def health():
+        return jsonify({"status": "ok"})
