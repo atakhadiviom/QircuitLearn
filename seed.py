@@ -50,7 +50,12 @@ def seed():
     description = "A concept-first approach to understanding why quantum computing matters, without drowning in math."
     
     if db_type == "postgres":
-        cur.execute("INSERT INTO courses(slug, title, description) VALUES(%s, %s, %s) RETURNING id", (course_slug, course_title, description))
+        cur.execute(
+            "INSERT INTO courses(slug, title, description) VALUES(%s, %s, %s) "
+            "ON CONFLICT (slug) DO UPDATE SET title=EXCLUDED.title, description=EXCLUDED.description "
+            "RETURNING id",
+            (course_slug, course_title, description)
+        )
         course_row = cur.fetchone()
         course_id = _row_get(course_row, 'id', 0)
         if course_id is None:
@@ -233,8 +238,10 @@ def seed():
     
     for l in lessons:
         if db_type == "postgres":
-            cur.execute("INSERT INTO lessons(course_id, slug, title, content, position) VALUES(%s, %s, %s, %s, %s)",
-                        (course_id, l["slug"], l["title"], l["content"], l["position"]))
+            cur.execute(
+                "INSERT INTO lessons(course_id, slug, title, content, position) VALUES(%s, %s, %s, %s, %s) "
+                "ON CONFLICT (course_id, slug) DO UPDATE SET title=EXCLUDED.title, content=EXCLUDED.content, position=EXCLUDED.position",
+                (course_id, l["slug"], l["title"], l["content"], l["position"]))
         else:
             cur.execute("INSERT INTO lessons(course_id, slug, title, content, position) VALUES(?, ?, ?, ?, ?)",
                         (course_id, l["slug"], l["title"], l["content"], l["position"]))
