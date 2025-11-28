@@ -215,9 +215,14 @@ def seed():
 <p><strong>Classical Logic:</strong> A switch that flips up or down.</p>
 <p><strong>Quantum Logic:</strong> Imagine the qubit is a point on a globe. A "gate" isn't a flip; it's a <em>rotation</em>. You rotate the point from the North Pole (0) to the Equator (Superposition).</p>
 <p><strong>The Takeaway:</strong> Programming a quantum computer is like navigating a ship on a sphere, not flipping switches on a board.</p>
+<p><strong>Interactive Task:</strong> Use an <strong>Ry</strong> gate on q0. Set the angle to <strong>π/2 (approx 1.57)</strong>. This rotates the state to the equator, creating a superposition just like the H gate!</p>
             """,
             "position": 10,
-            "task_json": None
+            "task_json": json.dumps({
+                "description": "Rotate q0 to Superposition using Ry(π/2)",
+                "criteria": "rotation_ry_pi_2",
+                "qubits": 1
+            })
         },
         {
             "slug": "music-score-circuits",

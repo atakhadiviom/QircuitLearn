@@ -868,6 +868,24 @@ function validateTask(data) {
                  message = "Close, but not a perfect Bell Pair. Make sure you have 50% |00> and 50% |11>.";
              }
         }
+    } else if (criteria === 'rotation_ry_pi_2') {
+        // Check if RY gate was used with approx 1.57
+        const hasRy = state.gates.some(g => g.type === 'RY' && Math.abs(g.params.theta - 1.57) < 0.1);
+        
+        // Check probabilities (should be 50/50)
+        if (data.probabilities && data.probabilities.length >= 2) {
+            const p0 = data.probabilities[0];
+            const p1 = data.probabilities[1];
+            
+            if (hasRy && Math.abs(p0 - 0.5) < 0.1) {
+                success = true;
+                message = "Perfect! Ry(π/2) creates a superposition just like Hadamard.";
+            } else if (!hasRy) {
+                message = "Use an Ry gate for this task.";
+            } else {
+                message = "Check your angle. It should be π/2 (approx 1.57).";
+            }
+        }
     }
 
     const taskBox = document.getElementById('task-box');
