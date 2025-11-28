@@ -1,6 +1,10 @@
 from .db import get_conn
 import os
 import sqlite3
+try:
+    from psycopg2.extras import RealDictCursor
+except Exception:
+    RealDictCursor = None
 
 def get_placeholder():
     t = os.getenv("DB_TYPE", "sqlite")
@@ -20,6 +24,14 @@ def execute_script(conn, script):
                 cur.execute(stmt)
         cur.close()
 
+def get_cursor(conn):
+    t = os.getenv("DB_TYPE", "sqlite")
+    if isinstance(conn, sqlite3.Connection):
+        return conn.cursor()
+    if t == "postgres" and RealDictCursor is not None:
+        return conn.cursor(cursor_factory=RealDictCursor)
+    return conn.cursor()
+
 def create_tables(schema_sql_path):
     conn = get_conn()
     with open(schema_sql_path, "r") as f:
@@ -28,7 +40,7 @@ def create_tables(schema_sql_path):
 
 def upsert_progress(user_id, lesson_id, status):
     conn = get_conn()
-    cur = conn.cursor()
+    cur = get_cursor(conn)
     ph = get_placeholder()
     
     if os.getenv("DB_TYPE", "sqlite") == "mysql":
@@ -46,7 +58,7 @@ def upsert_progress(user_id, lesson_id, status):
 
 def get_courses():
     conn = get_conn()
-    cur = conn.cursor()
+    cur = get_cursor(conn)
     cur.execute("SELECT * FROM courses ORDER BY created_at")
     rows = cur.fetchall()
     cur.close()
@@ -55,7 +67,7 @@ def get_courses():
 
 def get_course_by_slug(slug):
     conn = get_conn()
-    cur = conn.cursor()
+    cur = get_cursor(conn)
     ph = get_placeholder()
     cur.execute(f"SELECT * FROM courses WHERE slug={ph}", (slug,))
     row = cur.fetchone()
@@ -65,7 +77,7 @@ def get_course_by_slug(slug):
 
 def get_lessons(course_id):
     conn = get_conn()
-    cur = conn.cursor()
+    cur = get_cursor(conn)
     ph = get_placeholder()
     cur.execute(f"SELECT * FROM lessons WHERE course_id={ph} ORDER BY position", (course_id,))
     rows = cur.fetchall()
@@ -75,7 +87,7 @@ def get_lessons(course_id):
 
 def get_lesson_by_slug(course_id, slug):
     conn = get_conn()
-    cur = conn.cursor()
+    cur = get_cursor(conn)
     ph = get_placeholder()
     cur.execute(f"SELECT * FROM lessons WHERE course_id={ph} AND slug={ph}", (course_id, slug))
     row = cur.fetchone()
@@ -85,7 +97,7 @@ def get_lesson_by_slug(course_id, slug):
 
 def save_circuit(user_id, name, data):
     conn = get_conn()
-    cur = conn.cursor()
+    cur = get_cursor(conn)
     ph = get_placeholder()
     cur.execute(
         f"INSERT INTO circuits(user_id, name, data) VALUES({ph},{ph},{ph})",
