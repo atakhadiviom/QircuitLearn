@@ -90,6 +90,7 @@ def register_routes(app):
         return send_from_directory(os.path.join(os.path.dirname(__file__), "../static"), path)
 
     @app.get("/health")
+    @app.get("/qircuitapp/health")
     def health():
         return jsonify({"status": "ok"})
 
