@@ -3,7 +3,7 @@ const state = {
     steps: 20,
     gates: [], // { type, target, step, control? }
     draggedType: null,
-    pendingCNOT: null // { target, step }
+    pendingOp: null // { type: 'CNOT' | 'SWAP', target, step }
 };
 
 const editor = document.getElementById('editor');
@@ -68,7 +68,7 @@ function setupControls() {
     };
     document.getElementById('clear').onclick = () => {
         state.gates = [];
-        state.pendingCNOT = null;
+        state.pendingOp = null;
         render();
         output.innerHTML = '<div class="placeholder">Run simulation to see results...</div>';
     };
@@ -164,9 +164,14 @@ function handleDrop(e, qubit, step) {
     }
 
     if (type === 'CNOT') {
-        state.pendingCNOT = { target: qubit, step: step };
+        state.pendingOp = { type: 'CNOT', target: qubit, step: step };
         // Temporarily add incomplete gate
         state.gates.push({ type: 'CNOT', target: qubit, step: step, control: null });
+        render();
+    } else if (type === 'SWAP') {
+        state.pendingOp = { type: 'SWAP', target: qubit, step: step };
+        // Temporarily add incomplete gate
+        state.gates.push({ type: 'SWAP', target: qubit, step: step, params: { other: null } });
         render();
     } else if (['RX', 'RY', 'RZ'].includes(type)) {
         openRotationModal(1.57).then(theta => {
@@ -182,24 +187,30 @@ function handleDrop(e, qubit, step) {
 }
 
 function handleZoneClick(qubit, step) {
-    // If we are in pendingCNOT mode, this click sets the control
-    if (state.pendingCNOT) {
-        if (state.pendingCNOT.step !== step) {
-            // Clicked wrong column, maybe cancel?
-            cancelPendingCNOT();
+    // If we are in pendingOp mode
+    if (state.pendingOp) {
+        if (state.pendingOp.step !== step) {
+            // Clicked wrong column, cancel
+            cancelPendingOp();
             return;
         }
-        if (state.pendingCNOT.target === qubit) {
-            alert("Control cannot be the same as target.");
+        if (state.pendingOp.target === qubit) {
+            alert("Target cannot be the same as source.");
             return;
         }
 
-        // Finalize CNOT
-        const gate = state.gates.find(g => g.target === state.pendingCNOT.target && g.step === state.pendingCNOT.step && g.type === 'CNOT');
+        // Finalize Operation
+        const op = state.pendingOp;
+        const gate = state.gates.find(g => g.target === op.target && g.step === op.step && g.type === op.type);
+        
         if (gate) {
-            gate.control = qubit;
+            if (op.type === 'CNOT') {
+                gate.control = qubit;
+            } else if (op.type === 'SWAP') {
+                gate.params = { other: qubit };
+            }
         }
-        state.pendingCNOT = null;
+        state.pendingOp = null;
         render();
         return;
     }
@@ -212,26 +223,30 @@ function handleZoneClick(qubit, step) {
         return;
     }
 
-    // Check if it's a control point
-    const controlGateIndex = state.gates.findIndex(g => g.control === qubit && g.step === step);
+    // Check if it's a control point or swap partner
+    const controlGateIndex = state.gates.findIndex(g => 
+        (g.control === qubit && g.step === step) || 
+        (g.type === 'SWAP' && g.params && g.params.other === qubit && g.step === step)
+    );
     if (controlGateIndex !== -1) {
         state.gates.splice(controlGateIndex, 1);
         render();
     }
 }
 
-function cancelPendingCNOT() {
-    if (!state.pendingCNOT) return;
+function cancelPendingOp() {
+    if (!state.pendingOp) return;
+    const op = state.pendingOp;
     // Remove the incomplete gate
-    state.gates = state.gates.filter(g => !(g.target === state.pendingCNOT.target && g.step === state.pendingCNOT.step && g.type === 'CNOT' && g.control === null));
-    state.pendingCNOT = null;
+    state.gates = state.gates.filter(g => !(g.target === op.target && g.step === op.step && g.type === op.type && (g.control === null || (g.params && g.params.other === null))));
+    state.pendingOp = null;
     render();
 }
 
 function render() {
     editor.innerHTML = '';
 
-    if (state.pendingCNOT) {
+    if (state.pendingOp) {
         const banner = document.createElement('div');
         banner.style.background = 'rgba(16, 185, 129, 0.2)';
         banner.style.color = '#6ee7b7';
@@ -240,7 +255,11 @@ function render() {
         banner.style.borderRadius = '4px';
         banner.style.marginBottom = '10px';
         banner.style.fontWeight = 'bold';
-        banner.textContent = 'Select a Control Qubit (click a green zone)';
+        if (state.pendingOp.type === 'CNOT') {
+            banner.textContent = 'Select a Control Qubit (click a green zone)';
+        } else {
+            banner.textContent = 'Select the second qubit to SWAP with (click a green zone)';
+        }
         editor.appendChild(banner);
     }
 
@@ -312,6 +331,13 @@ function render() {
                     el.textContent = '?';
                     el.title = "Click a control qubit in this column";
                 }
+                
+                if (gate.type === 'SWAP' && (gate.params === undefined || gate.params.other === null)) {
+                    el.style.opacity = '0.5';
+                    el.textContent = '?';
+                    el.title = "Click another qubit in this column to swap with";
+                }
+
                 // Prevent drag on placed gates for now (simple)
                 // Or make them draggable to move?
                 // Let's keep it simple: Click to delete/move.
@@ -326,6 +352,17 @@ function render() {
                 // Make transparent so SVG dot shows, but keep for interaction
                 el.style.opacity = '0';
                 el.title = `Control for q${controlledGate.target}`;
+                zone.appendChild(el);
+            }
+
+            // Render SWAP partner if exists
+            const swapGate = state.gates.find(g => g.type === 'SWAP' && g.params && g.params.other === q && g.step === s);
+            if (swapGate) {
+                const el = document.createElement('div');
+                el.className = 'placed-gate';
+                el.textContent = 'SWAP';
+                // We can style it slightly differently or just rely on the line connecting them
+                el.title = `Swapping with q${swapGate.target}`;
                 zone.appendChild(el);
             }
 
@@ -395,6 +432,36 @@ function updateCircuitLines(container) {
                 circle.setAttribute("class", "cnot-control");
                 svg.appendChild(circle);
             }
+        } else if (g.type === 'SWAP' && g.params && g.params.other !== null && g.params.other !== undefined) {
+            const q1 = g.target;
+            const q2 = g.params.other;
+            const step = g.step;
+
+            const z1 = container.querySelector(`.drop-zone[data-qubit="${q1}"][data-step="${step}"]`);
+            const z2 = container.querySelector(`.drop-zone[data-qubit="${q2}"][data-step="${step}"]`);
+
+            if (z1 && z2) {
+                const r1 = z1.getBoundingClientRect();
+                const r2 = z2.getBoundingClientRect();
+
+                const x1 = r1.left + r1.width / 2 - containerRect.left;
+                const y1 = r1.top + r1.height / 2 - containerRect.top;
+                const x2 = r2.left + r2.width / 2 - containerRect.left;
+                const y2 = r2.top + r2.height / 2 - containerRect.top;
+
+                // Draw Line
+                const line = document.createElementNS(svgNS, "line");
+                line.setAttribute("x1", x1);
+                line.setAttribute("y1", y1);
+                line.setAttribute("x2", x2);
+                line.setAttribute("y2", y2);
+                line.setAttribute("class", "cnot-line"); // Reuse CNOT line style or create new
+                line.style.stroke = "#3b82f6"; // Blue for SWAP
+                svg.appendChild(line);
+
+                // We don't need dots for SWAP, the 'x' symbols in the boxes are enough.
+                // But maybe we want to ensure the line connects them nicely.
+            }
         }
     });
 }
@@ -417,7 +484,7 @@ async function callBackend() {
     try {
         // Sort gates by step
         const sortedGates = [...state.gates]
-            .filter(g => !(g.type === 'CNOT' && g.control === null)) // Filter incomplete CNOTs
+            .filter(g => !(g.type === 'CNOT' && g.control === null) && !(g.type === 'SWAP' && (g.params === undefined || g.params.other === null))) // Filter incomplete CNOTs and SWAPs
             .sort((a, b) => a.step - b.step);
 
         const payload = {
