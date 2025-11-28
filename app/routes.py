@@ -108,3 +108,10 @@ def register_routes(app):
         course_id = course['id'] if isinstance(course, dict) else course['id']
         lessons = get_lessons(course_id)
         return jsonify([to_dict(l) for l in lessons])
+
+    @app.get("/debug/routes")
+    def debug_routes():
+        rules = []
+        for r in app.url_map.iter_rules():
+            rules.append({"rule": str(r), "methods": sorted(list(r.methods))})
+        return jsonify(rules)
