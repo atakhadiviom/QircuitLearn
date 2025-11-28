@@ -13,6 +13,20 @@ def register_routes(app):
             courses = []
         return render_template("landing.html", courses=courses)
 
+    @app.get("/learn")
+    def learn_no_slash():
+        return redirect(url_for('learn_root'))
+
+    @app.get("/learn/")
+    def learn_root():
+        try:
+            courses = get_courses()
+        except Exception:
+            courses = []
+        if courses:
+            return redirect(url_for('course_overview', course_slug=courses[0]['slug']))
+        return render_template("landing.html", courses=courses)
+
     @app.get("/learn/<course_slug>")
     def course_overview(course_slug):
         course = get_course_by_slug(course_slug)
