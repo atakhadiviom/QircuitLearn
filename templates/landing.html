@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QircuitLearn - Quantum Computing for Humans</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="/assets/css/main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/landing.css">
 </head>
 <body class="landing-page">
     <nav class="landing-nav">
@@ -23,12 +23,8 @@
             <h1>Quantum Computing <br><span class="highlight">Without the Math</span></h1>
             <p class="subtitle">Stop drowning in linear algebra. Start understanding the concepts that actually matter. Interactive, visual, and no-nonsense.</p>
             <div class="cta-group">
-                {% if courses %}
-                <a href="/learn/{{ courses[0]['slug'] }}" class="btn primary lg">Start Learning Now</a>
-                {% else %}
-                <a href="#" class="btn primary lg">Coming Soon</a>
-                {% endif %}
-                <a href="#features" class="btn lg">How it Works</a>
+                <a href="/learn/quantum-no-nonsense" class="btn primary">Start Learning Now</a>
+                <a href="#features" class="btn secondary">How it Works</a>
             </div>
         </div>
     </header>
@@ -59,6 +55,11 @@
         <div class="container">
             <h2 class="section-title">Available Courses</h2>
             <div class="course-grid">
+                <div class="course-card">
+                    <h3>Quantum Computing: No-Nonsense</h3>
+                    <p>A concept-first approach to understanding why quantum computing matters, without drowning in math.</p>
+                    <a href="/learn/quantum-no-nonsense" class="btn primary">Start Course &rarr;</a>
+                </div>
                 {% for course in courses %}
                 <div class="course-card">
                     <h3>{{ course['title'] }}</h3>

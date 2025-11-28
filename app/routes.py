@@ -2,7 +2,7 @@ import os
 import json
 from flask import jsonify, request, send_from_directory, render_template, redirect, url_for
 from .simulate import simulate
-from .models import get_courses, get_lessons, get_course_by_slug, get_lesson_by_slug
+from .models import get_courses, get_lessons, get_course_by_slug, get_lesson_by_slug, upsert_progress
 
 def register_routes(app):
     def to_dict(row):
@@ -84,6 +84,23 @@ def register_routes(app):
             return jsonify(res)
         except Exception as e:
             return jsonify({"error": str(e)}), 400
+
+    @app.post("/api/progress")
+    def api_progress():
+        payload = request.get_json(silent=True) or {}
+        # TODO: Get real user_id from session
+        user_id = 1 
+        lesson_id = payload.get("lesson_id")
+        status = payload.get("status") # 'completed'
+        
+        if not lesson_id or not status:
+            return jsonify({"error": "Missing lesson_id or status"}), 400
+            
+        try:
+            upsert_progress(user_id, lesson_id, status)
+            return jsonify({"status": "ok"})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
 
     @app.get("/assets/<path:path>")
     def assets(path):

@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import json
 
 def seed():
     db_type = os.getenv("DB_TYPE", "sqlite")
@@ -78,7 +79,8 @@ def seed():
 <p>But for a classical computer, this is a nightmare. It has to check every single combination one by one to see if it works. For 100 guests, the number of combinations is greater than the number of atoms in the universe.</p>
 <p><strong>The Takeaway:</strong> Classical computers choke on problems with too many variables. They don't "think"; they just count very fast. If the number of possibilities is too huge, even the fastest supercomputer will take longer than the age of the universe to solve it.</p>
             """,
-            "position": 1
+            "position": 1,
+            "task_json": None
         },
         {
             "slug": "bits-are-boring",
@@ -89,7 +91,8 @@ def seed():
 <p>This binary nature is rigid. It's great for arithmetic and logic, but it's inefficient for mimicking nature, which is fluid and complex.</p>
 <p><strong>The Takeaway:</strong> We need a computer that behaves like nature, not like a switch. To simulate the real world—molecules, fluids, financial markets—we need a system that can handle nuance and uncertainty natively.</p>
             """,
-            "position": 2
+            "position": 2,
+            "task_json": None
         },
 
         # --- Phase 2: The Quantum Weirdness (Core Mechanics) ---
@@ -105,9 +108,14 @@ def seed():
 </ul>
 <p>This state is called <strong>Superposition</strong>. The coin keeps spinning until you slap your hand down on it—this is <strong>measurement</strong>. Only then does it force itself to be Heads or Tails.</p>
 <p><strong>The Takeaway:</strong> A quantum computer calculates with the "spinning" coin, allowing it to hold multiple possibilities at once. Instead of being just a 0 or a 1, a qubit can explore a complex combination of both.</p>
-<p><strong>Interactive Task:</strong> Drag an <strong>H</strong> (Hadamard) gate to the circuit and run it. You'll see a 50/50 chance of measuring 0 or 1. That's the spinning coin!</p>
+<p><strong>Interactive Task:</strong> Drag an <strong>H</strong> (Hadamard) gate to the circuit and run it. You'll see a 50/50 chance of measuring 0 or 1. Look at the <strong>Bloch Sphere</strong> below the results—the arrow points to the equator, representing the superposition state!</p>
             """,
-            "position": 3
+            "position": 3,
+            "task_json": json.dumps({
+                "description": "Create a Superposition State (50% chance of 0 or 1)",
+                "criteria": "superposition",
+                "qubits": 1
+            })
         },
         {
             "slug": "spooky-connection",
@@ -120,7 +128,12 @@ def seed():
 <p><strong>The Takeaway:</strong> Entanglement allows quantum computers to link qubits together so they work as a massive, unified brain rather than isolated bits. Changing one qubit instantly affects its partner, no matter the distance.</p>
 <p><strong>Interactive Task:</strong> Create a Bell Pair. Use an <strong>H</strong> gate on q0, then a <strong>CNOT</strong> gate (control q0, target q1). Measure both. They will always match!</p>
             """,
-            "position": 4
+            "position": 4,
+            "task_json": json.dumps({
+                "description": "Create a Bell Pair (|00> and |11> only)",
+                "criteria": "bell_pair",
+                "qubits": 2
+            })
         },
 
         # --- Phase 3: The "Quantum Speedup" (How It Works) ---
@@ -136,7 +149,8 @@ def seed():
 </ul>
 <p><strong>The Takeaway:</strong> Quantum computers don't do steps faster; they take fewer steps. They use the properties of waves (interference) to cancel out wrong answers and amplify the correct one.</p>
             """,
-            "position": 5
+            "position": 5,
+            "task_json": None
         },
 
         # --- Phase 4: The Reality Check (Hardware & Hype) ---
@@ -150,7 +164,8 @@ def seed():
 <p>Quantum states are incredibly fragile. A tiny vibration, a change in temperature, or a stray Wi-Fi signal causes the "spinning coin" to fall flat. This collapse is called <strong>decoherence</strong>.</p>
 <p><strong>The Takeaway:</strong> Building a quantum computer is like trying to balance a house of cards in a hurricane. This is why we don't have them on our desks yet. Engineers are fighting a constant battle against noise.</p>
             """,
-            "position": 6
+            "position": 6,
+            "task_json": None
         },
         {
             "slug": "breaking-internet",
@@ -162,7 +177,8 @@ def seed():
 <p><strong>The Threat:</strong> A powerful enough quantum computer, running <strong>Shor's Algorithm</strong>, could turn that "hard" math problem into an easy one, cracking the code in hours.</p>
 <p><strong>The Takeaway:</strong> Quantum computers are a potential threat to current cybersecurity, which is why governments and tech giants are racing to build them first—and to develop new "quantum-resistant" encryption.</p>
             """,
-            "position": 7
+            "position": 7,
+            "task_json": None
         },
 
         # --- Phase 5: The "Killer Apps" (Where the Money Is) ---
@@ -174,7 +190,8 @@ def seed():
 <p>Classical computers are terrible at simulating chemistry because molecules follow quantum rules. To simulate a caffeine molecule perfectly on a classical computer, you’d need more memory than there are atoms in the universe.</p>
 <p><strong>The Takeaway:</strong> Quantum computers can simulate new materials (better batteries, carbon capture, new drugs) because they speak the same language as nature.</p>
             """,
-            "position": 8
+            "position": 8,
+            "task_json": None
         },
         {
             "slug": "traveling-salesman",
@@ -184,7 +201,8 @@ def seed():
 <p>Imagine a delivery driver needs to visit 50 cities. Finding the perfect route is mathematically impossible for current supercomputers (too many combinations).</p>
 <p><strong>The Takeaway:</strong> Quantum computers can potentially look at the "energy landscape" of the problem and find the lowest point (the best route) much faster. This revolutionizes logistics, financial portfolios, and traffic flow.</p>
             """,
-            "position": 9
+            "position": 9,
+            "task_json": None
         },
 
         # --- Phase 6: The Logic (How to "Speak" Quantum) ---
@@ -198,7 +216,8 @@ def seed():
 <p><strong>Quantum Logic:</strong> Imagine the qubit is a point on a globe. A "gate" isn't a flip; it's a <em>rotation</em>. You rotate the point from the North Pole (0) to the Equator (Superposition).</p>
 <p><strong>The Takeaway:</strong> Programming a quantum computer is like navigating a ship on a sphere, not flipping switches on a board.</p>
             """,
-            "position": 10
+            "position": 10,
+            "task_json": None
         },
         {
             "slug": "music-score-circuits",
@@ -209,7 +228,8 @@ def seed():
 <p><strong>The Visual:</strong> Time moves from left to right. Each horizontal line is a qubit (an instrument). The boxes you drag onto them are the notes (operations) we play to create a result at the end.</p>
 <p><strong>The Takeaway:</strong> We compose quantum algorithms like music, sequencing operations in time to manipulate the state of the qubits.</p>
             """,
-            "position": 11
+            "position": 11,
+            "task_json": None
         },
 
         # --- Phase 7: The "Valley of Death" (The Roadmap) ---
@@ -221,7 +241,8 @@ def seed():
 <p>The Brutal Truth: You cannot go further than this without Linear Algebra (Vectors and Matrices).</p>
 <p><strong>The Advice:</strong> If you want to be a practitioner, you must learn how to multiply matrices. If you just want to be a manager or investor, you can stop here.</p>
             """,
-            "position": 12
+            "position": 12,
+            "task_json": None
         },
         {
             "slug": "get-hands-dirty",
@@ -232,19 +253,24 @@ def seed():
 <p><strong>The Takeaway:</strong> Writing <code>Hadamard(qubit)</code> in Python makes the theory real. But here, you can do it with drag-and-drop!</p>
 <p><strong>Final Challenge:</strong> Use the simulator below to create a Bell Pair (Entanglement) one last time. H on q0, CNOT on q0-q1. Verify the probability matches 50% 00 and 50% 11. You are now a quantum practitioner!</p>
             """,
-            "position": 13
+            "position": 13,
+            "task_json": json.dumps({
+                "description": "Final Exam: Create a Bell Pair",
+                "criteria": "bell_pair",
+                "qubits": 2
+            })
         }
     ]
     
     for l in lessons:
         if db_type == "postgres":
             cur.execute(
-                "INSERT INTO lessons(course_id, slug, title, content, position) VALUES(%s, %s, %s, %s, %s) "
-                "ON CONFLICT (course_id, slug) DO UPDATE SET title=EXCLUDED.title, content=EXCLUDED.content, position=EXCLUDED.position",
-                (course_id, l["slug"], l["title"], l["content"], l["position"]))
+                "INSERT INTO lessons(course_id, slug, title, content, position, task_json) VALUES(%s, %s, %s, %s, %s, %s) "
+                "ON CONFLICT (course_id, slug) DO UPDATE SET title=EXCLUDED.title, content=EXCLUDED.content, position=EXCLUDED.position, task_json=EXCLUDED.task_json",
+                (course_id, l["slug"], l["title"], l["content"], l["position"], l["task_json"]))
         else:
-            cur.execute("INSERT INTO lessons(course_id, slug, title, content, position) VALUES(?, ?, ?, ?, ?)",
-                        (course_id, l["slug"], l["title"], l["content"], l["position"]))
+            cur.execute("INSERT INTO lessons(course_id, slug, title, content, position, task_json) VALUES(?, ?, ?, ?, ?, ?)",
+                        (course_id, l["slug"], l["title"], l["content"], l["position"], l["task_json"]))
         
     conn.commit()
     conn.close()

@@ -1,35 +1,20 @@
-CREATE TABLE IF NOT EXISTS courses (
-  id SERIAL PRIMARY KEY,
-  slug TEXT UNIQUE,
-  title TEXT NOT NULL,
-  description TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+DROP TABLE IF EXISTS lessons;
+DROP TABLE IF EXISTS courses;
+
+CREATE TABLE courses (
+    id SERIAL PRIMARY KEY,
+    slug VARCHAR(255) UNIQUE NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT
 );
 
-CREATE TABLE IF NOT EXISTS lessons (
-  id SERIAL PRIMARY KEY,
-  course_id INT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-  slug TEXT NOT NULL,
-  title TEXT NOT NULL,
-  content TEXT NOT NULL,
-  position INT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(course_id, slug)
-);
-
-CREATE TABLE IF NOT EXISTS progress (
-  id SERIAL PRIMARY KEY,
-  user_id INT NOT NULL,
-  lesson_id INT NOT NULL REFERENCES lessons(id) ON DELETE CASCADE,
-  status TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE(user_id, lesson_id)
-);
-
-CREATE TABLE IF NOT EXISTS circuits (
-  id SERIAL PRIMARY KEY,
-  user_id INT NOT NULL,
-  name TEXT NOT NULL,
-  data TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE lessons (
+    id SERIAL PRIMARY KEY,
+    course_id INTEGER REFERENCES courses(id),
+    slug VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    task_json TEXT,
+    UNIQUE(course_id, slug)
 );
