@@ -7,6 +7,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="/static/css/main.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script defer src="/static/js/editor.js"></script>
 </head>
 <body>
@@ -20,16 +28,46 @@
   <div class="app-layout">
     <nav class="sidebar">
       <div class="brand"><a href="/">QircuitLearn</a></div>
+      <div style="padding: 0 1.5rem; margin-bottom: 1rem;">
+          <a href="/blog" class="btn sm secondary" style="width:100%; text-align:center;">Latest Articles</a>
+      </div>
       <div class="course-title">{{ course['title'] }}</div>
       <ul class="lesson-list">
+        {% set ns = namespace(current_section=None) %}
         {% for l in lessons %}
-          <li class="{{ 'active' if current_lesson and l['slug'] == current_lesson['slug'] else '' }}">
-            <a href="/learn/{{ course['slug'] }}/{{ l['slug'] }}">
-              <span class="num">{{ l['position'] }}</span>
-              <span class="text">{{ l['title'] }}</span>
+          {% set is_new_section = l['section'] != ns.current_section %}
+          
+          {% if is_new_section %}
+            {% if ns.current_section %}
+              </ul></li>
+            {% endif %}
+            
+            {% if l['section'] %}
+              <li class="section-group {{ 'expanded' if current_lesson and current_lesson['section'] == l['section'] else '' }}">
+                <div class="section-title" onclick="this.parentElement.classList.toggle('expanded')">
+                  <span class="toggle-icon">▶</span> {{ l['section'].replace('-', ' ').title() }}
+                </div>
+                <ul class="section-lessons">
+            {% endif %}
+            
+            {% set ns.current_section = l['section'] %}
+          {% endif %}
+
+          <li class="lesson-item {{ 'active' if current_lesson and l['slug'] == current_lesson['slug'] else '' }}">
+            <a href="/learn/{{ course['slug'] }}/{{ l['slug'] }}" style="display:flex; align-items:center; justify-content:space-between;">
+              <div style="display:flex; align-items:center;">
+                  <span class="text">{{ l['title'] }}</span>
+              </div>
+              {% if user_progress and user_progress.get(l.id) == 'completed' %}
+                <span style="color: #16a34a; font-size:0.9em;">✓</span>
+              {% endif %}
             </a>
           </li>
         {% endfor %}
+        
+        {% if ns.current_section %}
+          </ul></li>
+        {% endif %}
       </ul>
     </nav>
     <main class="main-content">
@@ -59,6 +97,77 @@
           </script>
           {% endif %}
           
+          <div id="quiz-container" class="quiz-box hidden">
+              <h3>📝 Knowledge Check</h3>
+              <div id="quiz-content"></div>
+              <button id="submit-quiz-btn" class="btn primary">Submit Answers</button>
+              <div id="quiz-result" class="hidden"></div>
+          </div>
+
+          <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const lessonId = "{{ current_lesson['id'] }}";
+                fetch(`/api/quiz/${lessonId}`)
+                    .then(r => {
+                        if(r.ok) return r.json();
+                        throw new Error('No quiz');
+                    })
+                    .then(data => {
+                        const container = document.getElementById('quiz-container');
+                        const content = document.getElementById('quiz-content');
+                        container.classList.remove('hidden');
+                        
+                        let html = `<h4>${data.title}</h4>`;
+                        data.questions.forEach((q, idx) => {
+                            html += `<div class="quiz-question" data-id="${q.id}">
+                                <p>${idx+1}. ${q.text}</p>
+                                <div class="quiz-options">`;
+                            q.options.forEach((opt, optIdx) => {
+                                html += `<label>
+                                    <input type="radio" name="q_${q.id}" value="${optIdx}"> ${opt}
+                                </label>`;
+                            });
+                            html += `</div></div>`;
+                        });
+                        content.innerHTML = html;
+
+                        if (window.MathJax) {
+                            window.MathJax.typesetPromise([content]);
+                        }
+
+                        document.getElementById('submit-quiz-btn').onclick = () => {
+                            const answers = {};
+                            data.questions.forEach(q => {
+                                const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                                if(selected) {
+                                    answers[q.id] = parseInt(selected.value);
+                                }
+                            });
+                            
+                            fetch('/api/quiz/submit', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({quiz_id: data.id, answers: answers})
+                            })
+                            .then(r => r.json())
+                            .then(res => {
+                                const resultDiv = document.getElementById('quiz-result');
+                                resultDiv.classList.remove('hidden');
+                                if(res.error) {
+                                    resultDiv.innerHTML = `<p class="status-fail">${res.error}</p>`;
+                                } else {
+                                    const cls = res.passed ? 'status-success' : 'status-fail';
+                                    resultDiv.innerHTML = `<p class="${cls}">
+                                        Score: ${res.score}/${res.total} (${Math.round(res.score/res.total*100)}%) - ${res.passed ? 'Passed!' : 'Try Again'}
+                                    </p>`;
+                                }
+                            });
+                        };
+                    })
+                    .catch(e => console.log("No quiz for this lesson"));
+            });
+          </script>
+
           <div class="lesson-nav">
             {% if prev_lesson %}
               <a href="/learn/{{ course['slug'] }}/{{ prev_lesson['slug'] }}" class="btn">&larr; Previous</a>

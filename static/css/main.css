@@ -210,6 +210,83 @@ body, html {
   gap: 10px;
 }
 
+/* Quiz Styles */
+.quiz-box {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.quiz-box h3 {
+  margin-top: 0;
+  color: var(--accent);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.quiz-box h4 {
+  color: var(--text-main);
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.quiz-question {
+  margin-bottom: 1.5rem;
+  background: rgba(15, 23, 42, 0.3);
+  padding: 15px;
+  border-radius: 6px;
+}
+
+.quiz-question p {
+  font-weight: 500;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+  margin-top: 0;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.quiz-options label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  color: var(--text-muted);
+}
+
+.quiz-options label:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-main);
+}
+
+.quiz-options input[type="radio"] {
+  accent-color: var(--primary);
+}
+
+#quiz-result {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+  text-align: center;
+}
+
+#quiz-result p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
 .btn {
   padding: 8px 16px;
   border-radius: 6px;
@@ -279,6 +356,7 @@ body, html {
   cursor: grab;
   user-select: none;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  touch-action: none;
 }
 
 .gate-btn:hover {
@@ -582,4 +660,53 @@ body, html {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+/* Lesson List Sections */
+.section-group {
+  /* No special style for the li container */
+}
+
+.section-title {
+  padding: 12px 20px;
+  color: var(--text-muted);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+
+.section-title:hover {
+  color: var(--text-main);
+}
+
+.toggle-icon {
+  font-size: 0.7rem;
+  transition: transform 0.2s;
+}
+
+.section-group.expanded .toggle-icon {
+  transform: rotate(90deg);
+}
+
+.section-lessons {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: none; /* Hidden by default */
+  background: rgba(0,0,0,0.2); /* Slightly darker for nested */
+}
+
+.section-group.expanded .section-lessons {
+  display: block;
+}
+
+.section-lessons li a {
+  padding-left: 40px; /* Indent nested lessons */
+  font-size: 0.95em;
 }

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if post %}Edit Article{% else %}New Article{% endif %} - QircuitLearn</title>
+    <link rel="stylesheet" href="/static/css/landing.css">
+</head>
+<body>
+    <nav class="landing-nav">
+        <div class="container nav-container">
+            <div class="brand"><a href="/" style="text-decoration:none; color:inherit;">QircuitLearn</a></div>
+            <div class="nav-links">
+                <a href="/blog" class="btn sm">Back to Blog</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container page-content">
+        <div class="form-container">
+            <h1>{% if post %}Edit Article{% else %}Write New Article{% endif %}</h1>
+            <form method="POST">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" required placeholder="Article Title" value="{{ post.title if post else '' }}">
+                </div>
+                <div class="form-group">
+                    <label>Content</label>
+                    <textarea name="content" rows="10" required placeholder="Write your article content here...">{{ post.content if post else '' }}</textarea>
+                </div>
+                <div class="actions">
+                    <a href="/blog" class="btn secondary">Cancel</a>
+                    <button type="submit" class="btn primary">{% if post %}Update Article{% else %}Publish Article{% endif %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

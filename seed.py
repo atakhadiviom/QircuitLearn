@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import json
+from werkzeug.security import generate_password_hash
 
 def seed():
     db_type = os.getenv("DB_TYPE", "sqlite")
@@ -45,61 +46,300 @@ def seed():
             except Exception:
                 return None
 
-    # 1. Insert Course
-    course_title = "Quantum Computing: The No-Nonsense Guide"
-    course_slug = "quantum-no-nonsense"
-    description = "A concept-first approach to understanding why quantum computing matters, without drowning in math."
+    # 0. Create Superuser
+    print("Creating superuser...")
+    admin_user = "admin"
+    admin_email = "admin@example.com"
+    admin_pass = "admin123"
+    pwd_hash = generate_password_hash(admin_pass, method='pbkdf2:sha256')
     
     if db_type == "postgres":
         cur.execute(
-            "INSERT INTO courses(slug, title, description) VALUES(%s, %s, %s) "
-            "ON CONFLICT (slug) DO UPDATE SET title=EXCLUDED.title, description=EXCLUDED.description "
-            "RETURNING id",
-            (course_slug, course_title, description)
+            "INSERT INTO users(username, email, password_hash, is_superuser) VALUES(%s, %s, %s, %s)",
+            (admin_user, admin_email, pwd_hash, True)
         )
-        course_row = cur.fetchone()
-        course_id = _row_get(course_row, 'id', 0)
-        if course_id is None:
-            cur.execute("SELECT id FROM courses WHERE slug=%s", (course_slug,))
-            course_row = cur.fetchone()
-            course_id = _row_get(course_row, 'id', 0)
     else:
-        cur.execute("INSERT INTO courses(slug, title, description) VALUES(?, ?, ?)", (course_slug, course_title, description))
-        course_id = cur.lastrowid
-    
-    # 2. Define Lessons
-    lessons = [
-        # --- Phase 1: The Wall (Why We Need This) ---
-        {
-            "slug": "impossible-dinner-party",
-            "title": "1. The Impossible Dinner Party",
-            "content": """
-<h2>Combinatorial Explosion</h2>
-<p>Imagine you have to seat 100 people at a wedding so that no enemies sit together. It sounds simple, right?</p>
-<p>But for a classical computer, this is a nightmare. It has to check every single combination one by one to see if it works. For 100 guests, the number of combinations is greater than the number of atoms in the universe.</p>
-<p><strong>The Takeaway:</strong> Classical computers choke on problems with too many variables. They don't "think"; they just count very fast. If the number of possibilities is too huge, even the fastest supercomputer will take longer than the age of the universe to solve it.</p>
-            """,
-            "position": 1,
-            "task_json": None
-        },
-        {
-            "slug": "bits-are-boring",
-            "title": "2. Bits are Boring (The Light Switch)",
-            "content": """
-<h2>Binary Code (0s and 1s)</h2>
-<p>A classical bit is like a light switch. It is either <strong>ON</strong> or <strong>OFF</strong>. You can't be "kind of" on.</p>
-<p>This binary nature is rigid. It's great for arithmetic and logic, but it's inefficient for mimicking nature, which is fluid and complex.</p>
-<p><strong>The Takeaway:</strong> We need a computer that behaves like nature, not like a switch. To simulate the real world—molecules, fluids, financial markets—we need a system that can handle nuance and uncertainty natively.</p>
-            """,
-            "position": 2,
-            "task_json": None
-        },
+        cur.execute(
+            "INSERT INTO users(username, email, password_hash, is_superuser) VALUES(?, ?, ?, ?)",
+            (admin_user, admin_email, pwd_hash, 1) # SQLite uses 1 for True
+        )
 
-        # --- Phase 2: The Quantum Weirdness (Core Mechanics) ---
+    # 1. Define Courses & Lessons
+    courses_data = [
         {
-            "slug": "spinning-coin",
-            "title": "3. The Spinning Coin (Superposition)",
-            "content": """
+            "slug": "stage-1-foundations",
+            "title": "Stage 1: The Non-Negotiable Foundations",
+            "description": "You cannot understand quantum mechanics without this toolkit.",
+            "lessons": [
+                {
+                    "slug": "linear-algebra-vectors",
+                    "title": "1. Linear Algebra: Vectors",
+                    "content": """
+<h2>Linear Algebra: Vectors</h2>
+<p>Let's get to work. In classical mechanics, we might use a vector to describe the position or velocity of a ball. In Quantum Computing, we use a vector to describe the <strong>state</strong> of the system—literally everything we know about it.</p>
+<p>These aren't just arrows in space; they are specific mathematical objects called <strong>State Vectors</strong>, and they live in a complex vector space called a <strong>Hilbert Space</strong>.</p>
+
+<h3>1. The Standard Basis (The "Axes")</h3>
+<p>In a classical computer, a bit is either 0 or 1. In a quantum computer, we treat these as column vectors. We call this the "Computational Basis."</p>
+<ul>
+    <li>The state "Zero" is denoted as $|0\\rangle$: $$|0\\rangle = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$$</li>
+    <li>The state "One" is denoted as $|1\\rangle$: $$|1\\rangle = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}$$</li>
+</ul>
+<p><em>(Note: The symbol $|\\psi\\rangle$ is called a "ket". This is Dirac Notation, and it's the standard language of quantum mechanics.)</em></p>
+
+<h3>2. Superposition (Linear Combination)</h3>
+<p>The power of quantum computing comes from <strong>Linearity</strong>. We can add these vectors together. A qubit can be in a state that is a linear combination (superposition) of $|0\\rangle$ and $|1\\rangle$:</p>
+$$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
+<p>Here, $\\alpha$ (alpha) and $\\beta$ (beta) are numbers that describe "how much" of 0 and 1 are in the state.</p>
+<p><strong>Here is your first task:</strong></p>
+<p>Using the column definitions for $|0\\rangle$ and $|1\\rangle$ above, if you perform the matrix addition and scalar multiplication for $\\alpha|0\\rangle + \\beta|1\\rangle$, what does the single resulting column vector look like?</p>
+                    """,
+                    "position": 1,
+                    "task_json": None,
+                    "section": "linear-algebra"
+                },
+                {
+                    "slug": "linear-algebra-matrices",
+                    "title": "2. Linear Algebra: Matrices",
+                    "content": """
+<h2>Matrices: The Transformers</h2>
+<p>If vectors are the <strong>states</strong>, matrices are the <strong>operations</strong>.</p>
+<ul>
+    <li><strong>Linear Transformation:</strong> A matrix acts on a vector to produce a new vector. In quantum computing, every logic gate (X, H, CNOT) is a matrix.</li>
+    <li><strong>Unitary Matrices:</strong> Quantum gates must be reversible and preserve probability. Mathematically, this means they must be <strong>Unitary Matrices</strong> ($U^{\\dagger}U = I$).</li>
+</ul>
+<p><strong>The Takeaway:</strong> Applying a gate to a qubit is just multiplying a matrix by a vector.</p>
+                    """,
+                    "position": 2,
+                    "task_json": None,
+                    "section": "linear-algebra"
+                },
+                {
+                    "slug": "linear-algebra-eigenvalues",
+                    "title": "3. Linear Algebra: Eigenvalues",
+                    "content": """
+<h2>Eigenvalues & Eigenvectors</h2>
+<p>Sometimes, a matrix doesn't rotate a vector; it just stretches it.</p>
+<ul>
+    <li><strong>Eigenvector:</strong> A vector that doesn't change direction when a matrix is applied to it.</li>
+    <li><strong>Eigenvalue:</strong> The factor by which the vector is stretched.</li>
+</ul>
+<p><strong>Why it matters:</strong> When we measure a quantum state, the possible outcomes are the <strong>eigenvalues</strong> of the measurement operator.</p>
+                    """,
+                    "position": 3,
+                    "task_json": None,
+                    "section": "linear-algebra"
+                },
+                {
+                    "slug": "linear-algebra-inner-products",
+                    "title": "4. Linear Algebra: Inner Products",
+                    "content": """
+<h2>Inner Products</h2>
+<p>How "close" are two quantum states? Do they overlap?</p>
+<p>The <strong>Inner Product</strong> (denoted $\\langle \\phi | \\psi \\rangle$) is a generalization of the dot product. It tells us the overlap between two states.</p>
+<ul>
+    <li>If $\\langle \\phi | \\psi \\rangle = 0$, the states are <strong>orthogonal</strong> (perfectly distinguishable).</li>
+    <li>If $\\langle \\phi | \\psi \\rangle = 1$, the states are identical.</li>
+</ul>
+                    """,
+                    "position": 4,
+                    "task_json": None,
+                    "section": "linear-algebra"
+                },
+                {
+                    "slug": "linear-algebra-hilbert-spaces",
+                    "title": "5. Linear Algebra: Hilbert Spaces",
+                    "content": """
+<h2>Hilbert Spaces</h2>
+<p>A <strong>Hilbert Space</strong> is just a fancy name for the vector space where quantum states live.</p>
+<p>It is a complex vector space with an inner product. Whether you have 1 qubit (2 dimensions) or 100 qubits ($2^{100}$ dimensions), the math is the same—it all happens in a Hilbert Space.</p>
+                    """,
+                    "position": 5,
+                    "task_json": None,
+                    "section": "linear-algebra"
+                },
+                {
+                    "slug": "complex-numbers-arithmetic",
+                    "title": "6. Complex Numbers: Arithmetic",
+                    "content": """
+<h2>Complex Arithmetic</h2>
+<p>Quantum mechanics runs on complex numbers ($a + bi$).</p>
+<ul>
+    <li><strong>Addition:</strong> Add the real parts and imaginary parts separately. $(3+2i) + (1-4i) = 4 - 2i$.</li>
+    <li><strong>Multiplication:</strong> Use standard algebra (FOIL), but remember that $i^2 = -1$.</li>
+</ul>
+<p><strong>The Takeaway:</strong> You need to be comfortable treating numbers as 2-dimensional objects.</p>
+                    """,
+                    "position": 6,
+                    "task_json": None,
+                    "section": "complex-numbers"
+                },
+                {
+                    "slug": "complex-numbers-euler",
+                    "title": "7. Complex Numbers: Euler's Formula",
+                    "content": """
+<h2>Euler's Formula</h2>
+<p>This is arguably the most important equation in quantum mechanics:</p>
+$$e^{i\\theta} = \cos(\\theta) + i\sin(\\theta)$$
+<p>It tells us that an exponential with an imaginary exponent is actually a point on a circle in the complex plane.</p>
+<p><strong>The Takeaway:</strong> This connects "growth" (exponentials) with "rotation" (trig). In quantum, gates are just rotations.</p>
+                    """,
+                    "position": 7,
+                    "task_json": None,
+                    "section": "complex-numbers"
+                },
+                {
+                    "slug": "complex-numbers-phases",
+                    "title": "8. Complex Numbers: Phases",
+                    "content": """
+<h2>Phases</h2>
+<p>The "angle" of the complex number is called its <strong>Phase</strong>.</p>
+<ul>
+    <li><strong>Global Phase:</strong> If we rotate the entire quantum state, physics doesn't change. $|\\psi\\rangle$ and $-|\\psi\\rangle$ represent the same physical state.</li>
+    <li><strong>Relative Phase:</strong> The difference in angle between two parts of a superposition ($|0\\rangle + |1\\rangle$ vs $|0\\rangle - |1\\rangle$). This changes everything!</li>
+</ul>
+<p><strong>The Takeaway:</strong> Relative phase is what creates interference patterns.</p>
+                    """,
+                    "position": 8,
+                    "task_json": None,
+                    "section": "complex-numbers"
+                },
+                {
+                    "slug": "probability-theory-random-variables",
+                    "title": "9. Probability Theory: Random Variables",
+                    "content": """
+<h2>Random Variables</h2>
+<p>A <strong>Random Variable</strong> is a variable whose value depends on the outcome of a random phenomenon.</p>
+<p>Example: Let $X$ be the result of rolling a die. $X$ can be 1, 2, 3, 4, 5, or 6.</p>
+<p>In quantum computing, the result of a measurement is a random variable. You don't know what you'll get until you look.</p>
+                    """,
+                    "position": 9,
+                    "task_json": None,
+                    "section": "probability-theory"
+                },
+                {
+                    "slug": "probability-theory-amplitudes",
+                    "title": "10. Probability: Amplitudes vs. Probabilities",
+                    "content": """
+<h2>Amplitudes vs. Probabilities</h2>
+<p>This is the single biggest difference between classical and quantum physics.</p>
+<ul>
+    <li><strong>Classical:</strong> Probabilities are always positive real numbers. To find the total probability, you ADD them.</li>
+    <li><strong>Quantum:</strong> We work with <strong>Amplitudes</strong> (complex numbers). To find the probability, you SQUARE the amplitude ($P = |\\alpha|^2$).</li>
+</ul>
+<p><strong>The Magic:</strong> Because amplitudes can be negative (or complex), they can CANCEL each other out when added. This is interference.</p>
+                    """,
+                    "position": 10,
+                    "task_json": None,
+                    "section": "probability-theory"
+                },
+                {
+                    "slug": "classical-logic-boolean",
+                    "title": "11. Classical Logic: Boolean Algebra",
+                    "content": """
+<h2>Boolean Algebra</h2>
+<p>George Boole proved that logic could be reduced to math.</p>
+<ul>
+    <li><strong>True</strong> = 1</li>
+    <li><strong>False</strong> = 0</li>
+</ul>
+<p>In classical computers, everything is built from these 0s and 1s. In quantum, we extend this to vectors.</p>
+                    """,
+                    "position": 11,
+                    "task_json": None,
+                    "section": "classical-logic"
+                },
+                {
+                    "slug": "classical-logic-gates",
+                    "title": "12. Classical Logic: Logic Gates",
+                    "content": """
+<h2>Logic Gates (AND, OR, NOT)</h2>
+<p>Complex decisions are built from simple gates.</p>
+<ul>
+    <li><strong>NOT:</strong> Flips 0 to 1 (like the Quantum X-gate).</li>
+    <li><strong>AND:</strong> Returns 1 only if BOTH inputs are 1.</li>
+    <li><strong>OR:</strong> Returns 1 if EITHER input is 1.</li>
+</ul>
+                    """,
+                    "position": 12,
+                    "task_json": None,
+                    "section": "classical-logic"
+                },
+                {
+                    "slug": "classical-logic-reversible",
+                    "title": "13. Classical Logic: Reversible Computing",
+                    "content": """
+<h2>Reversible Computing</h2>
+<p>A process is <strong>reversible</strong> if you can reconstruct the input from the output.</p>
+<ul>
+    <li><strong>Irreversible:</strong> An AND gate. If output is 0, was the input (0,0), (0,1), or (1,0)? Information is lost (dissipated as heat).</li>
+    <li><strong>Reversible:</strong> A NOT gate. If output is 0, input was 1.</li>
+</ul>
+<p><strong>The Rule:</strong> Quantum evolution MUST be reversible (unitary). Information is never lost.</p>
+                    """,
+                    "position": 13,
+                    "task_json": None,
+                    "section": "classical-logic"
+                }
+            ]
+        },
+        {
+            "slug": "stage-2-fundamentals",
+            "title": "Stage 2: Quantum Fundamentals",
+            "description": "Core mechanics: Postulates, The Qubit, Multi-Qubit Systems, and Gates.",
+            "lessons": [
+                {
+                    "slug": "postulates-state-space",
+                    "title": "1. Postulates: State Space",
+                    "content": """
+<h2>Postulate 1: State Space</h2>
+<p>The first postulate of quantum mechanics tells us where everything happens.</p>
+<ul>
+    <li><strong>The Rule:</strong> The state of an isolated quantum system is described by a unit vector $|\psi\\rangle$ in a complex vector space with an inner product (a Hilbert Space).</li>
+    <li><strong>Why it matters:</strong> This gives us the language. We aren't just listing properties; we are defining a single mathematical object that contains <em>all</em> the information about the system.</li>
+</ul>
+<p>The simplest quantum system is the Qubit, which lives in a 2-dimensional Hilbert space.</p>
+                    """,
+                    "position": 1,
+                    "task_json": None,
+                    "section": "postulates-of-quantum-mechanics"
+                },
+                {
+                    "slug": "postulates-evolution",
+                    "title": "2. Postulates: Evolution",
+                    "content": """
+<h2>Postulate 2: Evolution</h2>
+<p>How does the state change over time?</p>
+<ul>
+    <li><strong>The Rule:</strong> The evolution of a closed quantum system is described by a <strong>Unitary Transformation</strong>.</li>
+    <li><strong>The Equation:</strong> $|\psi'\\rangle = U|\psi\\rangle$</li>
+</ul>
+<p><strong>Key Property:</strong> Unitary matrices preserve the length of the vector (probability must sum to 1) and are reversible ($U^{-1} = U^{\dagger}$). This means quantum information is never lost.</p>
+                    """,
+                    "position": 2,
+                    "task_json": None,
+                    "section": "postulates-of-quantum-mechanics"
+                },
+                {
+                    "slug": "postulates-measurement",
+                    "title": "3. Postulates: Measurement",
+                    "content": """
+<h2>Postulate 3: Measurement</h2>
+<p>This is where things get weird. When we look at the system, we change it.</p>
+<ul>
+    <li><strong>The Rule:</strong> Quantum measurements are described by a collection of measurement operators $\{M_m\}$. The probability of outcome $m$ is $P(m) = \langle \psi | M_m^{\dagger} M_m | \psi \rangle$.</li>
+    <li><strong>Collapse:</strong> Immediately after measurement, the state of the system collapses to the outcome state.</li>
+</ul>
+<p><strong>The Takeaway:</strong> Measurement is irreversible. Once you look, you destroy the superposition.</p>
+                    """,
+                    "position": 3,
+                    "task_json": None,
+                    "section": "postulates-of-quantum-mechanics"
+                },
+                {
+                    "slug": "the-qubit-superposition",
+                    "title": "4. The Qubit: Superposition",
+                    "content": """
 <h2>Superposition</h2>
 <p>Let's upgrade our analogy.</p>
 <ul>
@@ -107,179 +347,446 @@ def seed():
     <li><strong>Qubit:</strong> A coin <em>spinning</em> on the table. Is it Heads or Tails? It’s <strong>both and neither</strong> at the same time.</li>
 </ul>
 <p>This state is called <strong>Superposition</strong>. The coin keeps spinning until you slap your hand down on it—this is <strong>measurement</strong>. Only then does it force itself to be Heads or Tails.</p>
-<p><strong>The Takeaway:</strong> A quantum computer calculates with the "spinning" coin, allowing it to hold multiple possibilities at once. Instead of being just a 0 or a 1, a qubit can explore a complex combination of both.</p>
 <p><strong>Interactive Task:</strong> Drag an <strong>H</strong> (Hadamard) gate to the circuit and run it. You'll see a 50/50 chance of measuring 0 or 1. Look at the <strong>Bloch Sphere</strong> below the results—the arrow points to the equator, representing the superposition state!</p>
-            """,
-            "position": 3,
-            "task_json": json.dumps({
-                "description": "Create a Superposition State (50% chance of 0 or 1)",
-                "criteria": "superposition",
-                "qubits": 1
-            })
-        },
-        {
-            "slug": "spooky-connection",
-            "title": "4. The Spooky Connection (Entanglement)",
-            "content": """
-<h2>Entanglement</h2>
-<p>Imagine you have two dice. You throw one in New York and one in Tokyo.</p>
-<p>If they are <strong>entangled</strong>, every time the New York die lands on 6, the Tokyo die <em>instantly</em> lands on 6. No signal is sent. They just know.</p>
-<p>This phenomenon confused even Einstein, who called it "spooky action at a distance."</p>
-<p><strong>The Takeaway:</strong> Entanglement allows quantum computers to link qubits together so they work as a massive, unified brain rather than isolated bits. Changing one qubit instantly affects its partner, no matter the distance.</p>
-<p><strong>Interactive Task:</strong> Create a Bell Pair. Use an <strong>H</strong> gate on q0, then a <strong>CNOT</strong> gate (control q0, target q1). Measure both. They will always match!</p>
-            """,
-            "position": 4,
-            "task_json": json.dumps({
-                "description": "Create a Bell Pair (|00> and |11> only)",
-                "criteria": "bell_pair",
-                "qubits": 2
-            })
-        },
-
-        # --- Phase 3: The "Quantum Speedup" (How It Works) ---
-        {
-            "slug": "maze-vs-god-view",
-            "title": "5. The Maze vs. The God’s Eye View",
-            "content": """
-<h2>Parallelism & Interference</h2>
-<p>How does a quantum computer solve problems faster? It's not about speed; it's about the path.</p>
+                    """,
+                    "position": 4,
+                    "task_json": json.dumps({
+                        "description": "Create a Superposition State (50% chance of 0 or 1)",
+                        "criteria": "superposition",
+                        "qubits": 1
+                    }),
+                    "section": "the-qubit"
+                },
+                {
+                    "slug": "the-qubit-bloch-sphere",
+                    "title": "5. The Qubit: The Bloch Sphere",
+                    "content": """
+<h2>The Bloch Sphere</h2>
+<p>Since a qubit $|\psi\\rangle = \alpha|0\\rangle + \beta|1\\rangle$ has complex coefficients, we can't just draw it on a 2D graph.</p>
+<p>However, ignoring the global phase, we can map the state of a single qubit to a point on the surface of a sphere called the <strong>Bloch Sphere</strong>.</p>
 <ul>
-    <li><strong>Classical Computer:</strong> A mouse in a maze. It hits a wall, turns back, tries a new path. It tries every path one by one until it finds the cheese.</li>
-    <li><strong>Quantum Computer:</strong> You pour water into the maze. The water goes down <em>all paths at once</em>. It doesn't "try" them; it flows through them simultaneously to find the exit.</li>
+    <li><strong>North Pole:</strong> $|0\\rangle$</li>
+    <li><strong>South Pole:</strong> $|1\\rangle$</li>
+    <li><strong>Equator:</strong> Superposition states (like $|+\\rangle = \\frac{|0\\rangle + |1\\rangle}{\sqrt{2}}$).</li>
 </ul>
-<p><strong>The Takeaway:</strong> Quantum computers don't do steps faster; they take fewer steps. They use the properties of waves (interference) to cancel out wrong answers and amplify the correct one.</p>
-            """,
-            "position": 5,
-            "task_json": None
+<p><strong>The Takeaway:</strong> Quantum Gates are just rotations of this sphere.</p>
+                    """,
+                    "position": 5,
+                    "task_json": None,
+                    "section": "the-qubit"
+                },
+                {
+                    "slug": "multi-qubit-tensor-products",
+                    "title": "6. Multi-Qubit: Tensor Products",
+                    "content": """
+<h2>Tensor Products</h2>
+<p>How do we describe two qubits? We multiply their vector spaces using the <strong>Tensor Product</strong> ($\otimes$).</p>
+<p>If qubit A is in state $|0\\rangle$ and qubit B is in state $|1\\rangle$, the combined state is:</p>
+$$|0\\rangle \otimes |1\\rangle = |01\\rangle$$
+<p>If we have two 2D vectors, their tensor product is a 4D vector. For $n$ qubits, the state space is $2^n$. This exponential growth is why quantum computers are hard to simulate.</p>
+                    """,
+                    "position": 6,
+                    "task_json": None,
+                    "section": "multi-qubit-systems"
+                },
+                {
+                    "slug": "multi-qubit-entanglement",
+                    "title": "7. Multi-Qubit: Entanglement",
+                    "content": """
+<h2>Entanglement</h2>
+<p>Entanglement occurs when a multi-qubit state <strong>cannot</strong> be written as a tensor product of individual qubit states.</p>
+<p>Imagine you have two dice. You throw one in New York and one in Tokyo. If they are <strong>entangled</strong>, every time the New York die lands on 6, the Tokyo die <em>instantly</em> lands on 6.</p>
+<p><strong>Interactive Task:</strong> Create a Bell Pair. Use an <strong>H</strong> gate on q0, then a <strong>CNOT</strong> gate (control q0, target q1). Measure both. They will always match!</p>
+                    """,
+                    "position": 7,
+                    "task_json": json.dumps({
+                        "description": "Create a Bell Pair (|00> and |11> only)",
+                        "criteria": "bell_pair",
+                        "qubits": 2
+                    }),
+                    "section": "multi-qubit-systems"
+                },
+                {
+                    "slug": "multi-qubit-bell-states",
+                    "title": "8. Multi-Qubit: The Bell States",
+                    "content": """
+<h2>The Bell States</h2>
+<p>The four maximally entangled states for two qubits are known as the Bell States:</p>
+<ul>
+    <li>$|\Phi^+\\rangle = \\frac{|00\\rangle + |11\\rangle}{\sqrt{2}}$ (The one you just made)</li>
+    <li>$|\Phi^-\\rangle = \\frac{|00\\rangle - |11\\rangle}{\sqrt{2}}$</li>
+    <li>$|\Psi^+\\rangle = \\frac{|01\\rangle + |10\\rangle}{\sqrt{2}}$</li>
+    <li>$|\Psi^-\\rangle = \\frac{|01\\rangle - |10\\rangle}{\sqrt{2}}$</li>
+</ul>
+<p>These form a basis for the two-qubit Hilbert space, known as the <strong>Bell Basis</strong>.</p>
+                    """,
+                    "position": 8,
+                    "task_json": None,
+                    "section": "multi-qubit-systems"
+                },
+                {
+                    "slug": "quantum-gates-pauli",
+                    "title": "9. Gates: Pauli Matrices",
+                    "content": """
+<h2>Pauli Matrices (X, Y, Z)</h2>
+<p>The single-qubit gates are rotations. The most fundamental ones are the Pauli matrices:</p>
+<ul>
+    <li><strong>X (Bit Flip):</strong> Swaps $|0\\rangle$ and $|1\\rangle$. (Rotation around X-axis)</li>
+    <li><strong>Y (Bit & Phase Flip):</strong> Swaps $|0\\rangle$ and $|1\\rangle$ and adds a phase. (Rotation around Y-axis)</li>
+    <li><strong>Z (Phase Flip):</strong> Leaves $|0\\rangle$ alone but flips the sign of $|1\\rangle$. (Rotation around Z-axis)</li>
+</ul>
+                    """,
+                    "position": 9,
+                    "task_json": None,
+                    "section": "quantum-gates"
+                },
+                {
+                    "slug": "quantum-gates-hadamard",
+                    "title": "10. Gates: Hadamard",
+                    "content": """
+<h2>The Hadamard Gate (H)</h2>
+<p>The Superposition Creator.</p>
+<p>It maps the basis states to superpositions:</p>
+<ul>
+    <li>$H|0\\rangle = |+\\rangle = \\frac{|0\\rangle + |1\\rangle}{\sqrt{2}}$</li>
+    <li>$H|1\\rangle = |-\\rangle = \\frac{|0\\rangle - |1\\rangle}{\sqrt{2}}$</li>
+</ul>
+<p>Applying H twice gets you back to where you started ($H^2 = I$).</p>
+                    """,
+                    "position": 10,
+                    "task_json": None,
+                    "section": "quantum-gates"
+                },
+                {
+                    "slug": "quantum-gates-cnot",
+                    "title": "11. Gates: CNOT",
+                    "content": """
+<h2>Controlled-NOT (CNOT)</h2>
+<p>The Entanglement Creator.</p>
+<p>This is a two-qubit gate. It flips the <strong>Target</strong> qubit if and only if the <strong>Control</strong> qubit is $|1\\rangle$.</p>
+<p>If the control qubit is in superposition ($|0\\rangle + |1\\rangle$), the target becomes entangled with it, creating the state $|00\\rangle + |11\\rangle$.</p>
+                    """,
+                    "position": 11,
+                    "task_json": None,
+                    "section": "quantum-gates"
+                },
+                {
+                    "slug": "quantum-gates-phase",
+                    "title": "12. Gates: Phase Gates",
+                    "content": """
+<h2>Phase Gates (S, T)</h2>
+<p>Sometimes we need finer control than a full Z-flip (180 degrees).</p>
+<ul>
+    <li><strong>S Gate:</strong> 90-degree rotation around Z axis ($\sqrt{Z}$).</li>
+    <li><strong>T Gate:</strong> 45-degree rotation around Z axis ($\sqrt[4]{Z}$).</li>
+</ul>
+<p>The T gate is crucial because H, S, and CNOT are not enough to build <em>any</em> quantum circuit. Adding the T gate makes the set "Universal".</p>
+                    """,
+                    "position": 12,
+                    "task_json": None,
+                    "section": "quantum-gates"
+                }
+            ]
         },
-
-        # --- Phase 4: The Reality Check (Hardware & Hype) ---
         {
-            "slug": "noise-problem",
-            "title": "6. The Noise Problem (Why It Breaks)",
-            "content": """
-<h2>Decoherence & Noise</h2>
-<p>If quantum computers are so powerful, why don't we all have one?</p>
-<p><strong>The Analogy:</strong> Balancing a pencil on its tip.</p>
-<p>Quantum states are incredibly fragile. A tiny vibration, a change in temperature, or a stray Wi-Fi signal causes the "spinning coin" to fall flat. This collapse is called <strong>decoherence</strong>.</p>
-<p><strong>The Takeaway:</strong> Building a quantum computer is like trying to balance a house of cards in a hurricane. This is why we don't have them on our desks yet. Engineers are fighting a constant battle against noise.</p>
-            """,
-            "position": 6,
-            "task_json": None
-        },
-        {
-            "slug": "breaking-internet",
-            "title": "7. Breaking the Internet (Encryption)",
-            "content": """
+            "slug": "stage-3-circuits-algorithms",
+            "title": "Stage 3: Quantum Circuits & Algorithms",
+            "description": "How we actually manipulate information: The Circuit Model, Parallelism, and Algorithms.",
+            "lessons": [
+                {
+                    "slug": "circuit-model-reading",
+                    "title": "1. The Circuit Model: Reading Scores",
+                    "content": """
+<h2>The Circuit Model</h2>
+<p>Quantum computing has a standard notation called the <strong>Circuit Model</strong>.</p>
+<p>Look at the simulator below. It looks like a musical score, right?</p>
+<ul>
+    <li><strong>Time:</strong> Moves from left to right.</li>
+    <li><strong>Qubits:</strong> Horizontal lines (like strings on a guitar).</li>
+    <li><strong>Gates:</strong> Boxes or symbols placed on the lines. These are operations happening at specific times.</li>
+</ul>
+<p><strong>The Takeaway:</strong> We compose quantum algorithms like music, sequencing operations in time to manipulate the state of the qubits.</p>
+                    """,
+                    "position": 1,
+                    "task_json": None,
+                    "section": "circuit-model"
+                },
+                {
+                    "slug": "quantum-parallelism-deutsch-jozsa",
+                    "title": "2. Parallelism: Deutsch-Jozsa",
+                    "content": """
+<h2>The Deutsch-Jozsa Algorithm</h2>
+<p>This was the first "proof of concept" that a quantum computer could do something faster than a classical one.</p>
+<p><strong>The Problem:</strong> You have a black box function $f(x)$ that takes a bit string input and outputs 0 or 1. The function is guaranteed to be either:</p>
+<ul>
+    <li><strong>Constant:</strong> Always outputs 0 or always outputs 1.</li>
+    <li><strong>Balanced:</strong> Outputs 0 for half the inputs and 1 for the other half.</li>
+</ul>
+<p><strong>The Solution:</strong>
+<ul>
+    <li><strong>Classical:</strong> You might need to check $2^{n-1} + 1$ inputs to be sure.</li>
+    <li><strong>Quantum:</strong> You can determine the answer with exactly <strong>ONE</strong> query.</li>
+</ul>
+<p>It works by creating a superposition of all possible inputs, querying the function once, and using interference to separate the "constant" case from the "balanced" case.</p>
+                    """,
+                    "position": 2,
+                    "task_json": None,
+                    "section": "quantum-parallelism"
+                },
+                {
+                    "slug": "amplitude-amplification-grover",
+                    "title": "3. Amplification: Grover’s Algorithm",
+                    "content": """
+<h2>Grover’s Algorithm</h2>
+<p>Imagine you have a phone book with $N$ names, but it's not alphabetized. You want to find a specific number.</p>
+<ul>
+    <li><strong>Classical Search:</strong> You have to look through them one by one. On average, you check $N/2$ entries.</li>
+    <li><strong>Quantum Search:</strong> Grover's Algorithm can find it in roughly $\sqrt{N}$ steps.</li>
+</ul>
+<p>If $N = 1,000,000$, a classical computer checks 500,000 times. A quantum computer checks 1,000 times.</p>
+<p><strong>How it works:</strong> It uses a process called <strong>Amplitude Amplification</strong>. It repeatedly rotates the state vector towards the correct answer, increasing its probability while decreasing the probability of wrong answers.</p>
+                    """,
+                    "position": 3,
+                    "task_json": None,
+                    "section": "amplitude-amplification"
+                },
+                {
+                    "slug": "qft-phase-estimation",
+                    "title": "4. QFT: Phase Estimation",
+                    "content": """
+<h2>Quantum Phase Estimation (QPE)</h2>
+<p>Many quantum algorithms rely on finding the <strong>eigenvalue</strong> of a unitary operator. If $U|\psi\\rangle = e^{i\theta}|\psi\\rangle$, we want to estimate $\theta$.</p>
+<p>The <strong>Quantum Fourier Transform (QFT)</strong> is the key. Just as a classical Fourier Transform extracts frequencies from a sound wave, the QFT extracts periodicity from quantum amplitudes.</p>
+<p>QPE is the engine under the hood of most advanced quantum algorithms, including Shor's Algorithm and Quantum Chemistry simulations.</p>
+                    """,
+                    "position": 4,
+                    "task_json": None,
+                    "section": "quantum-fourier-transform"
+                },
+                {
+                    "slug": "qft-shors",
+                    "title": "5. QFT: Shor’s Algorithm",
+                    "content": """
 <h2>Shor’s Algorithm</h2>
 <p>Why is there so much hype (and fear) around quantum computing?</p>
-<p>Most internet security (like HTTPS) relies on the fact that math is hard—specifically, factoring very large numbers. A classical supercomputer might take millions of years to crack your credit card encryption.</p>
-<p><strong>The Threat:</strong> A powerful enough quantum computer, running <strong>Shor's Algorithm</strong>, could turn that "hard" math problem into an easy one, cracking the code in hours.</p>
-<p><strong>The Takeaway:</strong> Quantum computers are a potential threat to current cybersecurity, which is why governments and tech giants are racing to build them first—and to develop new "quantum-resistant" encryption.</p>
-            """,
-            "position": 7,
-            "task_json": None
-        },
-
-        # --- Phase 5: The "Killer Apps" (Where the Money Is) ---
-        {
-            "slug": "simulation-battery",
-            "title": "8. Simulation (Why Your Battery Sucks)",
-            "content": """
-<h2>Quantum Simulation</h2>
-<p>Classical computers are terrible at simulating chemistry because molecules follow quantum rules. To simulate a caffeine molecule perfectly on a classical computer, you’d need more memory than there are atoms in the universe.</p>
-<p><strong>The Takeaway:</strong> Quantum computers can simulate new materials (better batteries, carbon capture, new drugs) because they speak the same language as nature.</p>
-            """,
-            "position": 8,
-            "task_json": None
+<p>Most internet security (like HTTPS/RSA) relies on the fact that factoring very large numbers is hard.</p>
+<p><strong>The Threat:</strong> Peter Shor discovered that by using Phase Estimation (and thus the QFT), a quantum computer could turn this "hard" math problem into an easy one.</p>
+<p><strong>The Impact:</strong> A powerful enough quantum computer could crack current encryption in hours, not millions of years. This is why the world is racing to build one.</p>
+                    """,
+                    "position": 5,
+                    "task_json": None,
+                    "section": "quantum-fourier-transform"
+                }
+            ]
         },
         {
-            "slug": "traveling-salesman",
-            "title": "9. The Traveling Salesman from Hell (Optimization)",
-            "content": """
-<h2>Combinatorial Optimization</h2>
-<p>Imagine a delivery driver needs to visit 50 cities. Finding the perfect route is mathematically impossible for current supercomputers (too many combinations).</p>
-<p><strong>The Takeaway:</strong> Quantum computers can potentially look at the "energy landscape" of the problem and find the lowest point (the best route) much faster. This revolutionizes logistics, financial portfolios, and traffic flow.</p>
-            """,
-            "position": 9,
-            "task_json": None
-        },
-
-        # --- Phase 6: The Logic (How to "Speak" Quantum) ---
-        {
-            "slug": "rotations-not-switches",
-            "title": "10. Rotations, Not Switches (Quantum Gates)",
-            "content": """
-<h2>Quantum Gates (Hadamard, X-Gate)</h2>
-<h3>The Analogy: The Globe</h3>
-<p><strong>Classical Logic:</strong> A switch that flips up or down.</p>
-<p><strong>Quantum Logic:</strong> Imagine the qubit is a point on a globe. A "gate" isn't a flip; it's a <em>rotation</em>. You rotate the point from the North Pole (0) to the Equator (Superposition).</p>
-<p><strong>The Takeaway:</strong> Programming a quantum computer is like navigating a ship on a sphere, not flipping switches on a board.</p>
-<p><strong>Interactive Task:</strong> Use an <strong>Ry</strong> gate on q0. Set the angle to <strong>π/2 (approx 1.57)</strong>. This rotates the state to the equator, creating a superposition just like the H gate!</p>
-            """,
-            "position": 10,
-            "task_json": json.dumps({
-                "description": "Rotate q0 to Superposition using Ry(π/2)",
-                "criteria": "rotation_ry_pi_2",
-                "qubits": 1
-            })
-        },
-        {
-            "slug": "music-score-circuits",
-            "title": "11. The Music Score (Quantum Circuits)",
-            "content": """
-<h2>Algorithms & Circuits</h2>
-<p>Look at the simulator below. It looks like a musical score, right?</p>
-<p><strong>The Visual:</strong> Time moves from left to right. Each horizontal line is a qubit (an instrument). The boxes you drag onto them are the notes (operations) we play to create a result at the end.</p>
-<p><strong>The Takeaway:</strong> We compose quantum algorithms like music, sequencing operations in time to manipulate the state of the qubits.</p>
-            """,
-            "position": 11,
-            "task_json": None
-        },
-
-        # --- Phase 7: The "Valley of Death" (The Roadmap) ---
-        {
-            "slug": "math-wall",
-            "title": "12. The Math Wall (Linear Algebra)",
-            "content": """
-<h2>Linear Algebra: The Math Wall</h2>
-<p>The Brutal Truth: You cannot go further than this without Linear Algebra (Vectors and Matrices).</p>
-<p><strong>The Advice:</strong> If you want to be a practitioner, you must learn how to multiply matrices. If you just want to be a manager or investor, you can stop here.</p>
-            """,
-            "position": 12,
-            "task_json": None
-        },
-        {
-            "slug": "get-hands-dirty",
-            "title": "13. Get Your Hands Dirty (Coding)",
-            "content": """
-<h2>Get Your Hands Dirty</h2>
-<p>You can actually run a real quantum job on a real quantum computer in the cloud right now for free (usually small, 5-7 qubit machines) using libraries like <strong>IBM Qiskit</strong> or <strong>Google Cirq</strong>.</p>
-<p><strong>The Takeaway:</strong> Writing <code>Hadamard(qubit)</code> in Python makes the theory real. But here, you can do it with drag-and-drop!</p>
-<p><strong>Final Challenge:</strong> Use the simulator below to create a Bell Pair (Entanglement) one last time. H on q0, CNOT on q0-q1. Verify the probability matches 50% 00 and 50% 11. You are now a quantum practitioner!</p>
-            """,
-            "position": 13,
-            "task_json": json.dumps({
-                "description": "Final Exam: Create a Bell Pair",
-                "criteria": "bell_pair",
-                "qubits": 2
-            })
+            "slug": "stage-4-advanced",
+            "title": "Stage 4: Advanced Theory & Hardware (Expert Level)",
+            "description": "Where reality meets theory.",
+            "lessons": [
+                {
+                    "slug": "qec-decoherence",
+                    "title": "1. QEC: Decoherence",
+                    "content": """
+<h2>Decoherence: The Enemy</h2>
+<p>Quantum states are fragile. Interaction with the environment (heat, radiation, magnetic fields) causes the quantum information to leak out.</p>
+<p>This process is called <strong>Decoherence</strong>.</p>
+<ul>
+    <li><strong>T1 (Relaxation):</strong> The time it takes for $|1\\rangle$ to decay to $|0\\rangle$.</li>
+    <li><strong>T2 (Dephasing):</strong> The time it takes for the relative phase ($\alpha|0\\rangle + \beta|1\\rangle$) to scramble.</li>
+</ul>
+<p>Without error correction, decoherence limits the depth of our circuits.</p>
+                    """,
+                    "position": 1,
+                    "task_json": None,
+                    "section": "quantum-error-correction"
+                },
+                {
+                    "slug": "qec-surface-codes",
+                    "title": "2. QEC: Surface Codes",
+                    "content": """
+<h2>Surface Codes & Fault Tolerance</h2>
+<p>How do we build a reliable computer from unreliable parts?</p>
+<p><strong>Quantum Error Correction (QEC):</strong> We spread the information of 1 <strong>Logical Qubit</strong> across many noisy <strong>Physical Qubits</strong>.</p>
+<p><strong>The Surface Code:</strong> The leading candidate for QEC. It uses a checkerboard pattern of data and measurement qubits to detect and correct errors without collapsing the state.</p>
+<p><strong>Threshold Theorem:</strong> If the physical error rate is below a certain threshold (~1%), we can make the logical error rate arbitrarily low by adding more physical qubits.</p>
+                    """,
+                    "position": 2,
+                    "task_json": None,
+                    "section": "quantum-error-correction"
+                },
+                {
+                    "slug": "complexity-bqp",
+                    "title": "3. Complexity: BQP vs P vs NP",
+                    "content": """
+<h2>Quantum Complexity Theory</h2>
+<p>Where does quantum computing fit in the landscape of solvable problems?</p>
+<ul>
+    <li><strong>P (Polynomial):</strong> Problems solvable quickly by a classical computer (Multiplication).</li>
+    <li><strong>NP (Nondeterministic Polynomial):</strong> Problems where a solution can be <em>verified</em> quickly (Sudoku, Traveling Salesman).</li>
+    <li><strong>BQP (Bounded-error Quantum Polynomial):</strong> Problems solvable quickly by a quantum computer.</li>
+</ul>
+<p><strong>The Reality:</strong> $P \subseteq BQP$. Quantum computers can solve everything classical computers can. But can they solve NP-Complete problems? <strong>Probably not.</strong></p>
+<p>They excel at specific "hidden structure" problems (like Factoring) that are likely in <strong>NP-Intermediate</strong>.</p>
+                    """,
+                    "position": 3,
+                    "task_json": None,
+                    "section": "quantum-complexity-theory"
+                },
+                {
+                    "slug": "hardware-superconducting",
+                    "title": "4. Hardware: Superconducting",
+                    "content": """
+<h2>Superconducting Qubits (Transmons)</h2>
+<p><strong>The Players:</strong> IBM, Google, Rigetti.</p>
+<p><strong>The Tech:</strong> Artificial atoms made from superconducting circuits (Josephson Junctions) cooled to near absolute zero.</p>
+<ul>
+    <li><strong>Pros:</strong> Very fast gate speeds (nanoseconds). Standard microchip fabrication.</li>
+    <li><strong>Cons:</strong> Short coherence times (microseconds). Wiring complexity grows with size. Needs massive dilution refrigerators.</li>
+</ul>
+                    """,
+                    "position": 4,
+                    "task_json": None,
+                    "section": "physical-implementations"
+                },
+                {
+                    "slug": "hardware-ions-photonics",
+                    "title": "5. Hardware: Ions & Photonics",
+                    "content": """
+<h2>Trapped Ions & Photonics</h2>
+<p><strong>Trapped Ions (IonQ, Quantinuum):</strong>
+<ul>
+    <li><strong>Tech:</strong> Individual atoms levitated by electric fields.</li>
+    <li><strong>Pros:</strong> Perfect qubits (nature makes them identical). Long coherence (seconds/minutes). High connectivity.</li>
+    <li><strong>Cons:</strong> Slow gates. Hard to scale trap size.</li>
+</ul></p>
+<p><strong>Photonics (PsiQuantum, Xanadu):</strong>
+<ul>
+    <li><strong>Tech:</strong> Encoding information in particles of light.</li>
+    <li><strong>Pros:</strong> Works at room temperature (mostly). Integration with fiber optics.</li>
+    <li><strong>Cons:</strong> Photons don't like to interact (hard to do 2-qubit gates). Loss is a major issue.</li>
+</ul></p>
+                    """,
+                    "position": 5,
+                    "task_json": None,
+                    "section": "physical-implementations"
+                },
+                {
+                    "slug": "qml-vqe",
+                    "title": "6. QML: VQE",
+                    "content": """
+<h2>Variational Quantum Eigensolvers (VQE)</h2>
+<p>How do we use today's noisy quantum computers (NISQ) for useful work?</p>
+<p><strong>VQE</strong> is a hybrid algorithm. It uses a classical computer to optimize the parameters of a quantum circuit to find the ground state energy of a molecule.</p>
+<p><strong>Application:</strong> Drug discovery and Material science. Simulating molecular bonds is one of the "killer apps" for near-term quantum.</p>
+                    """,
+                    "position": 6,
+                    "task_json": None,
+                    "section": "quantum-machine-learning"
+                },
+                {
+                    "slug": "qml-qaoa",
+                    "title": "7. QML: QAOA",
+                    "content": """
+<h2>Quantum Approximate Optimization (QAOA)</h2>
+<p><strong>QAOA</strong> is another hybrid algorithm designed for combinatorial optimization problems.</p>
+<p><strong>Example:</strong> The MaxCut problem (partitioning a graph). QAOA tries to find a "good enough" solution faster than classical brute force.</p>
+<p>It is a leading candidate for demonstrating "Quantum Advantage" in practical industry problems like logistics and finance.</p>
+                    """,
+                    "position": 7,
+                    "task_json": None,
+                    "section": "quantum-machine-learning"
+                }
+            ]
         }
     ]
-    
-    for l in lessons:
+
+    for course_data in courses_data:
+        course_slug = course_data["slug"]
+        course_title = course_data["title"]
+        description = course_data["description"]
+        
         if db_type == "postgres":
             cur.execute(
-                "INSERT INTO lessons(course_id, slug, title, content, position, task_json) VALUES(%s, %s, %s, %s, %s, %s) "
-                "ON CONFLICT (course_id, slug) DO UPDATE SET title=EXCLUDED.title, content=EXCLUDED.content, position=EXCLUDED.position, task_json=EXCLUDED.task_json",
-                (course_id, l["slug"], l["title"], l["content"], l["position"], l["task_json"]))
+                "INSERT INTO courses(slug, title, description) VALUES(%s, %s, %s) "
+                "ON CONFLICT (slug) DO UPDATE SET title=EXCLUDED.title, description=EXCLUDED.description "
+                "RETURNING id",
+                (course_slug, course_title, description)
+            )
+            course_row = cur.fetchone()
+            course_id = _row_get(course_row, 'id', 0)
+            if course_id is None:
+                cur.execute("SELECT id FROM courses WHERE slug=%s", (course_slug,))
+                course_row = cur.fetchone()
+                course_id = _row_get(course_row, 'id', 0)
         else:
-            cur.execute("INSERT INTO lessons(course_id, slug, title, content, position, task_json) VALUES(?, ?, ?, ?, ?, ?)",
-                        (course_id, l["slug"], l["title"], l["content"], l["position"], l["task_json"]))
+            # Check if course exists first to update or insert
+            # Actually simple INSERT OR REPLACE logic or checking ID
+            cur.execute("SELECT id FROM courses WHERE slug=?", (course_slug,))
+            row = cur.fetchone()
+            if row:
+                course_id = row[0]
+                cur.execute("UPDATE courses SET title=?, description=? WHERE id=?", (course_title, description, course_id))
+            else:
+                cur.execute("INSERT INTO courses(slug, title, description) VALUES(?, ?, ?)", (course_slug, course_title, description))
+                course_id = cur.lastrowid
         
+        print(f"Seeded Course: {course_title} (ID: {course_id})")
+
+        for l in course_data["lessons"]:
+            section = l.get("section")
+            if db_type == "postgres":
+                cur.execute(
+                    "INSERT INTO lessons(course_id, slug, title, content, position, task_json, section) VALUES(%s, %s, %s, %s, %s, %s, %s) "
+                    "ON CONFLICT (course_id, slug) DO UPDATE SET title=EXCLUDED.title, content=EXCLUDED.content, position=EXCLUDED.position, task_json=EXCLUDED.task_json, section=EXCLUDED.section",
+                    (course_id, l["slug"], l["title"], l["content"], l["position"], l["task_json"], section))
+            else:
+                cur.execute("SELECT id FROM lessons WHERE course_id=? AND slug=?", (course_id, l["slug"]))
+                l_row = cur.fetchone()
+                if l_row:
+                    cur.execute("UPDATE lessons SET title=?, content=?, position=?, task_json=?, section=? WHERE id=?", 
+                                (l["title"], l["content"], l["position"], l["task_json"], section, l_row[0]))
+                else:
+                    cur.execute("INSERT INTO lessons(course_id, slug, title, content, position, task_json, section) VALUES(?, ?, ?, ?, ?, ?, ?)",
+                                (course_id, l["slug"], l["title"], l["content"], l["position"], l["task_json"], section))
+    
+    # 3. Add a sample Quiz for "Linear Algebra"
+    print("Seeding Quizzes...")
+    # Find lesson id
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("linear-algebra-vectors",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("linear-algebra-vectors",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+        
+    if lesson_id:
+        quiz_title = "Linear Algebra Check"
+        question_text = "Using the column definitions for |0> and |1> above, if you perform the matrix addition and scalar multiplication for α|0> + β|1>, what does the single resulting column vector look like?"
+        # Options: [α, β], [α + β, 0], [0, α + β], [1, 1]
+        # Correct is [α, β] which is index 0.
+        options = json.dumps(["[α, β]", "[α + β, 0]", "[0, α + β]", "[1, 1]"])
+        correct_idx = 0
+        
+        if db_type == "postgres":
+            cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (lesson_id, quiz_title))
+            quiz_row = cur.fetchone()
+            quiz_id = _row_get(quiz_row, 'id', 0)
+            
+            cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)", 
+                (quiz_id, question_text, options, correct_idx))
+        else:
+            cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (lesson_id, quiz_title))
+            quiz_id = cur.lastrowid
+            
+            cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)", 
+                (quiz_id, question_text, options, correct_idx))
+
     conn.commit()
     conn.close()
-    print("Database seeded successfully with Zero to Hero curriculum!")
+    print("Database seeded successfully!")
 
 if __name__ == "__main__":
     seed()

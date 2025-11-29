@@ -7,23 +7,55 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/landing.css">
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body class="landing-page">
     <nav class="landing-nav">
         <div class="container nav-container">
             <div class="brand">QircuitLearn</div>
+            <button class="mobile-menu-btn" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <div class="nav-links">
                 <a href="#courses" class="btn sm">Courses</a>
+                <a href="/blog" class="btn sm">Blog</a>
+                {% if user %}
+                    <span class="user-welcome">Hi, {{ user }}</span>
+                    <a href="/logout" class="btn sm">Logout</a>
+                {% else %}
+                    <a href="/login" class="btn sm">Login</a>
+                    <a href="/register" class="btn sm primary">Register</a>
+                {% endif %}
             </div>
         </div>
     </nav>
+
+    <script>
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('active');
+            this.classList.toggle('active');
+        });
+    </script>
 
     <header class="hero">
         <div class="container hero-content">
             <h1>Quantum Computing <br><span class="highlight">Without the Math</span></h1>
             <p class="subtitle">Stop drowning in linear algebra. Start understanding the concepts that actually matter. Interactive, visual, and no-nonsense.</p>
             <div class="cta-group">
-                <a href="/learn/quantum-no-nonsense" class="btn primary">Start Learning Now</a>
+                {% if courses and courses|length > 0 %}
+                <a href="/learn/{{ courses[0]['slug'] }}" class="btn primary">Start Learning Now</a>
+                {% else %}
+                <a href="#courses" class="btn primary">Start Learning Now</a>
+                {% endif %}
                 <a href="#features" class="btn secondary">How it Works</a>
             </div>
         </div>
@@ -55,11 +87,6 @@
         <div class="container">
             <h2 class="section-title">Available Courses</h2>
             <div class="course-grid">
-                <div class="course-card">
-                    <h3>Quantum Computing: No-Nonsense</h3>
-                    <p>A concept-first approach to understanding why quantum computing matters, without drowning in math.</p>
-                    <a href="/learn/quantum-no-nonsense" class="btn primary">Start Course &rarr;</a>
-                </div>
                 {% for course in courses %}
                 <div class="course-card">
                     <h3>{{ course['title'] }}</h3>

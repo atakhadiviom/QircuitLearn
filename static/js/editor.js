@@ -34,6 +34,8 @@ function init() {
 function setupPalette() {
     document.querySelectorAll('.gate-btn').forEach(btn => {
         btn.setAttribute('draggable', 'true');
+        
+        // Mouse Drag Events
         btn.addEventListener('dragstart', (e) => {
             state.draggedType = btn.dataset.type;
             e.dataTransfer.effectAllowed = 'copy';
@@ -46,8 +48,88 @@ function setupPalette() {
             editor.classList.remove('dragging-active');
             state.draggedType = null;
         });
+
+        // Touch Drag Events
+        btn.addEventListener('touchstart', handleTouchStart, {passive: false});
+        btn.addEventListener('touchmove', handleTouchMove, {passive: false});
+        btn.addEventListener('touchend', handleTouchEnd);
+        btn.addEventListener('touchcancel', handleTouchEnd);
     });
 }
+
+// --- Touch Support ---
+let touchDragEl = null;
+let touchStartX = 0;
+let touchStartY = 0;
+
+function handleTouchStart(e) {
+    e.preventDefault(); // Prevent scrolling
+    const touch = e.touches[0];
+    const btn = e.currentTarget;
+    
+    state.draggedType = btn.dataset.type;
+    editor.classList.add('dragging-active');
+
+    // Create ghost element
+    touchDragEl = btn.cloneNode(true);
+    touchDragEl.style.position = 'fixed';
+    touchDragEl.style.zIndex = '1000';
+    touchDragEl.style.opacity = '0.8';
+    touchDragEl.style.pointerEvents = 'none'; // Allow elementFromPoint to see through
+    touchDragEl.style.width = btn.offsetWidth + 'px';
+    touchDragEl.style.height = btn.offsetHeight + 'px';
+    
+    // Center on finger
+    updateTouchPosition(touch.clientX, touch.clientY);
+    
+    document.body.appendChild(touchDragEl);
+}
+
+function handleTouchMove(e) {
+    e.preventDefault();
+    if (!touchDragEl) return;
+    const touch = e.touches[0];
+    updateTouchPosition(touch.clientX, touch.clientY);
+    
+    // Optional: Highlight drop zone
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    const zone = target ? target.closest('.drop-zone') : null;
+    
+    document.querySelectorAll('.drop-zone.drag-over').forEach(el => el.classList.remove('drag-over'));
+    if (zone) {
+        zone.classList.add('drag-over');
+    }
+}
+
+function handleTouchEnd(e) {
+    if (!touchDragEl) return;
+    const touch = e.changedTouches[0];
+    
+    // Find drop target
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    const zone = target ? target.closest('.drop-zone') : null;
+
+    if (zone) {
+        const qubit = parseInt(zone.dataset.qubit);
+        const step = parseInt(zone.dataset.step);
+        handleDrop(null, qubit, step); // Pass null for event since we prevented default already
+    }
+
+    // Cleanup
+    document.body.removeChild(touchDragEl);
+    touchDragEl = null;
+    editor.classList.remove('dragging-active');
+    state.draggedType = null;
+    document.querySelectorAll('.drop-zone.drag-over').forEach(el => el.classList.remove('drag-over'));
+}
+
+function updateTouchPosition(x, y) {
+    if (touchDragEl) {
+        touchDragEl.style.left = (x - touchDragEl.offsetWidth / 2) + 'px';
+        touchDragEl.style.top = (y - touchDragEl.offsetHeight / 2) + 'px';
+    }
+}
+// --- End Touch Support ---
 
 function setupControls() {
     document.getElementById('add-qubit').onclick = () => {
@@ -145,7 +227,7 @@ function updateQubitCount() {
 }
 
 function handleDrop(e, qubit, step) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const type = state.draggedType;
     if (!type) return;
 
@@ -819,78 +901,89 @@ function drawBlochSphere(canvas, vec) {
 
     ctx.clearRect(0, 0, w, h);
 
-    // Draw sphere outline
+    // Helper to project 3D (x,y,z) to 2D canvas (u,v)
+    // Coordinate system:
+    // Z is UP (canvas -y)
+    // Y is RIGHT (canvas +x)
+    // X is FRONT-LEFT (diagonal)
+    function project(x, y, z) {
+        const u = cx + y * r - x * r * 0.5;
+        const v = cy - z * r + x * r * 0.3;
+        return { u, v };
+    }
+
+    // Draw sphere background
+    const grad = ctx.createRadialGradient(cx - r/3, cy - r/3, r/10, cx, cy, r);
+    grad.addColorStop(0, '#f8fafc');
+    grad.addColorStop(1, '#e2e8f0');
+    ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-    ctx.strokeStyle = '#334155';
+    ctx.fill();
+    ctx.strokeStyle = '#cbd5e1';
     ctx.stroke();
 
-    // Draw equator
+    // Draw Equator (approximate ellipse)
     ctx.beginPath();
-    ctx.ellipse(cx, cy, r, r * 0.3, 0, 0, 2 * Math.PI);
-    ctx.strokeStyle = '#475569';
+    ctx.ellipse(cx, cy, r, r * 0.3, -0.2, 0, 2 * Math.PI); // Slight tilt
+    ctx.strokeStyle = '#dae1e7';
     ctx.stroke();
 
-    // Draw axes
-    // Z axis
+    // Draw Back Axes (behind the vector if possible, but we just draw first)
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = '#94a3b8';
+    
+    // Z Axis (dashed for negative?)
     ctx.beginPath();
     ctx.moveTo(cx, cy - r);
     ctx.lineTo(cx, cy + r);
-    ctx.strokeStyle = '#475569';
     ctx.stroke();
-    
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText('|0⟩', cx - 10, cy - r - 5);
-    ctx.fillText('|1⟩', cx - 10, cy + r + 15);
+    // Label Z
+    ctx.fillStyle = '#64748b';
+    ctx.font = '12px sans-serif';
+    ctx.fillText('|0⟩', cx - 15, cy - r - 5);
+    ctx.fillText('|1⟩', cx - 15, cy + r + 15);
 
-    // Draw Vector
-    // Project 3D (x, y, z) to 2D
-    // Simple projection: 
-    // screenX = cx + x * r * 0.7 + y * r * 0.5 (perspective)
-    // Actually, standard Bloch projection:
-    // x comes out of page (or right), y goes right (or into page), z goes up
-    // Let's use: x is right-down, y is right-up? 
-    // Standard: z is up. x is forward-left, y is forward-right?
-    // Let's stick to a simple 2D projection where we see Z clearly.
-    // x is horizontal, z is vertical? No, that's a circle.
-    // Let's try: x projects to x-axis offset, y projects to depth?
-    
-    // Simple isometric-ish:
-    // x axis: points to right-down
-    // y axis: points to right-up
-    // z axis: points up
-    
-    // For 2D canvas, let's just project x to x-axis and z to y-axis (inverted)
-    // And y adds some depth offset?
-    
-    // Let's assume standard view:
-    // Z is up (-y in canvas)
-    // Y is right (+x in canvas)
-    // X is coming at viewer (diagonal)
-
-    // vector tip:
-    const screenX = cx + vec.y * r - vec.x * r * 0.4;
-    const screenY = cy - vec.z * r + vec.x * r * 0.4;
-
-    // Draw line
+    // Y Axis
+    const pY = project(0, 1, 0);
     ctx.beginPath();
     ctx.moveTo(cx, cy);
-    ctx.lineTo(screenX, screenY);
-    ctx.strokeStyle = '#927052'; // Primary Copper
-    ctx.lineWidth = 2;
+    ctx.lineTo(pY.u, pY.v);
+    ctx.stroke();
+    ctx.fillText('+Y', pY.u + 5, pY.v);
+
+    // X Axis
+    const pX = project(1, 0, 0);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(pX.u, pX.v);
+    ctx.stroke();
+    ctx.fillText('+X', pX.u - 20, pX.v + 10);
+
+    // Draw Vector
+    const tip = project(vec.x, vec.y, vec.z);
+    
+    // Shadow/Line
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(tip.u, tip.v);
+    ctx.strokeStyle = '#ea580c'; // Orange-600
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
     ctx.stroke();
 
-    // Draw tip
+    // Tip point
     ctx.beginPath();
-    ctx.arc(screenX, screenY, 4, 0, 2 * Math.PI);
-    ctx.fillStyle = '#927052'; // Primary Copper
+    ctx.arc(tip.u, tip.v, 5, 0, 2 * Math.PI);
+    ctx.fillStyle = '#ea580c';
     ctx.fill();
     
-    // Debug text
-    // ctx.fillStyle = 'black';
-    // ctx.fillText(`x:${vec.x.toFixed(2)}`, 10, 20);
-    // ctx.fillText(`y:${vec.y.toFixed(2)}`, 10, 35);
-    // ctx.fillText(`z:${vec.z.toFixed(2)}`, 10, 50);
+    // Debug info
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '10px monospace';
+    ctx.fillText(`x:${vec.x.toFixed(2)}`, 10, h - 35);
+    ctx.fillText(`y:${vec.y.toFixed(2)}`, 10, h - 20);
+    ctx.fillText(`z:${vec.z.toFixed(2)}`, 10, h - 5);
 }
 
 // Init
