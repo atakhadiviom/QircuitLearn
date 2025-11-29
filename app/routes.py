@@ -255,9 +255,6 @@ def register_routes(app):
 
     @app.post("/api/quiz/submit")
     def submit_quiz():
-        if 'user_id' not in session:
-            return jsonify({"error": "Unauthorized"}), 401
-            
         payload = request.get_json(silent=True) or {}
         quiz_id = payload.get("quiz_id")
         answers = payload.get("answers") # {question_id: option_index}
@@ -278,7 +275,10 @@ def register_routes(app):
                     score += 1
         
         passed = (score / total) >= 0.7 if total > 0 else False
-        submit_quiz_attempt(session['user_id'], quiz_id, score, passed)
+        
+        # Only save attempt if user is logged in
+        if 'user_id' in session:
+            submit_quiz_attempt(session['user_id'], quiz_id, score, passed)
         
         return jsonify({"score": score, "total": total, "passed": passed})
 

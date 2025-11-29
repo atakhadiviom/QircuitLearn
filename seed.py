@@ -102,13 +102,27 @@ $$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
                     "slug": "linear-algebra-matrices",
                     "title": "2. Linear Algebra: Matrices",
                     "content": """
-<h2>Matrices: The Transformers</h2>
-<p>If vectors are the <strong>states</strong>, matrices are the <strong>operations</strong>.</p>
+<h2>Matrices</h2>
+<p>That's the correct progression. If <strong>vectors</strong> are the <strong>states</strong> of a quantum system, then <strong>matrices</strong> are the <strong>operations</strong> we perform on those states.</p>
+<p>In Quantum Computing, a single-qubit <strong>quantum gate</strong> is represented by a $2 \\times 2$ matrix. When you apply a gate to a qubit, you perform standard <strong>matrix-vector multiplication</strong>.</p>
+$$|\\psi'\\rangle = U |\\psi\\rangle$$
+<p>Where $U$ is the matrix (the gate) and $|\\psi\\rangle$ is the state vector.</p>
+
+<h3>⚛️ Key Gate: The Pauli-X (Quantum NOT)</h3>
+<p>The most fundamental operation is the <strong>Pauli-X</strong> gate, often simply called $X$. This is the quantum equivalent of the classical NOT gate, which flips the bit: $0 \\leftrightarrow 1$.</p>
+<p>The matrix for the $X$ gate is:</p>
+$$X = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$$
+
+<p>You can verify that:</p>
 <ul>
-    <li><strong>Linear Transformation:</strong> A matrix acts on a vector to produce a new vector. In quantum computing, every logic gate (X, H, CNOT) is a matrix.</li>
-    <li><strong>Unitary Matrices:</strong> Quantum gates must be reversible and preserve probability. Mathematically, this means they must be <strong>Unitary Matrices</strong> ($U^{\\dagger}U = I$).</li>
+    <li>$X|0\\rangle = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix} \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} = |1\\rangle$</li>
+    <li>$X|1\\rangle = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix} \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = |0\\rangle$</li>
 </ul>
-<p><strong>The Takeaway:</strong> Applying a gate to a qubit is just multiplying a matrix by a vector.</p>
+
+<h3>Your Task: Applying $X$ to Superposition</h3>
+<p>Let's test the linearity. Consider a superposition state $|\\psi\\rangle$ where the chance of being $|0\\rangle$ or $|1\\rangle$ is equal. Its normalized vector is:</p>
+$$|\\psi\\rangle = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$$
+<p>Calculate the resulting state, $|\\psi'\\rangle$, when you apply the $X$ gate to $|\\psi\\rangle$. What is the final column vector?</p>
                     """,
                     "position": 2,
                     "task_json": None,
@@ -118,13 +132,32 @@ $$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
                     "slug": "linear-algebra-eigenvalues",
                     "title": "3. Linear Algebra: Eigenvalues",
                     "content": """
-<h2>Eigenvalues & Eigenvectors</h2>
-<p>Sometimes, a matrix doesn't rotate a vector; it just stretches it.</p>
+<h2>Eigenvalues and Eigenvectors</h2>
+<p>In Quantum Computing, Eigenvalues and Eigenvectors are the language that translates a quantum operation into a physical, observable result.</p>
+
+<h3>1. 🔑 The Core Equation</h3>
+<p>An Eigenvector is a special vector $|\\psi\\rangle$ that, when acted upon by a matrix $U$, only gets scaled, not rotated.</p>
+<p>The amount it is scaled by is the Eigenvalue $\\lambda$:</p>
+$$U|\\psi\\rangle = \\lambda|\\psi\\rangle$$
+
+<h3>🧠 QC Interpretation: Observables and Outcomes</h3>
 <ul>
-    <li><strong>Eigenvector:</strong> A vector that doesn't change direction when a matrix is applied to it.</li>
-    <li><strong>Eigenvalue:</strong> The factor by which the vector is stretched.</li>
+    <li><strong>The Matrix $U$ is the Observable:</strong> A matrix that represents a physical property we can measure, like energy or spin. In our case, this is the measurement operator (usually the Pauli-Z gate).</li>
+    <li><strong>The Eigenvectors are the Measurable States:</strong> These special states ($\\{|\\psi\\rangle\\}$) are the only states the qubit can collapse into upon measurement. For a single qubit measured in the standard basis, the eigenvectors are simply $|0\\rangle$ and $|1\\rangle$.</li>
+    <li><strong>The Eigenvalues are the Measurement Results:</strong> The values ($\\lambda$) tell us what the result of the measurement is. In quantum mechanics, these are real numbers. We map them to the outcomes 0 and 1.</li>
 </ul>
-<p><strong>Why it matters:</strong> When we measure a quantum state, the possible outcomes are the <strong>eigenvalues</strong> of the measurement operator.</p>
+
+<h3>🚪 Introducing the Pauli-Z Gate ($Z$)</h3>
+<p>The Pauli-Z gate is the standard observable for measurement in the computational basis. Its matrix is:</p>
+$$Z = \\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}$$
+
+<h3>Your Task:</h3>
+<p>Apply the Pauli-Z matrix ($Z$) to our basis states, $|0\\rangle$ and $|1\\rangle$.</p>
+<ul>
+    <li>Calculate $Z|0\\rangle$. What is the resulting vector and its corresponding eigenvalue ($\\lambda_0$)?</li>
+    <li>Calculate $Z|1\\rangle$. What is the resulting vector and its corresponding eigenvalue ($\\lambda_1$)?</li>
+</ul>
+<p>This will reveal why $|0\\rangle$ and $|1\\rangle$ are the special states we measure.</p>
                     """,
                     "position": 3,
                     "task_json": None,
@@ -135,12 +168,33 @@ $$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
                     "title": "4. Linear Algebra: Inner Products",
                     "content": """
 <h2>Inner Products</h2>
-<p>How "close" are two quantum states? Do they overlap?</p>
-<p>The <strong>Inner Product</strong> (denoted $\\langle \\phi | \\psi \\rangle$) is a generalization of the dot product. It tells us the overlap between two states.</p>
-<ul>
-    <li>If $\\langle \\phi | \\psi \\rangle = 0$, the states are <strong>orthogonal</strong> (perfectly distinguishable).</li>
-    <li>If $\\langle \\phi | \\psi \\rangle = 1$, the states are identical.</li>
-</ul>
+<p>The <strong>Inner Product</strong> is the final, essential piece of single-qubit linear algebra. It is the tool that turns abstract vectors into concrete, measurable probabilities.</p>
+
+<h3>1. The Bra Vector and Dirac Notation</h3>
+<p>To perform the Inner Product, we need the <strong>bra</strong> vector. The bra $\\langle \\phi |$ is the Hermitian conjugate (the complex conjugate transpose) of the ket $|\\phi\\rangle$.</p>
+<p>If the ket for $|0\\rangle$ is:</p>
+$$|0\\rangle = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$$
+<p>Then the corresponding bra $\\langle 0 |$ is a row vector:</p>
+$$\\langle 0 | = \\begin{pmatrix} 1 & 0 \\end{pmatrix}$$
+
+<h3>2. The Inner Product (Bra-Ket)</h3>
+<p>The <strong>Inner Product</strong> of two state vectors, $|\\psi\\rangle$ and $|\\phi\\rangle$, is the matrix multiplication of the bra $\\langle \\phi |$ and the ket $|\\psi\\rangle$, resulting in a single complex number (a scalar):</p>
+$$\\langle \\phi | \\psi \\rangle = \\begin{pmatrix} \\phi_0^* & \\phi_1^* \\end{pmatrix} \\begin{pmatrix} \\psi_0 \\\\ \\psi_1 \\end{pmatrix} = \\phi_0^* \\psi_0 + \\phi_1^* \\psi_1$$
+
+<h3>3. Measurement Probability 🎯</h3>
+<p>In quantum mechanics, the probability ($P$) of measuring a state $|\\psi\\rangle$ to be in a specific state $|\\phi\\rangle$ is given by the squared magnitude of their inner product:</p>
+$$P(|\\psi\\rangle \\text{ collapses to } |\\phi\\rangle) = |\\langle \\phi | \\psi \\rangle|^2$$
+
+<hr>
+
+<h3>Your Task:</h3>
+<p>Consider the common superposition state $|+\\rangle$:</p>
+$$|+\\rangle = \\frac{1}{\\sqrt{2}}|0\\rangle + \\frac{1}{\\sqrt{2}}|1\\rangle = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$$
+<p>Calculate the probability $P$ that when we measure the state $|+\\rangle$, it collapses to the $|0\\rangle$ state.</p>
+<ol>
+    <li>First, calculate the inner product $\\langle 0 | + \\rangle$.</li>
+    <li>Then, find the probability $P = |\\langle 0 | + \\rangle|^2$.</li>
+</ol>
                     """,
                     "position": 4,
                     "task_json": None,
@@ -151,8 +205,29 @@ $$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
                     "title": "5. Linear Algebra: Hilbert Spaces",
                     "content": """
 <h2>Hilbert Spaces</h2>
-<p>A <strong>Hilbert Space</strong> is just a fancy name for the vector space where quantum states live.</p>
-<p>It is a complex vector space with an inner product. Whether you have 1 qubit (2 dimensions) or 100 qubits ($2^{100}$ dimensions), the math is the same—it all happens in a Hilbert Space.</p>
+<p>Excellent. You've built all the necessary components: states, operators, measurement. Now we need the <strong>container</strong> for all of it.</p>
+
+<p>A <strong>Hilbert Space ($\mathcal{H}$)</strong> is simply the formal, mathematical environment where all the rules of quantum computing live. It is a specific type of vector space with three core properties that make it suitable for quantum mechanics:</p>
+
+<ol>
+    <li><strong>It is a Vector Space:</strong> 🌌 This means it contains all possible linear combinations (superpositions) of the basis states. If $|0\\rangle$ and $|1\\rangle$ are in the space, then the vector $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$ must also be in the space.</li>
+    <li><strong>It has an Inner Product:</strong> $\\langle \\cdot | \\cdot \\rangle$ This allows us to calculate the <strong>length</strong> of vectors (normalization, ensuring $|\\alpha|^2 + |\\beta|^2 = 1$) and the <strong>angle</strong> between them (orthogonality, ensuring we can distinguish basis states).</li>
+    <li><strong>It is Complete:</strong> This is a technical property that ensures every sequence of vectors that "should" converge, does converge to a valid vector within the space. Physically, this means every possible measurement outcome corresponds to a valid quantum state.</li>
+</ol>
+
+<h3>The Single-Qubit Space</h3>
+<p>For a single qubit, the Hilbert space is 2-dimensional ($\mathcal{H} = \mathbb{C}^2$). The Bloch sphere is the visual representation of all the possible vectors in this 2-dimensional complex space.</p>
+
+<h3>📈 Scaling Up</h3>
+<p>The true power of the Hilbert space concept is in describing systems with multiple qubits. To describe $N$ independent qubits, we use a mathematical operation called the <strong>tensor product</strong> (which we'll cover next) to combine their individual spaces.</p>
+
+<p>For an $N$-qubit system, the dimension of the Hilbert space is:</p>
+$$\\text{Dimension}(\\mathcal{H}_N) = 2^N$$
+
+<hr>
+
+<h3>Your Task:</h3>
+<p>Based on this scaling rule, what is the dimension of the Hilbert space needed to fully describe the state of a system composed of <strong>two qubits</strong>?</p>
                     """,
                     "position": 5,
                     "task_json": None,
@@ -163,12 +238,32 @@ $$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
                     "title": "6. Complex Numbers: Arithmetic",
                     "content": """
 <h2>Complex Arithmetic</h2>
-<p>Quantum mechanics runs on complex numbers ($a + bi$).</p>
-<ul>
-    <li><strong>Addition:</strong> Add the real parts and imaginary parts separately. $(3+2i) + (1-4i) = 4 - 2i$.</li>
-    <li><strong>Multiplication:</strong> Use standard algebra (FOIL), but remember that $i^2 = -1$.</li>
-</ul>
-<p><strong>The Takeaway:</strong> You need to be comfortable treating numbers as 2-dimensional objects.</p>
+<p>That is the essential next step. If linear algebra is the <strong>structure</strong> of quantum mechanics, <strong>complex numbers</strong> are the very <strong>substance</strong> that makes it quantum. They are non-negotiable.</p>
+
+<p>In quantum computing, the numbers $\\alpha$ and $\\beta$ in your state vector are not just any scalars; they are <strong>complex numbers</strong>. They are called <strong>probability amplitudes</strong>.</p>
+
+<h3>1. The Imaginary Unit and Complex Number Definition</h3>
+<p>A complex number $z$ is composed of a real part ($a$) and an imaginary part ($b$):</p>
+$$z = a + bi$$
+<p>where $i$ is the imaginary unit, defined such that $i^2 = -1$.</p>
+
+<p>The crucial concept for QC is the <strong>phase</strong>. The complex number $z$ can be visualized on the complex plane (the Argand diagram), where its position defines both its <strong>magnitude</strong> (length from the origin) and its <strong>phase</strong> (the angle $\\phi$ it makes with the real axis). It is this phase that quantum gates manipulate to create interference.</p>
+
+<h3>2. The Complex Conjugate ($z^*$)</h3>
+<p>The <strong>complex conjugate</strong> $z^*$ is found by flipping the sign of the imaginary part:</p>
+$$z^* = a - bi$$
+
+<p>We need this conjugate for the Inner Product because the probability of measuring a state is the <strong>squared magnitude</strong> ($|z|^2$) of the amplitude $z$.</p>
+
+$$P = |z|^2 = z^* z$$
+
+<hr>
+
+<h3>Your Task: Calculating Probability</h3>
+<p>Suppose we have an amplitude $\\alpha$ for the $|0\\rangle$ state, defined as:</p>
+$$\\alpha = \\frac{1}{\\sqrt{2}} + \\frac{i}{\\sqrt{2}}$$
+
+<p>Calculate the probability $P$ of measuring the state $|0\\rangle$. Remember, $P = \\alpha^* \\alpha$.</p>
                     """,
                     "position": 6,
                     "task_json": None,
@@ -769,6 +864,186 @@ $$|0\\rangle \otimes |1\\rangle = |01\\rangle$$
         # Correct is [α, β] which is index 0.
         options = json.dumps(["[α, β]", "[α + β, 0]", "[0, α + β]", "[1, 1]"])
         correct_idx = 0
+        
+        if db_type == "postgres":
+            cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (lesson_id, quiz_title))
+            quiz_row = cur.fetchone()
+            quiz_id = _row_get(quiz_row, 'id', 0)
+            
+            cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)", 
+                (quiz_id, question_text, options, correct_idx))
+        else:
+            cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (lesson_id, quiz_title))
+            quiz_id = cur.lastrowid
+            
+            cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)", 
+                (quiz_id, question_text, options, correct_idx))
+
+    # 4. Add a sample Quiz for "Linear Algebra: Matrices"
+    # Find lesson id
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("linear-algebra-matrices",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("linear-algebra-matrices",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+        
+    if lesson_id:
+        quiz_title = "Matrix Operation Check"
+        question_text = "Calculate the resulting state |ψ'> when applying X to |ψ> = 1/√2 * [1, 1]^T. What is the final column vector?"
+        # Options: 
+        # 1. 1/√2 * [1, 1] (Correct)
+        # 2. 1/√2 * [1, -1]
+        # 3. [0, 0]
+        # 4. [1, 0]
+        options = json.dumps(["1/√2 * [1, 1]", "1/√2 * [1, -1]", "[0, 0]", "[1, 0]"])
+        correct_idx = 0
+        
+        if db_type == "postgres":
+            cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (lesson_id, quiz_title))
+            quiz_row = cur.fetchone()
+            quiz_id = _row_get(quiz_row, 'id', 0)
+            
+            cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)", 
+                (quiz_id, question_text, options, correct_idx))
+        else:
+            cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (lesson_id, quiz_title))
+            quiz_id = cur.lastrowid
+            
+            cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)", 
+                (quiz_id, question_text, options, correct_idx))
+
+    # 5. Add a sample Quiz for "Linear Algebra: Eigenvalues"
+    # Find lesson id
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("linear-algebra-eigenvalues",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("linear-algebra-eigenvalues",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+        
+    if lesson_id:
+        quiz_title = "Eigenvalue Check"
+        question_text = "When applying the Pauli-Z gate to the state |1>, what is the resulting eigenvalue?"
+        # Options: 
+        # 1. 1
+        # 2. -1 (Correct)
+        # 3. 0
+        # 4. i
+        options = json.dumps(["1", "-1", "0", "i"])
+        correct_idx = 1
+        
+        if db_type == "postgres":
+            cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (lesson_id, quiz_title))
+            quiz_row = cur.fetchone()
+            quiz_id = _row_get(quiz_row, 'id', 0)
+            
+            cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)", 
+                (quiz_id, question_text, options, correct_idx))
+        else:
+            cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (lesson_id, quiz_title))
+            quiz_id = cur.lastrowid
+            
+            cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)", 
+                (quiz_id, question_text, options, correct_idx))
+
+    # 6. Add a sample Quiz for "Linear Algebra: Inner Products"
+    # Find lesson id
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("linear-algebra-inner-products",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("linear-algebra-inner-products",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+        
+    if lesson_id:
+        quiz_title = "Probability Check"
+        question_text = "What is the probability P of measuring the state |+> = 1/√2(|0> + |1>) as |0>?"
+        # Options: 
+        # 1. 1 (100%)
+        # 2. 0.5 (50%) (Correct)
+        # 3. 0 (0%)
+        # 4. 0.707 (70.7%)
+        options = json.dumps(["1 (100%)", "0.5 (50%)", "0 (0%)", "0.707 (70.7%)"])
+        correct_idx = 1
+        
+        if db_type == "postgres":
+            cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (lesson_id, quiz_title))
+            quiz_row = cur.fetchone()
+            quiz_id = _row_get(quiz_row, 'id', 0)
+            
+            cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)", 
+                (quiz_id, question_text, options, correct_idx))
+        else:
+            cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (lesson_id, quiz_title))
+            quiz_id = cur.lastrowid
+            
+            cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)", 
+                (quiz_id, question_text, options, correct_idx))
+
+    # 7. Add a sample Quiz for "Linear Algebra: Hilbert Spaces"
+    # Find lesson id
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("linear-algebra-hilbert-spaces",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("linear-algebra-hilbert-spaces",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+        
+    if lesson_id:
+        quiz_title = "Hilbert Space Dimension"
+        question_text = "What is the dimension of the Hilbert space needed to fully describe the state of a system composed of 2 qubits?"
+        # Options: 
+        # 1. 2
+        # 2. 4 (Correct)
+        # 3. 8
+        # 4. 16
+        options = json.dumps(["2", "4", "8", "16"])
+        correct_idx = 1
+        
+        if db_type == "postgres":
+            cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (lesson_id, quiz_title))
+            quiz_row = cur.fetchone()
+            quiz_id = _row_get(quiz_row, 'id', 0)
+            
+            cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)", 
+                (quiz_id, question_text, options, correct_idx))
+        else:
+            cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (lesson_id, quiz_title))
+            quiz_id = cur.lastrowid
+            
+            cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)", 
+                (quiz_id, question_text, options, correct_idx))
+
+    # 8. Add a sample Quiz for "Complex Numbers: Arithmetic"
+    # Find lesson id
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("complex-numbers-arithmetic",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("complex-numbers-arithmetic",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+        
+    if lesson_id:
+        quiz_title = "Probability from Amplitude"
+        question_text = "Calculate the probability P of measuring |0> given the amplitude α = 1/√2 + i/√2."
+        # Options: 
+        # 1. 0.5 (50%)
+        # 2. 1 (100%) (Correct)
+        # 3. 0 (0%)
+        # 4. i
+        options = json.dumps(["0.5 (50%)", "1 (100%)", "0 (0%)", "i"])
+        correct_idx = 1
         
         if db_type == "postgres":
             cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (lesson_id, quiz_title))
