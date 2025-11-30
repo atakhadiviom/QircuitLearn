@@ -26,6 +26,18 @@ body, html {
   padding: 0 20px;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 a { text-decoration: none; transition: color 0.2s; }
 
 /* Navbar */
@@ -84,7 +96,7 @@ a { text-decoration: none; transition: color 0.2s; }
 .hero::before {
   content: '';
   position: absolute;
-  top: -20%;
+  top: -100px; /* Fixed value to reduce layout shift */
   left: 50%;
   transform: translateX(-50%);
   width: 600px;
