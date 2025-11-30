@@ -1,13 +1,14 @@
 import os
 import json
-from flask import jsonify, request, send_from_directory, render_template, redirect, url_for, session, flash
+from flask import jsonify, request, send_from_directory, render_template, redirect, url_for, session, flash, make_response
 from werkzeug.security import check_password_hash
 from .simulate import simulate
 from .models import (
     get_courses, get_lessons, get_course_by_slug, get_lesson_by_slug, upsert_progress,
     create_user, get_user_by_email, get_quiz_for_lesson, get_quiz_questions, 
     submit_quiz_attempt, get_forum_posts, create_forum_post, get_user_progress,
-    get_forum_post, update_forum_post, delete_forum_post, get_quiz_by_id
+    get_forum_post, update_forum_post, delete_forum_post, get_quiz_by_id,
+    get_user_passed_quiz_attempt
 )
 
 def register_routes(app):
@@ -253,6 +254,17 @@ def register_routes(app):
             })
         return jsonify({"id": quiz_dict['id'], "title": quiz_dict['title'], "questions": q_list})
 
+    @app.get("/api/quiz/status/<int:quiz_id>")
+    def api_quiz_status(quiz_id):
+        if 'user_id' not in session:
+            return jsonify({"passed": False, "authenticated": False})
+            
+        attempt = get_user_passed_quiz_attempt(session['user_id'], quiz_id)
+        if attempt:
+            # attempt is a Row or dict
+            return jsonify({"passed": True, "authenticated": True})
+        return jsonify({"passed": False, "authenticated": True})
+
     @app.post("/api/quiz/submit")
     def submit_quiz():
         payload = request.get_json(silent=True) or {}
@@ -278,7 +290,8 @@ def register_routes(app):
         
         # Only save attempt if user is logged in
         if 'user_id' in session:
-            submit_quiz_attempt(session['user_id'], quiz_id, score, passed)
+            answers_json = json.dumps(answers)
+            submit_quiz_attempt(session['user_id'], quiz_id, score, passed, answers_json)
             if passed:
                 quiz = get_quiz_by_id(quiz_id)
                 if quiz:
@@ -296,3 +309,42 @@ def register_routes(app):
     @app.get("/qircuitapp/health")
     def health():
         return jsonify({"status": "ok"})
+
+    @app.route('/sitemap.xml')
+    def sitemap():
+        urls = []
+
+        # Static pages
+        urls.append(url_for('index', _external=True))
+        urls.append(url_for('blog', _external=True))
+        urls.append(url_for('register', _external=True))
+        urls.append(url_for('login', _external=True))
+
+        # Courses and Lessons
+        try:
+            courses = get_courses()
+            for course in courses:
+                c = to_dict(course)
+                # Course overview page
+                urls.append(url_for('course_overview', course_slug=c['slug'], _external=True))
+                
+                # Lessons
+                lessons = get_lessons(c['id'])
+                for lesson in lessons:
+                    l = to_dict(lesson)
+                    urls.append(url_for('lesson_view', course_slug=c['slug'], lesson_slug=l['slug'], _external=True))
+        except Exception:
+            pass
+
+        xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        for url in urls:
+            xml += '  <url>\n'
+            xml += f'    <loc>{url}</loc>\n'
+            xml += '    <changefreq>weekly</changefreq>\n'
+            xml += '  </url>\n'
+        xml += '</urlset>'
+
+        response = make_response(xml)
+        response.headers["Content-Type"] = "application/xml"
+        return response

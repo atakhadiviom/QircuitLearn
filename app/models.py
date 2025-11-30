@@ -152,15 +152,27 @@ def get_quiz_questions(quiz_id):
     conn.close()
     return rows
 
-def submit_quiz_attempt(user_id, quiz_id, score, passed):
+def submit_quiz_attempt(user_id, quiz_id, score, passed, answers_json=None):
     conn = get_conn()
     cur = get_cursor(conn)
     ph = get_placeholder()
-    cur.execute(f"INSERT INTO user_quiz_attempts(user_id, quiz_id, score, passed) VALUES({ph},{ph},{ph},{ph})", (user_id, quiz_id, score, passed))
+    cur.execute(f"INSERT INTO user_quiz_attempts(user_id, quiz_id, score, passed, answers_json) VALUES({ph},{ph},{ph},{ph},{ph})", (user_id, quiz_id, score, passed, answers_json))
     if isinstance(conn, sqlite3.Connection):
         conn.commit()
     cur.close()
     conn.close()
+
+def get_user_passed_quiz_attempt(user_id, quiz_id):
+    conn = get_conn()
+    cur = get_cursor(conn)
+    ph = get_placeholder()
+    # Check if passed is true. We use a parameter for portability.
+    # SQLite uses 1/0, Postgres uses t/f, but the driver handles the python bool mapping.
+    cur.execute(f"SELECT * FROM user_quiz_attempts WHERE user_id={ph} AND quiz_id={ph} AND passed={ph} ORDER BY attempted_at DESC LIMIT 1", (user_id, quiz_id, True))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return row
 
 def get_forum_posts():
     conn = get_conn()

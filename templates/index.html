@@ -25,7 +25,7 @@
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <script defer src="/static/js/editor.js"></script>
+  <script defer src="/static/js/editor.js?v=2"></script>
   <script>
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('active');
@@ -107,7 +107,11 @@
           data-lesson-id="{{ current_lesson['id'] }}">
           <h3>🎯 Interactive Task</h3>
           <p id="task-desc"></p>
+          {% if user_progress and user_progress.get(current_lesson['id']) == 'completed' %}
+          <div id="task-status" class="status-success">✅ Completed</div>
+          {% else %}
           <div id="task-status" class="status-pending">Status: Pending...</div>
+          {% endif %}
         </div>
         <script>
           // Parse task safely
@@ -124,6 +128,7 @@
 
         <div id="quiz-container" class="quiz-box hidden">
           <h3>📝 Knowledge Check</h3>
+          <div id="quiz-header-msg" class="hidden" style="margin-bottom: 10px;"></div>
           <div id="quiz-content"></div>
           <button id="submit-quiz-btn" class="btn primary">Submit Answers</button>
           <div id="quiz-result" class="hidden"></div>
@@ -142,6 +147,20 @@
                 const container = document.getElementById('quiz-container');
                 const content = document.getElementById('quiz-content');
                 container.classList.remove('hidden');
+
+                // Check for existing passed attempt
+                if (window.isLoggedIn) {
+                  fetch(`/api/quiz/status/${data.id}`)
+                    .then(r => r.json())
+                    .then(status => {
+                      if (status.passed) {
+                        const msgDiv = document.getElementById('quiz-header-msg');
+                        msgDiv.classList.remove('hidden');
+                        msgDiv.innerHTML = `<div class="status-success">✅ You have already passed this quiz!</div>`;
+                      }
+                    })
+                    .catch(err => console.error("Failed to check quiz status", err));
+                }
 
                 let html = `<h4>${data.title}</h4>`;
                 data.questions.forEach((q, idx) => {

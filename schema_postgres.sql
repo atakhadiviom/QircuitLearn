@@ -67,6 +67,7 @@ CREATE TABLE user_quiz_attempts (
     quiz_id INTEGER REFERENCES quizzes(id),
     score INTEGER NOT NULL,
     passed BOOLEAN DEFAULT FALSE,
+    answers_json TEXT,
     attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

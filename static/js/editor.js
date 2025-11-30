@@ -1046,6 +1046,105 @@ function validateTask(data) {
                 message = "Check your angle. It should be π/2 (approx 1.57).";
             }
         }
+    } else if (criteria === 'eigenvalue_z_1') {
+        // Goal: Apply Z to |1> to get -|1>
+        // Statevector should be [0, -1] (approx)
+        if (data.statevector && data.statevector.length >= 2) {
+             const amp0 = parseComplexPython(data.statevector[0]);
+             const amp1 = parseComplexPython(data.statevector[1]);
+             
+             // Check magnitude of 1 is ~1 and 0 is ~0
+             const mag0 = Math.sqrt(amp0.re**2 + amp0.im**2);
+             const mag1 = Math.sqrt(amp1.re**2 + amp1.im**2);
+             
+             if (Math.abs(mag1 - 1.0) < 0.1) {
+                 // Check phase of amp1. Should be -1 (re ~ -1, im ~ 0)
+                 if (Math.abs(amp1.re + 1.0) < 0.1 && Math.abs(amp1.im) < 0.1) {
+                     success = true;
+                     message = "Correct! The eigenvalue is -1 (phase flip).";
+                 } else if (Math.abs(amp1.re - 1.0) < 0.1) {
+                     message = "You have the state |1>, but the phase is positive. Did you apply the Z gate?";
+                 } else {
+                     message = "You have the correct state probability, but the phase is incorrect.";
+                 }
+             } else {
+                 message = "You need to prepare the state |1> first (use X gate).";
+             }
+        }
+    } else if (criteria === 'h_then_x') {
+        // Goal: Apply H then X. Result is |+> (50/50)
+        const hasH = state.gates.some(g => g.type === 'H');
+        const hasX = state.gates.some(g => g.type === 'X');
+        
+        if (data.probabilities && data.probabilities.length >= 2) {
+             const p0 = data.probabilities[0];
+             const p1 = data.probabilities[1];
+             
+             if (hasH && hasX) {
+                 if (Math.abs(p0 - 0.5) < 0.1 && Math.abs(p1 - 0.5) < 0.1) {
+                     success = true;
+                     message = "Correct! X|+> = |+>. The state is unchanged by X.";
+                 } else {
+                     message = "You have the gates, but the state is not 50/50. Check your circuit.";
+                 }
+             } else if (!hasH) {
+                 message = "First, create a superposition using the H gate.";
+             } else if (!hasX) {
+                 message = "Now apply the X gate to the superposition.";
+             }
+        }
+    } else if (criteria === 'state_one') {
+        // Goal: Transform |0> to |1> using X gate
+        if (data.probabilities && data.probabilities.length >= 2) {
+             const p0 = data.probabilities[0];
+             const p1 = data.probabilities[1];
+             
+             if (p1 > 0.9 && p0 < 0.1) {
+                 success = true;
+                 message = "Correct! You transformed |0> to |1> using the X gate.";
+             } else if (p0 > 0.9) {
+                 message = "You're still in the |0> state. Try applying the X gate.";
+             } else {
+                 message = "Incorrect state. Aim for |1> (Probability of 1 should be 100%).";
+             }
+        }
+    } else if (criteria === 'minus_state') {
+        // Goal: Create |-> = 1/sqrt(2) (|0> - |1>)
+        // Use H then Z
+        if (data.statevector && data.statevector.length >= 2) {
+             const amp0 = parseComplexPython(data.statevector[0]);
+             const amp1 = parseComplexPython(data.statevector[1]);
+             
+             const magSq0 = amp0.re**2 + amp0.im**2;
+             const magSq1 = amp1.re**2 + amp1.im**2;
+             
+             // Check probabilities (0.5 each)
+             const probsCorrect = Math.abs(magSq0 - 0.5) < 0.1 && Math.abs(magSq1 - 0.5) < 0.1;
+             
+             if (probsCorrect) {
+                 // Check relative phase difference
+                 // angle1 - angle0 should be PI (or -PI)
+                 const angle0 = Math.atan2(amp0.im, amp0.re);
+                 const angle1 = Math.atan2(amp1.im, amp1.re);
+                 let diff = angle1 - angle0;
+                 
+                 // Normalize to [-PI, PI]
+                 while (diff <= -Math.PI) diff += 2*Math.PI;
+                 while (diff > Math.PI) diff -= 2*Math.PI;
+                 
+                 // Check if diff is approx PI or -PI (cos(diff) ~ -1)
+                 if (Math.abs(Math.cos(diff) + 1) < 0.1) {
+                     success = true;
+                     message = "Correct! You created the |-> state. Notice the phase of |1> is flipped.";
+                 } else if (Math.abs(Math.cos(diff) - 1) < 0.1) {
+                     message = "You have the |+> state. You need to flip the phase of |1>. Try the Z gate.";
+                 } else {
+                     message = "Probabilities are correct, but the phase difference is not 180 degrees.";
+                 }
+             } else {
+                 message = "First, create a superposition with the H gate, then apply Z.";
+             }
+        }
     }
 
     const taskBox = document.getElementById('task-box');
