@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -16,246 +17,268 @@
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script defer src="/static/js/editor.js"></script>
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+    }
+  </script>
 </head>
+
 <body>
   {% if error %}
-    <div class="container" style="text-align:center; margin-top: 50px;">
-      <h1>Welcome to QircuitLearn</h1>
-      <p>{{ error }}</p>
-      <p>Run <code>python seed.py</code> to initialize the curriculum.</p>
-    </div>
+  <div class="container" style="text-align:center; margin-top: 50px;">
+    <h1>Welcome to QircuitLearn</h1>
+    <p>{{ error }}</p>
+    <p>Run <code>python seed.py</code> to initialize the curriculum.</p>
+  </div>
   {% else %}
   <div class="app-layout">
-    <nav class="sidebar">
-      <div class="brand"><a href="/">QircuitLearn</a></div>
+    <button class="mobile-menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
+    <nav class="sidebar" id="sidebar">
+      <div class="brand">
+        <a href="/">QircuitLearn</a>
+        <button class="mobile-menu-close" onclick="toggleSidebar()">×</button>
+      </div>
       <div style="padding: 0 1.5rem; margin-bottom: 1rem;">
-          <a href="/blog" class="btn sm secondary" style="width:100%; text-align:center;">Latest Articles</a>
+        <a href="/blog" class="btn sm secondary" style="width:100%; text-align:center;">Latest Articles</a>
       </div>
       <div class="course-title">{{ course['title'] }}</div>
       <ul class="lesson-list">
         {% set ns = namespace(current_section=None) %}
         {% for l in lessons %}
-          {% set is_new_section = l['section'] != ns.current_section %}
-          
-          {% if is_new_section %}
-            {% if ns.current_section %}
-              </ul></li>
-            {% endif %}
-            
-            {% if l['section'] %}
-              <li class="section-group {{ 'expanded' if current_lesson and current_lesson['section'] == l['section'] else '' }}">
-                <div class="section-title" onclick="this.parentElement.classList.toggle('expanded')">
-                  <span class="toggle-icon">▶</span> {{ l['section'].replace('-', ' ').title() }}
-                </div>
-                <ul class="section-lessons">
-            {% endif %}
-            
-            {% set ns.current_section = l['section'] %}
+        {% set is_new_section = l['section'] != ns.current_section %}
+
+        {% if is_new_section %}
+        {% if ns.current_section %}
+      </ul>
+      </li>
+      {% endif %}
+
+      {% if l['section'] %}
+      <li
+        class="section-group {{ 'expanded' if current_lesson and current_lesson['section'] == l['section'] else '' }}">
+        <div class="section-title" onclick="this.parentElement.classList.toggle('expanded')">
+          <span class="toggle-icon">▶</span> {{ l['section'].replace('-', ' ').title() }}
+        </div>
+        <ul class="section-lessons">
+          {% endif %}
+
+          {% set ns.current_section = l['section'] %}
           {% endif %}
 
           <li class="lesson-item {{ 'active' if current_lesson and l['slug'] == current_lesson['slug'] else '' }}">
-            <a href="/learn/{{ course['slug'] }}/{{ l['slug'] }}" style="display:flex; align-items:center; justify-content:space-between;">
+            <a href="/learn/{{ course['slug'] }}/{{ l['slug'] }}"
+              style="display:flex; align-items:center; justify-content:space-between;">
               <div style="display:flex; align-items:center;">
-                  <span class="text">{{ l['title'] }}</span>
+                <span class="text">{{ l['title'] }}</span>
               </div>
-              {% if user_progress and user_progress.get(l.id) == 'completed' %}
-                <span style="color: #16a34a; font-size:0.9em;">✓</span>
+              {% if user_progress and user_progress.get(l['id']) == 'completed' %}
+              <span style="color: #16a34a; font-size:0.9em;">✓</span>
               {% endif %}
             </a>
           </li>
-        {% endfor %}
-        
-        {% if ns.current_section %}
-          </ul></li>
-        {% endif %}
+          {% endfor %}
+
+          {% if ns.current_section %}
+        </ul>
+      </li>
+      {% endif %}
       </ul>
     </nav>
     <main class="main-content">
       {% if current_lesson %}
-        <div class="lesson-pane">
-          <h1>{{ current_lesson['title'] }}</h1>
-          <div class="prose">
-            {{ current_lesson['content']|safe }}
-          </div>
+      <div class="lesson-pane">
+        <h1>{{ current_lesson['title'] }}</h1>
+        <div class="prose">
+          {{ current_lesson['content']|safe }}
+        </div>
 
-          {% if current_lesson['task_json'] %}
-          <div class="task-box" id="task-box" data-task='{{ current_lesson["task_json"] }}' data-lesson-id="{{ current_lesson['id'] }}">
-            <h3>🎯 Interactive Task</h3>
-            <p id="task-desc"></p>
-            <div id="task-status" class="status-pending">Status: Pending...</div>
-          </div>
-          <script>
-            // Parse task safely
-            try {
-                const taskData = JSON.parse(document.getElementById('task-box').dataset.task);
-                document.getElementById('task-desc').textContent = taskData.description;
-                window.currentTask = taskData;
-                window.currentLessonId = document.getElementById('task-box').dataset.lessonId;
-            } catch(e) {
-                console.error("Failed to parse task", e);
-            }
-          </script>
-          {% endif %}
-          
-          <div id="quiz-container" class="quiz-box hidden">
-              <h3>📝 Knowledge Check</h3>
-              <div id="quiz-content"></div>
-              <button id="submit-quiz-btn" class="btn primary">Submit Answers</button>
-              <div id="quiz-result" class="hidden"></div>
-          </div>
+        {% if current_lesson['task_json'] %}
+        <div class="task-box" id="task-box" data-task='{{ current_lesson["task_json"] }}'
+          data-lesson-id="{{ current_lesson['id'] }}">
+          <h3>🎯 Interactive Task</h3>
+          <p id="task-desc"></p>
+          <div id="task-status" class="status-pending">Status: Pending...</div>
+        </div>
+        <script>
+          // Parse task safely
+          try {
+            const taskData = JSON.parse(document.getElementById('task-box').dataset.task);
+            document.getElementById('task-desc').textContent = taskData.description;
+            window.currentTask = taskData;
+            window.currentLessonId = document.getElementById('task-box').dataset.lessonId;
+          } catch (e) {
+            console.error("Failed to parse task", e);
+          }
+        </script>
+        {% endif %}
 
-          <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                const lessonId = "{{ current_lesson['id'] }}";
-                fetch(`/api/quiz/${lessonId}`)
-                    .then(r => {
-                        if(r.ok) return r.json();
-                        throw new Error('No quiz');
-                    })
-                    .then(data => {
-                        const container = document.getElementById('quiz-container');
-                        const content = document.getElementById('quiz-content');
-                        container.classList.remove('hidden');
-                        
-                        let html = `<h4>${data.title}</h4>`;
-                        data.questions.forEach((q, idx) => {
-                            html += `<div class="quiz-question" data-id="${q.id}">
-                                <p>${idx+1}. ${q.text}</p>
+        <div id="quiz-container" class="quiz-box hidden">
+          <h3>📝 Knowledge Check</h3>
+          <div id="quiz-content"></div>
+          <button id="submit-quiz-btn" class="btn primary">Submit Answers</button>
+          <div id="quiz-result" class="hidden"></div>
+        </div>
+
+        <script>
+          window.isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
+          document.addEventListener('DOMContentLoaded', () => {
+            const lessonId = "{{ current_lesson['id'] }}";
+            fetch(`/api/quiz/${lessonId}`)
+              .then(r => {
+                if (r.ok) return r.json();
+                throw new Error('No quiz');
+              })
+              .then(data => {
+                const container = document.getElementById('quiz-container');
+                const content = document.getElementById('quiz-content');
+                container.classList.remove('hidden');
+
+                let html = `<h4>${data.title}</h4>`;
+                data.questions.forEach((q, idx) => {
+                  html += `<div class="quiz-question" data-id="${q.id}">
+                                <p>${idx + 1}. ${q.text}</p>
                                 <div class="quiz-options">`;
-                            q.options.forEach((opt, optIdx) => {
-                                html += `<label>
+                  q.options.forEach((opt, optIdx) => {
+                    html += `<label>
                                     <input type="radio" name="q_${q.id}" value="${optIdx}"> ${opt}
                                 </label>`;
-                            });
-                            html += `</div></div>`;
-                        });
-                        content.innerHTML = html;
+                  });
+                  html += `</div></div>`;
+                });
+                content.innerHTML = html;
 
-                        if (window.MathJax) {
-                            window.MathJax.typesetPromise([content]);
+                if (window.MathJax) {
+                  window.MathJax.typesetPromise([content]);
+                }
+
+                document.getElementById('submit-quiz-btn').onclick = () => {
+                  const answers = {};
+                  data.questions.forEach(q => {
+                    const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                    if (selected) {
+                      answers[q.id] = parseInt(selected.value);
+                    }
+                  });
+
+                  fetch('/api/quiz/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ quiz_id: data.id, answers: answers })
+                  })
+                    .then(r => r.json())
+                    .then(res => {
+                      const resultDiv = document.getElementById('quiz-result');
+                      resultDiv.classList.remove('hidden');
+                      if (res.error) {
+                        resultDiv.innerHTML = `<p class="status-fail">${res.error}</p>`;
+                      } else {
+                        const cls = res.passed ? 'status-success' : 'status-fail';
+                        let msg = `Score: ${res.score}/${res.total} (${Math.round(res.score / res.total * 100)}%) - ${res.passed ? 'Passed!' : 'Try Again'}`;
+                        if (res.passed && isLoggedIn) {
+                            msg += ' <span style="font-size:0.8em; margin-left:10px;">(Marking complete...)</span>';
+                            setTimeout(() => location.reload(), 1500);
                         }
+                        resultDiv.innerHTML = `<p class="${cls}">${msg}</p>`;
+                      }
+                    });
+                };
+              })
+              .catch(e => console.log("No quiz for this lesson"));
+          });
+        </script>
 
-                        document.getElementById('submit-quiz-btn').onclick = () => {
-                            const answers = {};
-                            data.questions.forEach(q => {
-                                const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
-                                if(selected) {
-                                    answers[q.id] = parseInt(selected.value);
-                                }
-                            });
-                            
-                            fetch('/api/quiz/submit', {
-                                method: 'POST',
-                                headers: {'Content-Type': 'application/json'},
-                                body: JSON.stringify({quiz_id: data.id, answers: answers})
-                            })
-                            .then(r => r.json())
-                            .then(res => {
-                                const resultDiv = document.getElementById('quiz-result');
-                                resultDiv.classList.remove('hidden');
-                                if(res.error) {
-                                    resultDiv.innerHTML = `<p class="status-fail">${res.error}</p>`;
-                                } else {
-                                    const cls = res.passed ? 'status-success' : 'status-fail';
-                                    resultDiv.innerHTML = `<p class="${cls}">
-                                        Score: ${res.score}/${res.total} (${Math.round(res.score/res.total*100)}%) - ${res.passed ? 'Passed!' : 'Try Again'}
-                                    </p>`;
-                                }
-                            });
-                        };
-                    })
-                    .catch(e => console.log("No quiz for this lesson"));
-            });
-          </script>
+        <div class="lesson-nav">
+          {% if prev_lesson %}
+          <a href="/learn/{{ course['slug'] }}/{{ prev_lesson['slug'] }}" class="btn">&larr; Previous</a>
+          {% else %}
+          <div></div>
+          {% endif %}
 
-          <div class="lesson-nav">
-            {% if prev_lesson %}
-              <a href="/learn/{{ course['slug'] }}/{{ prev_lesson['slug'] }}" class="btn">&larr; Previous</a>
-            {% else %}
-              <div></div>
-            {% endif %}
-            
-            {% if next_lesson %}
-              <a href="/learn/{{ course['slug'] }}/{{ next_lesson['slug'] }}" class="btn primary">Next Lesson &rarr;</a>
-            {% endif %}
-          </div>
+          {% if next_lesson %}
+          <a href="/learn/{{ course['slug'] }}/{{ next_lesson['slug'] }}" class="btn primary">Next Lesson &rarr;</a>
+          {% endif %}
         </div>
+      </div>
       {% endif %}
-      
+
       <div class="editor-pane">
         <!-- Rotation Modal -->
         <div id="rotation-modal" class="modal hidden">
-            <div class="modal-content">
-                <h3 id="modal-title">Set Rotation Angle</h3>
-                <div class="modal-body">
-                    <div class="slider-group">
-                        <label for="angle-slider">Angle (radians):</label>
-                        <input type="range" id="angle-slider" min="0" max="6.28" step="0.01" value="1.57">
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="angle-input" step="0.01" value="1.57">
-                        <span class="unit">rad</span>
-                    </div>
-                    <div class="preset-buttons">
-                        <button class="btn sm" data-val="0">0</button>
-                        <button class="btn sm" data-val="0.785">π/4</button>
-                        <button class="btn sm" data-val="1.571">π/2</button>
-                        <button class="btn sm" data-val="3.142">π</button>
-                        <button class="btn sm" data-val="6.283">2π</button>
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button id="modal-cancel" class="btn secondary">Cancel</button>
-                    <button id="modal-confirm" class="btn primary">Confirm</button>
-                </div>
+          <div class="modal-content">
+            <h3 id="modal-title">Set Rotation Angle</h3>
+            <div class="modal-body">
+              <div class="slider-group">
+                <label for="angle-slider">Angle (radians):</label>
+                <input type="range" id="angle-slider" min="0" max="6.28" step="0.01" value="1.57">
+              </div>
+              <div class="input-group">
+                <input type="number" id="angle-input" step="0.01" value="1.57">
+                <span class="unit">rad</span>
+              </div>
+              <div class="preset-buttons">
+                <button class="btn sm" data-val="0">0</button>
+                <button class="btn sm" data-val="0.785">π/4</button>
+                <button class="btn sm" data-val="1.571">π/2</button>
+                <button class="btn sm" data-val="3.142">π</button>
+                <button class="btn sm" data-val="6.283">2π</button>
+              </div>
             </div>
+            <div class="modal-actions">
+              <button id="modal-cancel" class="btn secondary">Cancel</button>
+              <button id="modal-confirm" class="btn primary">Confirm</button>
+            </div>
+          </div>
         </div>
 
         <div class="toolbar">
-            <div class="control-group">
-                <label>Qubits: <span id="qubit-count">2</span></label>
-                <button class="btn sm" id="add-qubit" title="Add Qubit">+</button>
-                <button class="btn sm" id="remove-qubit" title="Remove Qubit">-</button>
-            </div>
-            <div class="control-group">
-                <button class="btn sm danger" id="clear">Clear Circuit</button>
-            </div>
+          <div class="control-group">
+            <label>Qubits: <span id="qubit-count">2</span></label>
+            <button class="btn sm" id="add-qubit" title="Add Qubit">+</button>
+            <button class="btn sm" id="remove-qubit" title="Remove Qubit">-</button>
+          </div>
+          <div class="control-group">
+            <button class="btn sm danger" id="clear">Clear Circuit</button>
+          </div>
         </div>
-        
+
         <div class="gate-palette">
-            <div class="gate-btn" data-type="H" title="Hadamard Gate">H</div>
-            <div class="gate-btn" data-type="X" title="Pauli-X (NOT)">X</div>
-            <div class="gate-btn" data-type="Y" title="Pauli-Y">Y</div>
-            <div class="gate-btn" data-type="Z" title="Pauli-Z">Z</div>
-            <div class="gate-btn" data-type="S" title="Phase Gate (Z^1/2)">S</div>
-            <div class="gate-btn" data-type="T" title="T Gate (Z^1/4)">T</div>
-            <div class="gate-btn" data-type="RX" title="Rotation X">Rx</div>
-            <div class="gate-btn" data-type="RY" title="Rotation Y">Ry</div>
-            <div class="gate-btn" data-type="RZ" title="Rotation Z">Rz</div>
-            <div class="gate-btn" data-type="CNOT" title="Controlled-NOT">CNOT</div>
-            <div class="gate-btn" data-type="SWAP" title="Swap Qubits">SWAP</div>
-            <div class="gate-btn" data-type="MEASURE" title="Measure">M</div>
+          <div class="gate-btn" data-type="H" title="Hadamard Gate">H</div>
+          <div class="gate-btn" data-type="X" title="Pauli-X (NOT)">X</div>
+          <div class="gate-btn" data-type="Y" title="Pauli-Y">Y</div>
+          <div class="gate-btn" data-type="Z" title="Pauli-Z">Z</div>
+          <div class="gate-btn" data-type="S" title="Phase Gate (Z^1/2)">S</div>
+          <div class="gate-btn" data-type="T" title="T Gate (Z^1/4)">T</div>
+          <div class="gate-btn" data-type="RX" title="Rotation X">Rx</div>
+          <div class="gate-btn" data-type="RY" title="Rotation Y">Ry</div>
+          <div class="gate-btn" data-type="RZ" title="Rotation Z">Rz</div>
+          <div class="gate-btn" data-type="CNOT" title="Controlled-NOT">CNOT</div>
+          <div class="gate-btn" data-type="SWAP" title="Swap Qubits">SWAP</div>
+          <div class="gate-btn" data-type="MEASURE" title="Measure">M</div>
         </div>
 
         <div id="editor" class="circuit-editor"></div>
-        
+
         <div class="simulation-controls">
-            <button class="btn primary" id="simulate">Run Simulation</button>
-            <div id="loading" class="hidden">Running...</div>
+          <button class="btn primary" id="simulate">Run Simulation</button>
+          <div id="loading" class="hidden">Running...</div>
         </div>
-        
+
         <div class="results-container">
-            <div id="output" class="output-console">
-                <div class="placeholder">Run simulation to see results...</div>
-            </div>
-            <div class="chart-container" style="position: relative; height:300px; width:100%; margin-top: 20px; display: none;">
-                <canvas id="resultsChart"></canvas>
-            </div>
-            <div id="bloch-container" class="bloch-container" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin-top: 20px;"></div>
+          <div id="output" class="output-console">
+            <div class="placeholder">Run simulation to see results...</div>
+          </div>
+          <div class="chart-container"
+            style="position: relative; height:300px; width:100%; margin-top: 20px; display: none;">
+            <canvas id="resultsChart"></canvas>
+          </div>
+          <div id="bloch-container" class="bloch-container"
+            style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin-top: 20px;"></div>
         </div>
       </div>
     </main>
   </div>
   {% endif %}
 </body>
+
 </html>

@@ -7,7 +7,7 @@ from .models import (
     get_courses, get_lessons, get_course_by_slug, get_lesson_by_slug, upsert_progress,
     create_user, get_user_by_email, get_quiz_for_lesson, get_quiz_questions, 
     submit_quiz_attempt, get_forum_posts, create_forum_post, get_user_progress,
-    get_forum_post, update_forum_post, delete_forum_post
+    get_forum_post, update_forum_post, delete_forum_post, get_quiz_by_id
 )
 
 def register_routes(app):
@@ -279,6 +279,12 @@ def register_routes(app):
         # Only save attempt if user is logged in
         if 'user_id' in session:
             submit_quiz_attempt(session['user_id'], quiz_id, score, passed)
+            if passed:
+                quiz = get_quiz_by_id(quiz_id)
+                if quiz:
+                    # Handle both dict and row access
+                    lesson_id = quiz['lesson_id'] if isinstance(quiz, dict) or hasattr(quiz, 'keys') else quiz[1]
+                    upsert_progress(session['user_id'], lesson_id, 'completed')
         
         return jsonify({"score": score, "total": total, "passed": passed})
 

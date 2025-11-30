@@ -41,6 +41,38 @@ def create_tables(schema_sql_path):
 def upsert_progress(user_id, lesson_id, status):
     conn = get_conn()
     cur = get_cursor(conn)
+    ph = get_placeholder()
+    db_type = os.getenv("DB_TYPE", "sqlite")
+
+    try:
+        if db_type == "postgres":
+            query = f"""
+                INSERT INTO progress (user_id, lesson_id, status, updated_at)
+                VALUES ({ph}, {ph}, {ph}, CURRENT_TIMESTAMP)
+                ON CONFLICT (user_id, lesson_id)
+                DO UPDATE SET status = EXCLUDED.status, updated_at = CURRENT_TIMESTAMP
+            """
+            cur.execute(query, (user_id, lesson_id, status))
+        elif db_type == "mysql":
+            query = f"""
+                INSERT INTO progress (user_id, lesson_id, status, updated_at)
+                VALUES ({ph}, {ph}, {ph}, NOW())
+                ON DUPLICATE KEY UPDATE status = VALUES(status), updated_at = NOW()
+            """
+            cur.execute(query, (user_id, lesson_id, status))
+        else:
+            # SQLite
+            query = f"INSERT OR REPLACE INTO progress (user_id, lesson_id, status, updated_at) VALUES ({ph}, {ph}, {ph}, CURRENT_TIMESTAMP)"
+            cur.execute(query, (user_id, lesson_id, status))
+            
+        if isinstance(conn, sqlite3.Connection):
+            conn.commit()
+    except Exception as e:
+        print(f"Error upserting progress: {e}")
+        raise e
+    finally:
+        cur.close()
+        conn.close()
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -95,6 +127,16 @@ def get_quiz_for_lesson(lesson_id):
     cur = get_cursor(conn)
     ph = get_placeholder()
     cur.execute(f"SELECT * FROM quizzes WHERE lesson_id={ph}", (lesson_id,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return row
+
+def get_quiz_by_id(quiz_id):
+    conn = get_conn()
+    cur = get_cursor(conn)
+    ph = get_placeholder()
+    cur.execute(f"SELECT * FROM quizzes WHERE id={ph}", (quiz_id,))
     row = cur.fetchone()
     cur.close()
     conn.close()

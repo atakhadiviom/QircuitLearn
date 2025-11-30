@@ -1076,6 +1076,9 @@ async function saveProgress() {
             })
         });
         console.log("Progress saved!");
+        if (window.isLoggedIn) {
+            setTimeout(() => location.reload(), 1500);
+        }
     } catch (e) {
         console.error("Failed to save progress", e);
     }
