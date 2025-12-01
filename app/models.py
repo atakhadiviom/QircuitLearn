@@ -223,6 +223,29 @@ def delete_forum_post(post_id):
     cur.close()
     conn.close()
 
+def upsert_forum_post(user_id, title, slug, meta_title, meta_description, content, post_id=None):
+    conn = get_conn()
+    cur = get_cursor(conn)
+    ph = get_placeholder()
+    if post_id:
+        cur.execute(f"UPDATE forum_posts SET title={ph}, slug={ph}, meta_title={ph}, meta_description={ph}, content={ph} WHERE id={ph}", (title, slug, meta_title, meta_description, content, post_id))
+    else:
+        cur.execute(f"INSERT INTO forum_posts(user_id, title, slug, meta_title, meta_description, content) VALUES({ph},{ph},{ph},{ph},{ph},{ph})", (user_id, title, slug, meta_title, meta_description, content))
+    if isinstance(conn, sqlite3.Connection):
+        conn.commit()
+    cur.close()
+    conn.close()
+
+def get_forum_post_by_slug(slug):
+    conn = get_conn()
+    cur = get_cursor(conn)
+    ph = get_placeholder()
+    cur.execute(f"SELECT p.*, u.username FROM forum_posts p JOIN users u ON p.user_id = u.id WHERE slug={ph}", (slug,))
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+    return row
+
 def get_courses():
     conn = get_conn()
     cur = get_cursor(conn)

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.meta_title or post.title }} - QircuitLearn</title>
+    {% if post.meta_description %}
+    <meta name="description" content="{{ post.meta_description }}">
+    {% endif %}
+    <link rel="stylesheet" href="/static/css/landing.css">
+</head>
+<body>
+    <nav class="landing-nav">
+        <div class="container nav-container">
+            <div class="brand"><a href="/" style="text-decoration:none; color:inherit;">QircuitLearn</a></div>
+            <div class="nav-links"><a href="/blog" class="btn sm">All Articles</a></div>
+        </div>
+    </nav>
+    <div class="container page-content">
+        <div class="post-card">
+            <div class="post-meta">By {{ post.username }} • {{ post.created_at }}</div>
+            <h1 class="post-title">{{ post.title }}</h1>
+            <div class="post-content">{{ post.content | safe }}</div>
+        </div>
+    </div>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "{{ post.title }}",
+      "datePublished": "{{ post.created_at }}",
+      "author": {
+        "@type": "Person",
+        "name": "{{ post.username }}"
+      },
+      "articleBody": "{{ post.content | replace('\n',' ') | replace('"','\"') }}"
+    }
+    </script>
+</body>
+</html>

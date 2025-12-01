@@ -47,7 +47,7 @@ def seed():
         if not cur.fetchone():
             print("Adding answers_json column to user_quiz_attempts...")
             cur.execute("ALTER TABLE user_quiz_attempts ADD COLUMN answers_json TEXT")
-            conn.commit()
+        conn.commit()
     else:
         # SQLite
         cur.execute("PRAGMA table_info(user_quiz_attempts)")
@@ -56,6 +56,46 @@ def seed():
             print("Adding answers_json column to user_quiz_attempts...")
             cur.execute("ALTER TABLE user_quiz_attempts ADD COLUMN answers_json TEXT")
             conn.commit()
+
+    # MIGRATION: Add slug, meta_title, meta_description to forum_posts
+    try:
+        if db_type == "postgres":
+            cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name='forum_posts'")
+            fp_cols = {row[0] for row in cur.fetchall()}
+            if 'slug' not in fp_cols:
+                print("Adding slug column to forum_posts...")
+                cur.execute("ALTER TABLE forum_posts ADD COLUMN slug VARCHAR(255) UNIQUE")
+                conn.commit()
+            if 'meta_title' not in fp_cols:
+                print("Adding meta_title column to forum_posts...")
+                cur.execute("ALTER TABLE forum_posts ADD COLUMN meta_title VARCHAR(255)")
+                conn.commit()
+            if 'meta_description' not in fp_cols:
+                print("Adding meta_description column to forum_posts...")
+                cur.execute("ALTER TABLE forum_posts ADD COLUMN meta_description TEXT")
+                conn.commit()
+        else:
+            cur.execute("PRAGMA table_info(forum_posts)")
+            fp_cols = [row['name'] for row in cur.fetchall()]
+            if 'slug' not in fp_cols:
+                print("Adding slug column to forum_posts...")
+                cur.execute("ALTER TABLE forum_posts ADD COLUMN slug TEXT")
+                conn.commit()
+                try:
+                    cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_forum_posts_slug ON forum_posts(slug)")
+                    conn.commit()
+                except Exception:
+                    pass
+            if 'meta_title' not in fp_cols:
+                print("Adding meta_title column to forum_posts...")
+                cur.execute("ALTER TABLE forum_posts ADD COLUMN meta_title TEXT")
+                conn.commit()
+            if 'meta_description' not in fp_cols:
+                print("Adding meta_description column to forum_posts...")
+                cur.execute("ALTER TABLE forum_posts ADD COLUMN meta_description TEXT")
+                conn.commit()
+    except Exception as e:
+        print(f"Forum posts migration error: {e}")
 
     def _row_get(row, key, index=0):
         try:

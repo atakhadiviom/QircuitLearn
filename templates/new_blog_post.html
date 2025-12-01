@@ -14,6 +14,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% if post %}Edit Article{% else %}New Article{% endif %} - QircuitLearn</title>
     <link rel="stylesheet" href="/static/css/landing.css">
+    <script src="https://cdn.tiny.cloud/1/{{ tinymce_api_key }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+      tinymce.init({
+        selector: '#editor',
+        height: 500,
+        plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
+        toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | code preview',
+        images_upload_url: '/api/upload',
+        automatic_uploads: true,
+        images_upload_credentials: true,
+        convert_urls: false,
+        content_style: 'body{font-family:Inter,system-ui,sans-serif;}',
+      });
+    </script>
 </head>
 <body>
     <nav class="landing-nav">
@@ -30,12 +44,24 @@
             <h1>{% if post %}Edit Article{% else %}Write New Article{% endif %}</h1>
             <form method="POST">
                 <div class="form-group">
+                    <label>Slug</label>
+                    <input type="text" name="slug" placeholder="my-article-slug" value="{{ post.slug if post else '' }}">
+                </div>
+                <div class="form-group">
                     <label>Title</label>
                     <input type="text" name="title" required placeholder="Article Title" value="{{ post.title if post else '' }}">
                 </div>
                 <div class="form-group">
+                    <label>Meta Title</label>
+                    <input type="text" name="meta_title" placeholder="SEO Title" value="{{ post.meta_title if post else '' }}">
+                </div>
+                <div class="form-group">
+                    <label>Meta Description</label>
+                    <input type="text" name="meta_description" placeholder="SEO Description" value="{{ post.meta_description if post else '' }}">
+                </div>
+                <div class="form-group">
                     <label>Content</label>
-                    <textarea name="content" rows="10" required placeholder="Write your article content here...">{{ post.content if post else '' }}</textarea>
+                    <textarea id="editor" name="content" rows="10" required placeholder="Write your article content here...">{{ post.content if post else '' }}</textarea>
                 </div>
                 <div class="actions">
                     <a href="/blog" class="btn secondary">Cancel</a>

@@ -6,9 +6,9 @@ from .simulate import simulate
 from .models import (
     get_courses, get_lessons, get_course_by_slug, get_lesson_by_slug, upsert_progress,
     create_user, get_user_by_email, get_quiz_for_lesson, get_quiz_questions, 
-    submit_quiz_attempt, get_forum_posts, create_forum_post, get_user_progress,
-    get_forum_post, update_forum_post, delete_forum_post, get_quiz_by_id,
-    get_user_passed_quiz_attempt, search_lessons
+    submit_quiz_attempt, get_forum_posts, get_user_progress,
+    get_forum_post, delete_forum_post, get_quiz_by_id,
+    get_user_passed_quiz_attempt, search_lessons, upsert_forum_post, get_forum_post_by_slug
 )
 
 def register_routes(app):
@@ -198,9 +198,19 @@ def register_routes(app):
         if request.method == "POST":
             title = request.form.get("title")
             content = request.form.get("content")
-            create_forum_post(session['user_id'], title, content)
+            meta_title = request.form.get("meta_title")
+            meta_description = request.form.get("meta_description")
+            slug = request.form.get("slug")
+            if not slug and title:
+                base = ''.join(c.lower() if c.isalnum() else '-' for c in title).strip('-')
+                slug = '-'.join([s for s in base.split('-') if s])
+            try:
+                upsert_forum_post(session['user_id'], title, slug, meta_title, meta_description, content)
+            except Exception as e:
+                flash(f"Error publishing: {e}", "error")
+                return render_template("new_blog_post.html", tinymce_api_key=os.getenv("TINYMCE_API_KEY", "3r5vbmw3vcozuhk57cjfcbes2u4mkwe09lo24uj0h4g73lsa"))
             return redirect(url_for('blog'))
-        return render_template("new_blog_post.html")
+        return render_template("new_blog_post.html", tinymce_api_key=os.getenv("TINYMCE_API_KEY", "3r5vbmw3vcozuhk57cjfcbes2u4mkwe09lo24uj0h4g73lsa"))
 
     @app.route("/blog/edit/<int:post_id>", methods=["GET", "POST"])
     def edit_blog_post(post_id):
@@ -219,12 +229,68 @@ def register_routes(app):
         if request.method == "POST":
             title = request.form.get("title")
             content = request.form.get("content")
-            update_forum_post(post_id, title, content)
+            meta_title = request.form.get("meta_title")
+            meta_description = request.form.get("meta_description")
+            slug = request.form.get("slug")
+            if not slug and title:
+                base = ''.join(c.lower() if c.isalnum() else '-' for c in title).strip('-')
+                slug = '-'.join([s for s in base.split('-') if s])
+            upsert_forum_post(session['user_id'], title, slug, meta_title, meta_description, content, post_id=post_id)
             flash("Article updated successfully.", "success")
             return redirect(url_for('blog'))
             
         # Reuse the new_blog_post template but pass the post object
-        return render_template("new_blog_post.html", post=to_dict(post))
+        return render_template("new_blog_post.html", post=to_dict(post), tinymce_api_key=os.getenv("TINYMCE_API_KEY", "3r5vbmw3vcozuhk57cjfcbes2u4mkwe09lo24uj0h4g73lsa"))
+
+    @app.route('/blog/<slug>')
+    def blog_detail(slug):
+        post = get_forum_post_by_slug(slug)
+        if not post:
+            return redirect(url_for('blog'))
+        pd = to_dict(post)
+        return render_template('post_detail.html', post=pd)
+
+    @app.post('/api/upload')
+    def upload_media():
+        if 'user_id' not in session or not session.get('is_superuser'):
+            return jsonify({"error": "Unauthorized"}), 401
+        f = request.files.get('file')
+        if not f:
+            return jsonify({"error": "No file"}), 400
+        name = f.filename
+        allowed = {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'}
+        ext = os.path.splitext(name)[1].lower()
+        if ext not in allowed:
+            return jsonify({"error": "Unsupported file type"}), 400
+        upload_dir = os.path.join(os.path.dirname(__file__), '../static/uploads')
+        os.makedirs(upload_dir, exist_ok=True)
+        safe_name = ''.join(c if c.isalnum() or c in ('.','-','_') else '-' for c in name)
+        original_path = os.path.join(upload_dir, safe_name)
+
+        # Attempt WebP conversion for raster images
+        convert_exts = {'.png', '.jpg', '.jpeg'}
+        if ext in convert_exts:
+            try:
+                from PIL import Image
+                f.stream.seek(0)
+                im = Image.open(f.stream)
+                im = im.convert('RGB')
+                base = os.path.splitext(safe_name)[0]
+                webp_name = base + '.webp'
+                webp_path = os.path.join(upload_dir, webp_name)
+                im.save(webp_path, 'WEBP', quality=82, method=6)
+                url = url_for('assets', path=f'uploads/{webp_name}', _external=True)
+                return jsonify({"location": url, "format": "webp"})
+            except Exception:
+                # Fallback: save original
+                f.save(original_path)
+                url = url_for('assets', path=f'uploads/{safe_name}', _external=True)
+                return jsonify({"location": url, "format": ext.strip('.')})
+        else:
+            # For webp, svg, gif: save as-is
+            f.save(original_path)
+            url = url_for('assets', path=f'uploads/{safe_name}', _external=True)
+            return jsonify({"location": url, "format": ext.strip('.')})
 
     @app.post("/blog/delete/<int:post_id>")
     def delete_blog_post(post_id):
@@ -338,6 +404,16 @@ def register_routes(app):
                 for lesson in lessons:
                     l = to_dict(lesson)
                     urls.append(url_for('lesson_view', course_slug=c['slug'], lesson_slug=l['slug'], _external=True))
+        except Exception:
+            pass
+
+        # Blog posts
+        try:
+            posts = get_forum_posts()
+            for p in posts:
+                d = to_dict(p)
+                if d.get('slug'):
+                    urls.append(url_for('blog_detail', slug=d['slug'], _external=True))
         except Exception:
             pass
 

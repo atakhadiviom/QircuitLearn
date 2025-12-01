@@ -75,6 +75,9 @@ CREATE TABLE forum_posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER REFERENCES users(id),
     title TEXT NOT NULL,
+    slug TEXT UNIQUE,
+    meta_title TEXT,
+    meta_description TEXT,
     content TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
