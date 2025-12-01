@@ -349,7 +349,7 @@ $$|\psi'\\rangle = e^{i\\gamma}(\\alpha|0\\rangle + \\beta|1\\rangle) = (e^{i\\g
 <p>Relative phase is the difference in phase <em>between</em> the coefficients $\\alpha$ and $\\beta$. This is the parameter $\\phi$ on the Bloch Sphere.</p>
 
 <div style="text-align: center; margin: 20px;">
-    <img src="/assets/images/bloch-sphere.png" alt="Bloch Sphere showing relative phase phi" style="max-width: 300px; border-radius: 8px;">
+    <img src="/static/images/bloch-sphere.png" alt="Bloch Sphere showing relative phase phi" style="max-width: 300px; border-radius: 8px;">
     <p><em>The angle $\\phi$ around the Z-axis is the Relative Phase.</em></p>
 </div>
 
@@ -368,9 +368,36 @@ $$|\\psi\\rangle = \\cos(\\frac{\\theta}{2})|0\\rangle + e^{i\\phi}\\sin(\\frac{
                     "title": "9. Probability Theory: Random Variables",
                     "content": """
 <h2>Random Variables</h2>
-<p>A <strong>Random Variable</strong> is a variable whose value depends on the outcome of a random phenomenon.</p>
-<p>Example: Let $X$ be the result of rolling a die. $X$ can be 1, 2, 3, 4, 5, or 6.</p>
-<p>In quantum computing, the result of a measurement is a random variable. You don't know what you'll get until you look.</p>
+<p>This is where the "Physics" of quantum mechanics meets the "Statistics" of reality. A qubit in superposition is not a fuzzy value; it is a Random Variable waiting to be sampled.</p>
+<p>In classical probability, a random variable $X$ is a variable that takes on specific values with specific probabilities. In Quantum Computing, the act of measurement creates this random variable.</p>
+
+<h3>1. The Discrete Random Variable (The Outcome)</h3>
+<p>When you measure a qubit in the $Z$-basis, you are querying a discrete random variable that can only take one of two specific values (the eigenvalues of the $Z$-operator):</p>
+<ul>
+    <li><strong>+1</strong> (corresponding to state $|0\\rangle$)</li>
+    <li><strong>-1</strong> (corresponding to state $|1\\rangle$)</li>
+</ul>
+<p><strong>Crucial Note:</strong> Computer scientists often map these to the bits $0$ and $1$, but physically/mathematically, the math works on the eigenvalues $+1$ and $-1$.</p>
+
+<h3>2. The Probability Distribution (The State)</h3>
+<p>The quantum state vector $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$ defines the Probability Mass Function (PMF) for this random variable.</p>
+$$P(X = +1) = |\\alpha|^2$$
+$$P(X = -1) = |\\beta|^2$$
+<p><strong>Constraint:</strong> Since something must happen, $|\\alpha|^2 + |\\beta|^2 = 1$.</p>
+
+<h3>3. The Expectation Value (The Average)</h3>
+<p>This is the most misunderstood concept for beginners. The Expectation Value (denoted as $E[X]$ or $\\langle Z \\rangle$) is <strong>NOT</strong> the value you expect to see in a single measurement.</p>
+<p>Since the outcomes are only $+1$ or $-1$, you will never see the expectation value (which is usually a decimal, like $0.5$) in a single shot.</p>
+<p>The Expectation Value is the average of the results if you repeated the experiment 1000 times.</p>
+$$E[X] = \\sum x_i P(x_i)$$
+$$E[X] = (+1) \\cdot P(0) + (-1) \\cdot P(1)$$
+$$E[X] = |\\alpha|^2 - |\\beta|^2$$
+<p>This number tells us the "bias" of the qubit.</p>
+<ul>
+    <li>If $E[X] = 1$, the qubit is definitely $|0\\rangle$.</li>
+    <li>If $E[X] = -1$, the qubit is definitely $|1\\rangle$.</li>
+    <li>If $E[X] = 0$, the qubit is perfectly balanced (50/50 superposition).</li>
+</ul>
                     """,
                     "position": 9,
                     "task_json": None,
@@ -381,12 +408,39 @@ $$|\\psi\\rangle = \\cos(\\frac{\\theta}{2})|0\\rangle + e^{i\\phi}\\sin(\\frac{
                     "title": "10. Probability: Amplitudes vs. Probabilities",
                     "content": """
 <h2>Amplitudes vs. Probabilities</h2>
-<p>This is the single biggest difference between classical and quantum physics.</p>
+<p>This is the most critical distinction in all of quantum mechanics. If you treat amplitudes like probabilities, you will fail to understand how a quantum computer actually solves problems.</p>
+<p><strong>Nature operates on Amplitudes. We only observe Probabilities.</strong></p>
+
+<h3>1. The Fundamental Difference</h3>
+<p><strong>Probabilities</strong> ($P$) are real numbers between 0 and 1. They describe uncertainty. If you have a 50% chance of rain and a 30% chance of snow, you add them. Probabilities accumulate; they only increase the total likelihood of outcomes.</p>
+<p><strong>Amplitudes</strong> ($\\alpha$) are complex numbers. They describe the physical state. Because they have a phase (direction), amplitudes can point in opposite directions and <em>cancel</em> when added.</p>
+
+<h3>2. The Power: Interference</h3>
+<p>This is why quantum computers can outperform classical ones.</p>
+<p><strong>Classical:</strong> If there are two ways to get a result, probabilities add:</p>
+$$P_{total} = P_{path1} + P_{path2}$$
+<p><strong>Quantum:</strong> Amplitudes add first, then you square for probability:</p>
+$$\\alpha_{total} = \\alpha_{path1} + \\alpha_{path2}$$
+<p><strong>Destructive Interference:</strong> If $\\alpha_{path1} = 0.5$ and $\\alpha_{path2} = -0.5$, then</p>
+<p>Classical intuition: $0.5^2 + (-0.5)^2 = 0.25 + 0.25 = 0.5$.</p>
+<p>Quantum reality: $0.5 + (-0.5) = 0$, so $P = |0|^2 = 0$. The event cannot happen.</p>
+<p>Quantum algorithms (Grover, Shor) choreograph amplitudes so wrong answers cancel (destructive interference) and the right answer amplifies (constructive interference).</p>
+
+<div style=\"text-align:center; margin:20px;\">
+  <img src=\"/static/images/wave%20interference.png\" alt=\"Wave interference pattern\" style=\"max-width: 420px; border-radius: 8px;\">
+  <p><em>Interference: amplitudes combine before probabilities are observed.</em></p>
+}</div>
+
+<h3>📝 Knowledge Check: The \"Impossible\" Zero</h3>
+<p>Imagine a system with three paths contributing amplitude to the $|1\\rangle$ state:</p>
 <ul>
-    <li><strong>Classical:</strong> Probabilities are always positive real numbers. To find the total probability, you ADD them.</li>
-    <li><strong>Quantum:</strong> We work with <strong>Amplitudes</strong> (complex numbers). To find the probability, you SQUARE the amplitude ($P = |\\alpha|^2$).</li>
-</ul>
-<p><strong>The Magic:</strong> Because amplitudes can be negative (or complex), they can CANCEL each other out when added. This is interference.</p>
+  <li>Path A: $\\frac{1}{2}$</li>
+  <li>Path B: $\\frac{i}{2}$</li>
+  <li>Path C: $-\\frac{1}{2} - \\frac{i}{2}$</li>
+ </ul>
+<p><strong>Classical Thinking:</strong> Compute $|A|^2 + |B|^2 + |C|^2$.</p>
+<p><strong>Quantum Thinking:</strong> Compute $(A + B + C)$ first, then $|\\alpha_{total}|^2$.</p>
+<p>Compare the results. The difference is the <strong>quantum magic</strong>.</p>
                     """,
                     "position": 10,
                     "task_json": None,
@@ -1253,6 +1307,145 @@ $$|0\\rangle \otimes |1\\rangle = |01\\rangle$$
                     (quiz_id, question_text, options, correct_idx))
         else:
              print(f"Quiz '{quiz_title}' already exists.")
+
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("probability-theory-random-variables",))
+        rv_row = cur.fetchone()
+        rv_lesson_id = _row_get(rv_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("probability-theory-random-variables",))
+        rv_row = cur.fetchone()
+        rv_lesson_id = _row_get(rv_row, 'id', 0)
+
+    if rv_lesson_id:
+        quiz_title = "The Trap of the Average"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (rv_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (rv_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "For |ψ⟩ = √0.8|0⟩ + √0.2|1⟩, what are P(X=+1) and P(X=-1)?"
+            q1_options = json.dumps([
+                "P(+1)=0.8, P(-1)=0.2",
+                "P(+1)=0.2, P(-1)=0.8",
+                "P(+1)=0.64, P(-1)=0.36",
+                "P(+1)=0.5, P(-1)=0.5"
+            ])
+            q1_correct = 0
+
+            q2_text = "Compute ⟨Z⟩ for the state above."
+            q2_options = json.dumps([
+                "⟨Z⟩ = 0.2",
+                "⟨Z⟩ = 0.6",
+                "⟨Z⟩ = -0.6",
+                "⟨Z⟩ = 1.0"
+            ])
+            q2_correct = 1
+
+            q3_text = "If you measure once, what number is read out, and can you ever read ⟨Z⟩ in a single shot?"
+            q3_options = json.dumps([
+                "+1 or -1; you cannot get 0.6 in a single shot",
+                "0.6; expectation is a single-shot observable",
+                "+1 only; the state collapses deterministically",
+                "Any real number between -1 and +1"
+            ])
+            q3_correct = 0
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (rv_lesson_id, quiz_title))
+                new_quiz_row = cur.fetchone()
+                new_quiz_id = _row_get(new_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (new_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (new_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (new_quiz_id, q3_text, q3_options, q3_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (rv_lesson_id, quiz_title))
+                new_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (new_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (new_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (new_quiz_id, q3_text, q3_options, q3_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # 12. Add a Quiz for "Probability: Amplitudes vs. Probabilities"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("probability-theory-amplitudes",))
+        ap_row = cur.fetchone()
+        ap_lesson_id = _row_get(ap_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("probability-theory-amplitudes",))
+        ap_row = cur.fetchone()
+        ap_lesson_id = _row_get(ap_row, 'id', 0)
+
+    if ap_lesson_id:
+        quiz_title = "The \"Impossible\" Zero"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (ap_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (ap_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "Treating amplitudes as separate probabilities: what is |A|^2 + |B|^2 + |C|^2 for A=1/2, B=i/2, C=-(1/2)-(i/2)?"
+            q1_options = json.dumps([
+                "1.0 (sum of 0.25 + 0.25 + 0.5)",
+                "0.5",
+                "0.0",
+                "0.25"
+            ])
+            q1_correct = 0
+
+            q2_text = "Add A+B+C first to get the total amplitude. What is the actual probability |α_total|^2 of measuring |1⟩?"
+            q2_options = json.dumps([
+                "1.0",
+                "0.0",
+                "0.5",
+                "0.25"
+            ])
+            q2_correct = 1
+
+            q3_text = "What principle explains the difference between the two results?"
+            q3_options = json.dumps([
+                "Destructive interference cancels amplitudes before squaring",
+                "Probabilities must be squared before summing",
+                "Global phase changes measurement outcomes",
+                "Hilbert space dimension doubles the probability"
+            ])
+            q3_correct = 0
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (ap_lesson_id, quiz_title))
+                ap_quiz_row = cur.fetchone()
+                ap_quiz_id = _row_get(ap_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (ap_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (ap_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (ap_quiz_id, q3_text, q3_options, q3_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (ap_lesson_id, quiz_title))
+                ap_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (ap_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (ap_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (ap_quiz_id, q3_text, q3_options, q3_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
 
     # CLEANUP: Remove quizzes that users requested to be deleted
     quizzes_to_remove = ["Linear Algebra Check", "Matrix Operation Check", "Eigenvalue Check"]
