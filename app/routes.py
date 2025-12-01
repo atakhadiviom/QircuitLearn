@@ -348,3 +348,18 @@ def register_routes(app):
         response = make_response(xml)
         response.headers["Content-Type"] = "application/xml"
         return response
+
+    @app.route('/robots.txt')
+    def robots_txt():
+        lines = [
+            "User-agent: *",
+            "Allow: /",
+            "Disallow: /api/",
+            "Disallow: /qircuitapp/",
+            "Disallow: /register",
+            "Disallow: /login",
+            f"Sitemap: {url_for('sitemap', _external=True)}",
+        ]
+        response = make_response("\n".join(lines))
+        response.headers["Content-Type"] = "text/plain"
+        return response
