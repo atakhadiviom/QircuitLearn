@@ -18,6 +18,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/landing.css">
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('img').forEach(img => {
+          img.setAttribute('loading', 'lazy');
+          img.setAttribute('decoding', 'async');
+        });
+      });
+    </script>
 </head>
 <body class="landing-page">
     <nav class="landing-nav">
@@ -108,4 +116,42 @@
         </div>
     </footer>
 </body>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Qircuit",
+  "url": "https://qircuit.com",
+  "logo": "https://qircuit.com/assets/logo.png"
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "url": "https://qircuit.com",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://qircuit.com/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "QircuitLearn",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>
 </html>

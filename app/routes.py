@@ -8,7 +8,7 @@ from .models import (
     create_user, get_user_by_email, get_quiz_for_lesson, get_quiz_questions, 
     submit_quiz_attempt, get_forum_posts, create_forum_post, get_user_progress,
     get_forum_post, update_forum_post, delete_forum_post, get_quiz_by_id,
-    get_user_passed_quiz_attempt
+    get_user_passed_quiz_attempt, search_lessons
 )
 
 def register_routes(app):
@@ -66,6 +66,7 @@ def register_routes(app):
         current_lesson = None
         prev_lesson = None
         next_lesson = None
+        related_lessons = []
         
         for i, l in enumerate(lessons):
             if l['slug'] == lesson_slug:
@@ -74,6 +75,9 @@ def register_routes(app):
                     prev_lesson = lessons[i-1]
                 if i < len(lessons) - 1:
                     next_lesson = lessons[i+1]
+                # Related lessons: same section excluding current
+                if l['section']:
+                    related_lessons = [rl for rl in lessons if rl['section'] == l['section'] and rl['slug'] != l['slug']][:4]
                 break
         
         if not current_lesson:
@@ -89,6 +93,7 @@ def register_routes(app):
                                current_lesson=current_lesson,
                                prev_lesson=prev_lesson,
                                next_lesson=next_lesson,
+                               related_lessons=related_lessons,
                                user_progress=user_progress)
 
     @app.post("/api/simulate")
@@ -348,6 +353,27 @@ def register_routes(app):
         response = make_response(xml)
         response.headers["Content-Type"] = "application/xml"
         return response
+
+    @app.get('/search')
+    def search():
+        q = request.args.get('q', '').strip()
+        results = []
+        if q:
+            try:
+                raw = search_lessons(q)
+                # rows can be Row or dict; normalize
+                results = []
+                for r in raw:
+                    d = dict(r) if hasattr(r, 'keys') else r
+                    results.append({
+                        'title': d['title'],
+                        'slug': d['slug'],
+                        'course_slug': d.get('course_slug'),
+                        'course_title': d.get('course_title')
+                    })
+            except Exception:
+                results = []
+        return render_template('search.html', q=q, results=results)
 
     @app.route('/robots.txt')
     def robots_txt():

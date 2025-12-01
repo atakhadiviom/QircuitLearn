@@ -64,4 +64,27 @@
         </div>
     </div>
 </body>
+
+{% if posts and posts|length > 0 %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "blogPost": [
+    {% for post in posts %}
+    {
+      "@type": "BlogPosting",
+      "headline": "{{ post.title }}",
+      "datePublished": "{{ post.created_at }}",
+      "author": {
+        "@type": "Person",
+        "name": "{{ post.username }}"
+      },
+      "articleBody": "{{ post.content | replace('\n',' ') | replace('"','\"') }}"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endif %}
 </html>

@@ -262,6 +262,24 @@ def get_lessons(course_id):
     conn.close()
     return rows
 
+def search_lessons(term):
+    conn = get_conn()
+    cur = get_cursor(conn)
+    ph = get_placeholder()
+    tlike = f"%{term}%"
+    # Search by title or content; limit to reasonable number
+    cur.execute(
+        f"SELECT lessons.*, courses.title AS course_title, courses.slug AS course_slug "
+        f"FROM lessons JOIN courses ON lessons.course_id = courses.id "
+        f"WHERE lessons.title LIKE {ph} OR lessons.content LIKE {ph} "
+        f"ORDER BY lessons.position LIMIT 50",
+        (tlike, tlike)
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return rows
+
 def get_lesson_by_slug(course_id, slug):
     conn = get_conn()
     cur = get_cursor(conn)

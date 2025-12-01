@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Search - QircuitLearn</title>
+    <link rel="stylesheet" href="/static/css/landing.css">
+</head>
+<body>
+    <nav class="landing-nav">
+        <div class="container nav-container">
+            <div class="brand"><a href="/" style="text-decoration:none; color:inherit;">QircuitLearn</a></div>
+        </div>
+    </nav>
+
+    <div class="container page-content">
+        <h1>Search</h1>
+        <form method="GET" action="/search" style="display:flex; gap:10px; margin-bottom: 1rem;">
+            <input type="text" name="q" placeholder="Search lessons..." value="{{ q }}" style="flex:1; padding:8px;">
+            <button type="submit" class="btn primary">Search</button>
+        </form>
+
+        {% if q and results %}
+        <p>Found {{ results|length }} result{{ '' if results|length == 1 else 's' }} for "{{ q }}"</p>
+        <div class="features-grid">
+            {% for r in results %}
+            <div class="feature-card">
+                <h3>{{ r.title }}</h3>
+                <p class="text-muted">Course: {{ r.course_title }}</p>
+                <a class="btn" href="/learn/{{ r.course_slug }}/{{ r.slug }}">View Lesson</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% elif q %}
+        <p>No results for "{{ q }}"</p>
+        {% endif %}
+    </div>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": "https://qircuit.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://qircuit.com/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+</body>
+</html>
