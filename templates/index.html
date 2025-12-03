@@ -13,7 +13,69 @@
   </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{ course['title'] if course else 'QircuitLearn' }}</title>
+  
+  {% set page_title = (current_lesson['title'] + ' - ' + course['title']) if current_lesson else (course['title'] + ' - QircuitLearn') %}
+  {% set page_desc = (current_lesson['content'][:200] | striptags) if current_lesson else (course['description'] or 'Learn ' + course['title'] + ' interactively on QircuitLearn') %}
+  {% set page_url = 'https://qircuit.com/learn/' + course['slug'] + ('/' + current_lesson['slug'] if current_lesson else '') %}
+
+  <title>{{ page_title }}</title>
+  <meta name="description" content="{{ page_desc }}">
+  <link rel="canonical" href="{{ page_url }}">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ page_url }}">
+  <meta property="og:title" content="{{ page_title }}">
+  <meta property="og:description" content="{{ page_desc }}">
+  <meta property="og:image" content="https://qircuit.com/static/images/bloch-sphere.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="{{ page_url }}">
+  <meta property="twitter:title" content="{{ page_title }}">
+  <meta property="twitter:description" content="{{ page_desc }}">
+  <meta property="twitter:image" content="https://qircuit.com/static/images/bloch-sphere.png">
+
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      "name": "{{ course['title'] }}",
+      "description": "{{ course['description'] }}",
+      "provider": {
+        "@type": "Organization",
+        "name": "QircuitLearn",
+        "sameAs": "https://qircuit.com"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://qircuit.com/"
+      },{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ course['title'] }}",
+        "item": "https://qircuit.com/learn/{{ course['slug'] }}"
+      }
+      {% if current_lesson %}
+      ,{
+        "@type": "ListItem",
+        "position": 3,
+        "name": "{{ current_lesson['title'] }}",
+        "item": "https://qircuit.com/learn/{{ course['slug'] }}/{{ current_lesson['slug'] }}"
+      }
+      {% endif %}
+      ]
+    }
+  ]
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="/static/css/main.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -25,7 +87,7 @@
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <script defer src="{{ url_for('static', filename='js/editor.js') }}?v=9"></script>
+  <script defer src="{{ url_for('static', filename='js/editor.js') }}?v=14"></script>
   <script>
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('active');
@@ -37,6 +99,17 @@
         img.setAttribute('loading', 'lazy');
         img.setAttribute('decoding', 'async');
       });
+
+      // Convert Markdown **bold** to HTML <strong>bold</strong>
+      const prose = document.querySelector('.prose');
+      if (prose) {
+        prose.innerHTML = prose.innerHTML.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Re-trigger MathJax if it's loaded, just in case
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise([prose]);
+        }
+      }
     });
   </script>
 </head>
@@ -363,19 +436,4 @@
   </div>
   {% endif %}
 </body>
-
-{% if current_lesson %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ url_for('index', _external=True) }}"},
-    {"@type": "ListItem", "position": 2, "name": "{{ course['title'] }}", "item": "{{ url_for('course_overview', course_slug=course['slug'], _external=True) }}"},
-    {"@type": "ListItem", "position": 3, "name": "{{ current_lesson['title'] }}", "item": "{{ url_for('lesson_view', course_slug=course['slug'], lesson_slug=current_lesson['slug'], _external=True) }}"}
-  ]
-}
-</script>
-{% endif %}
-
 </html>

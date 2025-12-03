@@ -383,27 +383,37 @@ def register_routes(app):
 
     @app.route('/sitemap.xml')
     def sitemap():
-        urls = []
+        items = []
 
         # Static pages
-        urls.append(url_for('index', _external=True))
-        urls.append(url_for('blog', _external=True))
-        urls.append(url_for('register', _external=True))
-        urls.append(url_for('login', _external=True))
+        items.append({'loc': url_for('index', _external=True), 'priority': '1.0', 'changefreq': 'daily'})
+        items.append({'loc': url_for('blog', _external=True), 'priority': '0.9', 'changefreq': 'daily'})
 
         # Courses and Lessons
         try:
             courses = get_courses()
             for course in courses:
                 c = to_dict(course)
-                # Course overview page
-                urls.append(url_for('course_overview', course_slug=c['slug'], _external=True))
+                # Extract YYYY-MM-DD from created_at
+                lastmod = str(c.get('created_at', '')).split(' ')[0] if c.get('created_at') else None
+                items.append({
+                    'loc': url_for('course_overview', course_slug=c['slug'], _external=True),
+                    'lastmod': lastmod,
+                    'priority': '0.9',
+                    'changefreq': 'weekly'
+                })
                 
                 # Lessons
                 lessons = get_lessons(c['id'])
                 for lesson in lessons:
                     l = to_dict(lesson)
-                    urls.append(url_for('lesson_view', course_slug=c['slug'], lesson_slug=l['slug'], _external=True))
+                    l_lastmod = str(l.get('created_at', '')).split(' ')[0] if l.get('created_at') else None
+                    items.append({
+                        'loc': url_for('lesson_view', course_slug=c['slug'], lesson_slug=l['slug'], _external=True),
+                        'lastmod': l_lastmod,
+                        'priority': '0.8',
+                        'changefreq': 'weekly'
+                    })
         except Exception:
             pass
 
@@ -413,16 +423,25 @@ def register_routes(app):
             for p in posts:
                 d = to_dict(p)
                 if d.get('slug'):
-                    urls.append(url_for('blog_detail', slug=d['slug'], _external=True))
+                    p_lastmod = str(d.get('created_at', '')).split(' ')[0] if d.get('created_at') else None
+                    items.append({
+                        'loc': url_for('blog_detail', slug=d['slug'], _external=True),
+                        'lastmod': p_lastmod,
+                        'priority': '0.7',
+                        'changefreq': 'monthly'
+                    })
         except Exception:
             pass
 
         xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
         xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        for url in urls:
+        for item in items:
             xml += '  <url>\n'
-            xml += f'    <loc>{url}</loc>\n'
-            xml += '    <changefreq>weekly</changefreq>\n'
+            xml += f'    <loc>{item["loc"]}</loc>\n'
+            if item.get("lastmod"):
+                xml += f'    <lastmod>{item["lastmod"]}</lastmod>\n'
+            xml += f'    <changefreq>{item.get("changefreq", "weekly")}</changefreq>\n'
+            xml += f'    <priority>{item.get("priority", "0.5")}</priority>\n'
             xml += '  </url>\n'
         xml += '</urlset>'
 

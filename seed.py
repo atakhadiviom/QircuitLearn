@@ -444,44 +444,39 @@ $$E[X] = |\\alpha|^2 - |\\beta|^2$$
                     "section": "probability-theory"
                 },
                 {
-                    "slug": "probability-theory-amplitudes",
-                    "title": "10. Probability: Amplitudes vs. Probabilities",
+                    "slug": "gates-hadamard",
+                    "title": "10. Gates: Hadamard",
                     "content": """
-<h2>Amplitudes vs. Probabilities</h2>
-<p>This is the most critical distinction in all of quantum mechanics. If you treat amplitudes like probabilities, you will fail to understand how a quantum computer actually solves problems.</p>
-<p><strong>Nature operates on Amplitudes. We only observe Probabilities.</strong></p>
+<h2>10. Gates: Hadamard</h2>
+<p>The <strong>Hadamard Gate ($H$)</strong> is the indispensable single-qubit tool. It is the gate that generates balanced <strong>superposition</strong> and enables the ability to measure the qubit in a new basis, which is necessary for algorithms like the Quantum Fourier Transform.</p>
 
-<h3>1. The Fundamental Difference</h3>
-<p><strong>Probabilities</strong> ($P$) are real numbers between 0 and 1. They describe uncertainty. If you have a 50% chance of rain and a 30% chance of snow, you add them. Probabilities accumulate; they only increase the total likelihood of outcomes.</p>
-<p><strong>Amplitudes</strong> ($\\alpha$) are complex numbers. They describe the physical state. Because they have a phase (direction), amplitudes can point in opposite directions and <em>cancel</em> when added.</p>
+<h3>1. The Matrix and the Operation</h3>
+<p>The Hadamard gate is a $2\times 2$ unitary matrix:</p>
+$$H = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}$$
+<p>Its action is to map the computational basis states ($|0\rangle, |1\rangle$) to the new basis states, often called the <strong>Hadamard Basis</strong> or the <strong>X-Basis</strong> states ($|+\rangle, |-\rangle$):</p>
+$$\begin{array}{l} H|0\rangle = |+\rangle = \frac{1}{\sqrt{2}}|0\rangle + \frac{1}{\sqrt{2}}|1\rangle \\ H|1\rangle = |-\rangle = \frac{1}{\sqrt{2}}|0\rangle - \frac{1}{\sqrt{2}}|1\rangle \end{array}$$
 
-<h3>2. The Power: Interference</h3>
-<p>This is why quantum computers can outperform classical ones.</p>
-<p><strong>Classical:</strong> If there are two ways to get a result, probabilities add:</p>
-$$P_{total} = P_{path1} + P_{path2}$$
-<p><strong>Quantum:</strong> Amplitudes add first, then you square for probability:</p>
-$$\\alpha_{total} = \\alpha_{path1} + \\alpha_{path2}$$
-<p><strong>Destructive Interference:</strong> If $\\alpha_{path1} = 0.5$ and $\\alpha_{path2} = -0.5$, then</p>
-<p>Classical intuition: $0.5^2 + (-0.5)^2 = 0.25 + 0.25 = 0.5$.</p>
-<p>Quantum reality: $0.5 + (-0.5) = 0$, so $P = |0|^2 = 0$. The event cannot happen.</p>
-<p>Quantum algorithms (Grover, Shor) choreograph amplitudes so wrong answers cancel (destructive interference) and the right answer amplifies (constructive interference).</p>
+<h3>2. Physical Significance: Basis Change</h3>
+<p>On the Bloch sphere, the Hadamard gate represents a specific sequence of rotations (a $90^\circ$ rotation about the Y-axis followed by a $180^\circ$ rotation about the X-axis) that effectively swaps the Z-axis with the X-axis.</p>
 
-<div style=\"text-align:center; margin:20px;\">
-  <img src=\"/static/images/wave%20interference.png\" alt=\"Wave interference pattern\" style=\"max-width: 420px; border-radius: 8px;\">
-  <p><em>Interference: amplitudes combine before probabilities are observed.</em></p>
-}</div>
+<div style="text-align:center; margin:20px;">
+  <img src="/static/images/bloch-sphere.png" alt="Bloch Sphere" style="max-width: 400px; border-radius: 8px;">
+</div>
 
-<h3>📝 Knowledge Check: The \"Impossible\" Zero</h3>
-<p>Imagine a system with three paths contributing amplitude to the $|1\\rangle$ state:</p>
 <ul>
-  <li>Path A: $\\frac{1}{2}$</li>
-  <li>Path B: $\\frac{i}{2}$</li>
-  <li>Path C: $-\\frac{1}{2} - \\frac{i}{2}$</li>
- </ul>
-<p><strong>Classical Thinking:</strong> Compute $|A|^2 + |B|^2 + |C|^2$.</p>
-<p><strong>Quantum Thinking:</strong> Compute $(A + B + C)$ first, then $|\\alpha_{total}|^2$.</p>
-<p>Compare the results. The difference is the <strong>quantum magic</strong>.</p>
-                    """,
+  <li>When you apply $H$ to $|0\rangle$, the state vector moves from the North Pole (Z-axis) to the positive X-axis ($|+\rangle$).</li>
+  <li>If you measure the state $|+\rangle$ in the Z-basis, the result is random (50/50).</li>
+  <li>However, if you apply $H$ again, the state returns to $|0\rangle$. Now, if you measure, the result is deterministic ($100\%$ probability of $|0\rangle$).</li>
+</ul>
+<p>This ability to switch bases is what allows quantum computation to function. Interference effects (which rely on the relative phase $\phi$) are only visible when the state is measured in the correct basis.</p>
+
+<h3>Your Task: Proving Reversibility</h3>
+<p>Since $H$ is a valid quantum gate, it must be <strong>unitary</strong> (Postulate 2). The simplest way to show this is to prove that the gate is its own inverse, meaning applying it twice returns the original state.</p>
+<p>Prove that:</p>
+$$H^2 = I$$
+<p>where $I = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}$ is the Identity matrix.</p>
+<p>Show the matrix multiplication $H \cdot H$ step-by-step.</p>
+""",
                     "position": 10,
                     "task_json": None,
                     "section": "probability-theory"
@@ -867,31 +862,108 @@ $$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
                     "title": "5. The Qubit: The Bloch Sphere",
                     "content": """
 <h2>The Bloch Sphere</h2>
-<p>Since a qubit $|\psi\\rangle = \alpha|0\\rangle + \beta|1\\rangle$ has complex coefficients, we can't just draw it on a 2D graph.</p>
-<p>However, ignoring the global phase, we can map the state of a single qubit to a point on the surface of a sphere called the <strong>Bloch Sphere</strong>.</p>
+<p>The Bloch Sphere is not a physical object; it is the essential geometric visualization tool for the state space of a single qubit ($\mathbb{C}^2$). It ties together everything you’ve learned about normalization, superposition, and phase.</p>
+
+<h3>1. The Mapping</h3>
+<p>A state vector is a 2-dimensional complex vector, but the Bloch Sphere allows us to map it uniquely onto the surface of a 3-dimensional real sphere (the unit sphere).</p>
 <ul>
-    <li><strong>North Pole:</strong> $|0\\rangle$</li>
-    <li><strong>South Pole:</strong> $|1\\rangle$</li>
-    <li><strong>Equator:</strong> Superposition states (like $|+\\rangle = \\frac{|0\\rangle + |1\\rangle}{\sqrt{2}}$).</li>
+    <li><strong>Poles (The Classical Basis):</strong> The North Pole is the state $|0\\rangle$. The South Pole is the state $|1\\rangle$.</li>
+    <li><strong>Surface (Superposition):</strong> Every single point on the surface represents a valid pure superposition state $|\\psi\\rangle$.</li>
+    <li><strong>Vector Length (Normalization):</strong> The vector from the center to any point on the surface has a length of 1, satisfying the normalization condition $\\langle \\psi | \\psi \\rangle = 1$.</li>
 </ul>
-<p><strong>The Takeaway:</strong> Quantum Gates are just rotations of this sphere.</p>
+<img src="/static/images/Sphere.jpeg" alt="Bloch Sphere" style="max-width:100%; margin: 20px 0;">
+
+<h3>2. The Spherical Coordinates</h3>
+<p>The position of any pure state $|\\psi\\rangle$ on the sphere is defined by two real angles, $\\theta$ (polar) and $\\phi$ (azimuthal), which directly map to probability and phase:</p>
+$$|\\psi\\rangle = \\cos(\\frac{\\theta}{2})|0\\rangle + e^{i\\phi}\\sin(\\frac{\\theta}{2})|1\\rangle$$
+
+<ul>
+    <li><strong>Angle $\\theta$ (Polar, $0 \\le \\theta \\le \\pi$):</strong> This angle, measured from the Z-axis (North Pole), controls the probability bias.
+    $$P(|0\\rangle) = \\cos^2(\\theta/2)$$
+    $$P(|1\\rangle) = \\sin^2(\\theta/2)$$
+    </li>
+    <li><strong>Angle $\\phi$ (Azimuthal, $0 \\le \\phi < 2\\pi$):</strong> This angle, measured from the X-axis, controls the crucial relative phase $e^{i\\phi}$ between the $|0\\rangle$ and $|1\\rangle$ components.</li>
+</ul>
+
+<h3>3. Gates as Rotations</h3>
+<p>Unitary gates (Postulate 2) are represented as rotations of the state vector on the sphere.</p>
+<ul>
+    <li>The <strong>Pauli-X</strong> gate is a $180^\\circ$ rotation about the X-axis.</li>
+    <li>The <strong>Pauli-Z</strong> gate is a rotation about the Z-axis (changing $\\phi$).</li>
+    <li>The <strong>Hadamard</strong> gate is a rotation that maps the Z-axis states ($|0\\rangle, |1\\rangle$) to the X-axis states ($|+\\rangle, |-\\rangle$).</li>
+</ul>
+
+<h3>Your Task: Mapping the Superposition</h3>
+<p>The balanced superposition state $|+\\rangle$ is created by applying the Hadamard gate to $|0\\rangle$. Its vector form is:</p>
+$$|+\\rangle = \\frac{1}{\\sqrt{2}}|0\\rangle + \\frac{1}{\\sqrt{2}}|1\\rangle$$
+<p>Find the corresponding spherical coordinates $(\\theta, \\phi)$ for this state.</p>
+<ul>
+    <li><strong>Determine $\\theta$:</strong> What value for $\\theta$ makes $\\cos(\\theta/2) = 1/\\sqrt{2}$?</li>
+    <li><strong>Determine $\\phi$:</strong> Since the coefficient of $|1\\rangle$ is real, what must the phase factor $e^{i\\phi}$ equal?</li>
+</ul>
                     """,
                     "position": 5,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Create the |+> state by applying the Hadamard (H) gate to |0>.",
+                        "criteria": "state_plus",
+                        "qubits": 1
+                    }),
                     "section": "the-qubit"
                 },
                 {
                     "slug": "multi-qubit-tensor-products",
                     "title": "6. Multi-Qubit: Tensor Products",
                     "content": """
-<h2>Tensor Products</h2>
-<p>How do we describe two qubits? We multiply their vector spaces using the <strong>Tensor Product</strong> ($\otimes$).</p>
-<p>If qubit A is in state $|0\\rangle$ and qubit B is in state $|1\\rangle$, the combined state is:</p>
-$$|0\\rangle \otimes |1\\rangle = |01\\rangle$$
-<p>If we have two 2D vectors, their tensor product is a 4D vector. For $n$ qubits, the state space is $2^n$. This exponential growth is why quantum computers are hard to simulate.</p>
-                    """,
+<h2>The Tensor Product</h2>
+<p>This is the mathematical machine that allows us to scale from one qubit to a million. It is the reason quantum simulation is so hard for classical computers.</p>
+
+<h3>1. The Physics: Merging Universes</h3>
+<p>When you have two separate classical coins, you describe them separately: "Coin A is Heads, Coin B is Tails."</p>
+<p>In Quantum Mechanics, when you bring two systems together, they cease to be separate mathematical entities. They merge into a <strong>single, larger state vector</strong> residing in a larger Hilbert Space.</p>
+
+<p>The tool we use to glue these spaces together is the <strong>Tensor Product</strong> (denoted by the symbol $\\otimes$).</p>
+
+<p>If system A is in state $|\\psi\\rangle$ and system B is in state $|\\phi\\rangle$, the combined system is:</p>
+$$|\\Psi_{AB}\\rangle = |\\psi\\rangle \\otimes |\\phi\\rangle$$
+
+<h3>2. The Math: The Kronecker Product</h3>
+<p>How do we actually calculate this? We use the Kronecker Product rule. It takes a vector of size $M$ and a vector of size $N$ and creates a new vector of size $M \\times N$.</p>
+
+$$\\begin{pmatrix} a \\\\ b \\end{pmatrix} \\otimes \\begin{pmatrix} c \\\\ d \\end{pmatrix} = \\begin{pmatrix} a \\cdot \\begin{pmatrix} c \\\\ d \\end{pmatrix} \\\\ b \\cdot \\begin{pmatrix} c \\\\ d \\end{pmatrix} \\end{pmatrix} = \\begin{pmatrix} ac \\\\ ad \\\\ bc \\\\ bd \\end{pmatrix}$$
+
+<h3>3. The New Basis (The Computational Basis)</h3>
+<p>For two qubits, we tensor their individual basis states ($|0\\rangle, |1\\rangle$) to form the new <strong>4-dimensional</strong> basis for the combined system.</p>
+
+<ul>
+    <li>$|00\\rangle = |0\\rangle \\otimes |0\\rangle = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} \\otimes \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 1 \\\\ 0 \\\\ 0 \\\\ 0 \\end{pmatrix}$</li>
+    <li>$|01\\rangle = |0\\rangle \\otimes |1\\rangle = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} \\otimes \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 1 \\\\ 0 \\\\ 0 \\end{pmatrix}$</li>
+    <li>$|10\\rangle = |1\\rangle \\otimes |0\\rangle = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} \\otimes \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 0 \\\\ 1 \\\\ 0 \\end{pmatrix}$</li>
+    <li>$|11\\rangle = |1\\rangle \\otimes |1\\rangle = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} \\otimes \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 0 \\\\ 0 \\\\ 1 \\end{pmatrix}$</li>
+</ul>
+
+<p>Notice the pattern? The vector has a $1$ in the position corresponding to the binary value (00 is index 0, 11 is index 3).</p>
+
+<h3>Your Task: The Product State</h3>
+<p>You have two qubits.</p>
+<ul>
+    <li><strong>Qubit 1</strong> is in state $|1\\rangle$.</li>
+    <li><strong>Qubit 2</strong> is in the superposition state $|+\\rangle = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$.</li>
+</ul>
+
+<p>Calculate the state vector of the combined system $|\\Psi\\rangle = |1\\rangle \\otimes |+\\rangle$.</p>
+<ol>
+    <li>Set up the tensor product of the column vectors.</li>
+    <li>Perform the multiplication to find the resulting 4-element column vector.</li>
+    <li>Rewrite this vector in Dirac notation (e.g., $\\alpha|00\\rangle + \\beta|01\\rangle...$).</li>
+</ol>
+<p><em>(Hint: You will see that only the bottom half of the vector is populated.)</em></p>
+""",
                     "position": 6,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Create the state |1> ⊗ |+> (Qubit 0 in |1>, Qubit 1 in |+>).",
+                        "criteria": "tensor_product_1_plus",
+                        "qubits": 2
+                    }),
                     "section": "multi-qubit-systems"
                 },
                 {
@@ -899,13 +971,76 @@ $$|0\\rangle \otimes |1\\rangle = |01\\rangle$$
                     "title": "7. Multi-Qubit: Entanglement",
                     "content": """
 <h2>Entanglement</h2>
-<p>Entanglement occurs when a multi-qubit state <strong>cannot</strong> be written as a tensor product of individual qubit states.</p>
-<p>Imagine you have two dice. You throw one in New York and one in Tokyo. If they are <strong>entangled</strong>, every time the New York die lands on 6, the Tokyo die <em>instantly</em> lands on 6.</p>
-<p><strong>Interactive Task:</strong> Create a Bell Pair. Use an <strong>H</strong> gate on q0, then a <strong>CNOT</strong> gate (control q0, target q1). Measure both. They will always match!</p>
+<p>This is the point where your intuition will try to fail you. Do not let it.</p>
+
+<p>You just learned about Tensor Products, which allow us to combine independent qubits into a larger system (e.g., $|\Psi\\rangle = |a\\rangle \\otimes |b\\rangle$).</p>
+
+<p><strong>Entanglement</strong> is simply the realization that <strong>not all states in the larger system can be created this way.</strong></p>
+
+<h3>1. The Definition: Product vs. Entangled</h3>
+<p>In the 4-dimensional space of two qubits ($\mathbb{C}^4$), most vectors <strong>cannot</strong> be factored back into two smaller vectors.</p>
+
+<ul>
+    <li><strong>Product State:</strong> A state that can be written as $|\\psi\\rangle_1 \\otimes |\\phi\\rangle_2$. The qubits are independent. Measuring one tells you nothing about the other.</li>
+    <li><strong>Entangled State:</strong> A state where <strong>no such factorization exists</strong>. The qubits have lost their individual identity. They are no longer "Qubit A" and "Qubit B"; they are a single system sharing a probability distribution.</li>
+</ul>
+
+<h3>2. The Bell State ($|\\Phi^+\\rangle$)</h3>
+<p>The canonical example of entanglement is the <strong>Bell State</strong>:</p>
+
+$$|\\Phi^+\\rangle = \\frac{1}{\\sqrt{2}} (|00\\rangle + |11\\rangle) = \\frac{1}{\\sqrt{2}} \\begin{pmatrix} 1 \\\\ 0 \\\\ 0 \\\\ 1 \\end{pmatrix}$$
+
+<p>Look closely at this vector. It is a superposition of "Both Zero" and "Both One".</p>
+<p>It contains <strong>zero</strong> probability for the states $|01\\rangle$ and $|10\\rangle$.</p>
+
+<h3>3. The Consequence: Correlation</h3>
+<p>If you measure the first qubit of the $|\\Phi^+\\rangle$ state:</p>
+<ol>
+    <li><strong>Randomness:</strong> You have a 50% chance of measuring $0$ and a 50% chance of measuring $1$.</li>
+    <li><strong>Collapse:</strong>
+        <ul>
+            <li>If you measure <strong>0</strong>, the state collapses to $|00\\rangle$. The second qubit <em>instantly</em> becomes $|0\\rangle$.</li>
+            <li>If you measure <strong>1</strong>, the state collapses to $|11\\rangle$. The second qubit <em>instantly</em> becomes $|1\\rangle$.</li>
+        </ul>
+    </li>
+</ol>
+
+<p>There is no time delay. There is no signal sent between them. The correlation is absolute. If you know one, you know the other.</p>
+
+<hr>
+
+<h3>Your Task: The Proof of Impossibility</h3>
+<p>You need to prove to yourself that $|\\Phi^+\\rangle$ cannot be broken down.</p>
+
+<p>Assume that $|\\Phi^+\\rangle$ <em>could</em> be written as a product of two independent qubits:</p>
+$$(\\alpha|0\\rangle + \\beta|1\\rangle) \\otimes (\\gamma|0\\rangle + \\delta|1\\rangle) = \\frac{1}{\\sqrt{2}}|00\\rangle + \\frac{1}{\\sqrt{2}}|11\\rangle$$
+
+<p>Expand the tensor product on the left:</p>
+$$\\alpha\\gamma|00\\rangle + \\alpha\\delta|01\\rangle + \\beta\\gamma|10\\rangle + \\beta\\delta|11\\rangle$$
+
+<p>Now, match the coefficients with the Bell State on the right:</p>
+<ol>
+    <li>$\\alpha\\gamma = \\frac{1}{\\sqrt{2}}$ (Must be non-zero)</li>
+    <li>$\\beta\\delta = \\frac{1}{\\sqrt{2}}$ (Must be non-zero)</li>
+    <li>$\\alpha\\delta = 0$ (Middle terms must vanish)</li>
+    <li>$\\beta\\gamma = 0$ (Middle terms must vanish)</li>
+</ol>
+
+<p><strong>The Logic Puzzle:</strong></p>
+<p>Look at equations 3 and 4. For $\\alpha\\delta$ to be 0, either $\\alpha$ or $\\delta$ must be 0.</p>
+<ul>
+    <li>If $\\alpha = 0$, then equation 1 ($\\alpha\\gamma$) becomes 0. <strong>Contradiction.</strong></li>
+    <li>If $\\delta = 0$, then equation 2 ($\\beta\\delta$) becomes 0. <strong>Contradiction.</strong></li>
+</ul>
+
+<p><strong>Conclusion:</strong> The system of equations has <strong>no solution</strong>.</p>
+
+<p><strong>Question for you:</strong><br>
+Since you cannot describe the Bell State using individual qubit coefficients ($\\alpha, \\beta, \\gamma, \\delta$), what does this imply about the "state" of Qubit 1 before it is measured? Does Qubit 1 even <em>have</em> a state?</p>
                     """,
                     "position": 7,
                     "task_json": json.dumps({
-                        "description": "Create a Bell Pair (|00> and |11> only)",
+                        "description": "Create a Bell Pair (|00> and |11> only). Use H on q0, then CNOT (q0 controls q1).",
                         "criteria": "bell_pair",
                         "qubits": 2
                     }),
@@ -916,63 +1051,227 @@ $$|0\\rangle \otimes |1\\rangle = |01\\rangle$$
                     "title": "8. Multi-Qubit: The Bell States",
                     "content": """
 <h2>The Bell States</h2>
-<p>The four maximally entangled states for two qubits are known as the Bell States:</p>
+<p>You have analyzed the concept of entanglement (the "what"). Now you need the <strong>toolkit</strong> (the "how"). The <strong>Bell States</strong> are not just random entangled vectors. They are the <strong>four specific, maximally entangled states</strong> that form a complete orthonormal basis for the two-qubit Hilbert space. Just as $|00\\rangle, |01\\rangle, |10\\rangle, |11\\rangle$ form the standard "Computational Basis," the four Bell states form the "Bell Basis."</p>
+
+<h3>1. The Four Bell States</h3>
+<p>These are the "North, South, East, and West" of the entangled world.</p>
+<ol>
+    <li><strong>$|\\Phi^+\\rangle$ (Phi-Plus):</strong> The standard Bell state. $$|\\Phi^+\\rangle = \\frac{|00\\rangle + |11\\rangle}{\\sqrt{2}}$$ <em>(Correlation: Same results. If you measure 0, they measure 0.)</em></li>
+    <li><strong>$|\\Phi^-\\rangle$ (Phi-Minus):</strong> The phase-flipped version. $$|\\Phi^-\\rangle = \\frac{|00\\rangle - |11\\rangle}{\\sqrt{2}}$$ <em>(Correlation: Same results, but carries a phase difference).</em></li>
+    <li><strong>$|\\Psi^+\\rangle$ (Psi-Plus):</strong> The "parity" flip. $$|\\Psi^+\\rangle = \\frac{|01\\rangle + |10\\rangle}{\\sqrt{2}}$$ <em>(Correlation: Opposite results. If you measure 0, they measure 1.)</em></li>
+    <li><strong>$|\\Psi^-\\rangle$ (Psi-Minus):</strong> The "singlet" state (crucial in physics). $$|\\Psi^-\\rangle = \\frac{|01\\rangle - |10\\rangle}{\\sqrt{2}}$$ <em>(Correlation: Opposite results, with a phase difference).</em></li>
+</ol>
+
+<h3>2. The Circuit: How to Make Them</h3>
+<p>You don't find these in nature; you build them. The recipe is universal for all quantum computers.</p>
+<p><strong>The Ingredients:</strong></p>
+<ol>
+    <li>Two qubits.</li>
+    <li>One <strong>Hadamard (H)</strong> gate.</li>
+    <li>One <strong>CNOT</strong> gate.</li>
+</ol>
+<p><strong>The Process (to create $|\\Phi^+\\rangle$):</strong></p>
+<ol>
+    <li><strong>Start:</strong> Initialize both qubits to $|00\\rangle$ (Qubit A is left, Qubit B is right).</li>
+    <li><strong>Superposition:</strong> Apply $H$ to <strong>Qubit A</strong>. $$|00\\rangle \\xrightarrow{H \\otimes I} \\frac{(|0\\rangle + |1\\rangle)}{\\sqrt{2}} \\otimes |0\\rangle = \\frac{|00\\rangle + |10\\rangle}{\\sqrt{2}}$$</li>
+    <li><strong>Entanglement:</strong> Apply CNOT with <strong>Qubit A as Control</strong> and <strong>Qubit B as Target</strong>.
+        <ul>
+            <li>$|00\\rangle \\to |00\\rangle$ (Control is 0, do nothing).</li>
+            <li>$|10\\rangle \\to |11\\rangle$ (Control is 1, flip target).</li>
+            <li><strong>Result:</strong> $\\frac{|00\\rangle + |11\\rangle}{\\sqrt{2}}$</li>
+        </ul>
+    </li>
+</ol>
+
+<h3>3. Why This Matters: Change of Basis</h3>
+<p>Because these four states form a valid <strong>Basis</strong>, you can measure a two-qubit system <em>in the Bell Basis</em>. This is the secret sauce behind <strong>Quantum Teleportation</strong> and <strong>Superdense Coding</strong>.</p>
+<p>In Teleportation, you don't measure "0" or "1"; you measure "Which of the 4 Bell states are these two qubits in?" The answer tells you how to reconstruct the state on the other side of the universe.</p>
+
+<hr>
+
+<h3>Your Task: Deriving the "Singlet" ($|\\Psi^-\\rangle$)</h3>
+<p>To master quantum circuits, you must be able to trace the state vector step-by-step. You want to generate the state $|\\Psi^-\\rangle = \\frac{|01\\rangle - |10\\rangle}{\\sqrt{2}}$.</p>
+
+<p><strong>The Setup:</strong></p>
 <ul>
-    <li>$|\Phi^+\\rangle = \\frac{|00\\rangle + |11\\rangle}{\sqrt{2}}$ (The one you just made)</li>
-    <li>$|\Phi^-\\rangle = \\frac{|00\\rangle - |11\\rangle}{\sqrt{2}}$</li>
-    <li>$|\Psi^+\\rangle = \\frac{|01\\rangle + |10\\rangle}{\sqrt{2}}$</li>
-    <li>$|\Psi^-\\rangle = \\frac{|01\\rangle - |10\\rangle}{\sqrt{2}}$</li>
+    <li><strong>Input State:</strong> $|11\\rangle$ (Qubit A is 1, Qubit B is 1).</li>
+    <li><strong>Gate Sequence:</strong> Apply $H$ to Qubit A, then apply CNOT (Control A, Target B).</li>
 </ul>
-<p>These form a basis for the two-qubit Hilbert space, known as the <strong>Bell Basis</strong>.</p>
+
+<p><strong>Derive the final state:</strong></p>
+<ol>
+    <li><strong>After H on A:</strong> Apply the Hadamard to the first $|1\\rangle$. Recall that $H|1\\rangle = \\frac{|0\\rangle - |1\\rangle}{\\sqrt{2}}$. What is the combined 2-qubit state vector at this midpoint?</li>
+    <li><strong>After CNOT:</strong> Take the result from step 1 and apply the CNOT logic. (Remember: flip the second bit <em>only</em> if the first bit is 1). Does your result match the definition of $|\\Psi^-\\rangle$ above?</li>
+</ol>
                     """,
                     "position": 8,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Derive |Ψ-> from input state |11> using H on q0 then CNOT (q0 controls q1).",
+                        "criteria": "singlet_state_derivation",
+                        "qubits": 2
+                    }),
                     "section": "multi-qubit-systems"
                 },
                 {
                     "slug": "quantum-gates-pauli",
                     "title": "9. Gates: Pauli Matrices",
                     "content": """
-<h2>Pauli Matrices (X, Y, Z)</h2>
-<p>The single-qubit gates are rotations. The most fundamental ones are the Pauli matrices:</p>
+<h2>The Pauli Matrices</h2>
+<p>The <strong>Pauli Matrices</strong> are the alphabet of single-qubit quantum operations. Any single-qubit gate you ever see is a function or rotation based on these three matrices and the Identity matrix ($I$). They are the simplest, non-trivial, $2 \\times 2$ <strong>Hermitian</strong> matrices (Postulate 3: they can act as observables) and they are <strong>unitary</strong> (Postulate 2: they are valid gates).</p>
+
+<h3>1. The Pauli Group ($\\{I, X, Y, Z\\}$)</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Gate</th>
+            <th>Matrix ($\\sigma$)</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>I</strong></td>
+            <td>$\\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$</td>
+            <td><strong>Identity:</strong> Do nothing.</td>
+        </tr>
+        <tr>
+            <td><strong>$X$</strong> ($\\sigma_x$)</td>
+            <td>$\\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$</td>
+            <td><strong>Bit-Flip (NOT):</strong> Flips $|0\\rangle \\leftrightarrow |1\\rangle$. (Rotation about X-axis).</td>
+        </tr>
+        <tr>
+            <td><strong>$Z$</strong> ($\\sigma_z$)</td>
+            <td>$\\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}$</td>
+            <td><strong>Phase-Flip:</strong> Flips the phase of $|1\\rangle$. (Rotation about Z-axis).</td>
+        </tr>
+        <tr>
+            <td><strong>$Y$</strong> ($\\sigma_y$)</td>
+            <td>$\\begin{pmatrix} 0 & -i \\\\ i & 0 \\end{pmatrix}$</td>
+            <td><strong>Bit & Phase Flip:</strong> Combination of $X$ and $Z$.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>2. Physical and Mathematical Significance</h3>
 <ul>
-    <li><strong>X (Bit Flip):</strong> Swaps $|0\\rangle$ and $|1\\rangle$. (Rotation around X-axis)</li>
-    <li><strong>Y (Bit & Phase Flip):</strong> Swaps $|0\\rangle$ and $|1\\rangle$ and adds a phase. (Rotation around Y-axis)</li>
-    <li><strong>Z (Phase Flip):</strong> Leaves $|0\\rangle$ alone but flips the sign of $|1\\rangle$. (Rotation around Z-axis)</li>
+    <li><strong>Observables:</strong> Since they are Hermitian ($M = M^\\dagger$), they represent measurable physical properties (like spin).</li>
+    <li><strong>Rotations:</strong> On the Bloch sphere (Postulate 2), $X, Y, Z$ are the axes of rotation. Applying any Pauli matrix is a $180^\\circ$ rotation about its respective axis.</li>
+    <li><strong>Eigenstates:</strong> The eigenstates of $X$ ($|+\\rangle, |-\\rangle$) and $Y$ ($|i+\\rangle, |i-\\rangle$) form alternative measurement bases.</li>
 </ul>
+
+<h3>3. The Relationship: Anti-Commutation</h3>
+<p>The Pauli matrices satisfy fundamental anti-commutation relations. For example:</p>
+$$XY = -YX$$
+<p>This means the order in which you apply the gates <em>absolutely</em> matters. Changing the order of two operations in a quantum circuit changes the physics, which is often crucial for algorithms.</p>
+
+<hr>
+
+<h3>Your Task: Analyzing Pauli-Y</h3>
+<p>The Pauli-Y gate is the only one that explicitly contains the complex number $i$. This is where complex arithmetic is unavoidable. Apply the Pauli-Y gate to the computational basis state $|0\\rangle$:</p>
+$$Y|0\\rangle = \\begin{pmatrix} 0 & -i \\\\ i & 0 \\end{pmatrix} \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$$
+<ol>
+    <li>What is the resulting column vector?</li>
+    <li>Rewrite the result in Dirac notation (e.g., $\\alpha|0\\rangle + \\beta|1\\rangle$).</li>
+    <li>Based on the final state, describe the physical effect of $Y|0\\rangle$ in terms of bit flip and phase shift.</li>
+</ol>
                     """,
                     "position": 9,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Apply the Y gate to |0> and verify the result matches the mathematical prediction (i|1>).",
+                        "criteria": "state_y_0",
+                        "qubits": 1
+                    }),
                     "section": "quantum-gates"
                 },
                 {
                     "slug": "quantum-gates-hadamard",
                     "title": "10. Gates: Hadamard",
-                    "content": """
-<h2>The Hadamard Gate (H)</h2>
-<p>The Superposition Creator.</p>
-<p>It maps the basis states to superpositions:</p>
+                    "content": r"""<h2>10. Gates: Hadamard</h2>
+<p>The <strong>Hadamard Gate ($H$)</strong> is the indispensable single-qubit tool. It is the gate that generates balanced <strong>superposition</strong> and enables the ability to measure the qubit in a new basis, which is necessary for algorithms like the Quantum Fourier Transform.</p>
+
+<h3>1. The Matrix and the Operation</h3>
+<p>The Hadamard gate is a $2\times 2$ unitary matrix:</p>
+$$H = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}$$
+<p>Its action is to map the computational basis states ($|0\rangle, |1\rangle$) to the new basis states, often called the <strong>Hadamard Basis</strong> or the <strong>X-Basis</strong> states ($|+\rangle, |-\rangle$):</p>
+$$H|0\rangle = |+\rangle = \frac{|0\rangle + |1\rangle}{\sqrt{2}}$$
+$$H|1\rangle = |-\rangle = \frac{|0\rangle - |1\rangle}{\sqrt{2}}$$
+
+<h3>2. Physical Significance: Basis Change</h3>
+<p>On the Bloch sphere, the Hadamard gate represents a specific sequence of rotations (a $90^\circ$ rotation about the Y-axis followed by a $180^\circ$ rotation about the X-axis) that effectively swaps the Z-axis with the X-axis.</p>
+
+<div style="text-align:center; margin:20px;">
+  <img src="/static/images/bloch-sphere.png" alt="Bloch Sphere" style="max-width: 400px; border-radius: 8px;">
+</div>
+
 <ul>
-    <li>$H|0\\rangle = |+\\rangle = \\frac{|0\\rangle + |1\\rangle}{\sqrt{2}}$</li>
-    <li>$H|1\\rangle = |-\\rangle = \\frac{|0\\rangle - |1\\rangle}{\sqrt{2}}$</li>
+  <li>When you apply $H$ to $|0\rangle$, the state vector moves from the North Pole (Z-axis) to the positive X-axis ($|+\rangle$).</li>
+  <li>If you measure the state $|+\rangle$ in the Z-basis, the result is random (50/50).</li>
+  <li>However, if you apply $H$ again, the state returns to $|0\rangle$. Now, if you measure, the result is deterministic ($100\%$ probability of $|0\rangle$).</li>
 </ul>
-<p>Applying H twice gets you back to where you started ($H^2 = I$).</p>
-                    """,
+<p>This ability to switch bases is what allows quantum computation to function. Interference effects (which rely on the relative phase $\phi$) are only visible when the state is measured in the correct basis.</p>
+
+<h3>Your Task: Proving Reversibility</h3>
+<p>Since $H$ is a valid quantum gate, it must be <strong>unitary</strong> (Postulate 2). The simplest way to show this is to prove that the gate is its own inverse, meaning applying it twice returns the original state.</p>
+<p>Prove that:</p>
+$$H^2 = I$$
+<p>where $I = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}$ is the Identity matrix.</p>
+<p>Show the matrix multiplication $H \cdot H$ step-by-step.</p>
+""",
                     "position": 10,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Apply the Hadamard (H) gate to the |0> state to create the |+> superposition state.",
+                        "criteria": "state_plus",
+                        "qubits": 1
+                    }),
                     "section": "quantum-gates"
                 },
                 {
                     "slug": "quantum-gates-cnot",
                     "title": "11. Gates: CNOT",
-                    "content": """
-<h2>Controlled-NOT (CNOT)</h2>
-<p>The Entanglement Creator.</p>
-<p>This is a two-qubit gate. It flips the <strong>Target</strong> qubit if and only if the <strong>Control</strong> qubit is $|1\\rangle$.</p>
-<p>If the control qubit is in superposition ($|0\\rangle + |1\\rangle$), the target becomes entangled with it, creating the state $|00\\rangle + |11\\rangle$.</p>
+                    "content": r"""<h2>Controlled-NOT (CNOT)</h2>
+<p>You have mastered the single-qubit rotations. Now you need the tool that links them.</p>
+<p>The <strong>Controlled-NOT (CNOT)</strong> is the single most important multi-qubit gate, as it is the only non-local operation required to achieve <strong>universality</strong> in quantum computing.</p>
+
+<h3>1. The Matrix and the Operation</h3>
+<p>The CNOT gate acts on two qubits: a <strong>Control</strong> qubit and a <strong>Target</strong> qubit.</p>
+<ul>
+    <li><strong>The Rule:</strong> The state of the <strong>Target qubit is flipped (NOT)</strong> <em>if and only if</em> the <strong>Control qubit is $|1\rangle$</strong>. Otherwise, nothing happens.</li>
+</ul>
+
+<p><strong>The Matrix (Control Qubit 0, Target Qubit 1):</strong></p>
+<p>The CNOT is a $4 \times 4$ unitary matrix:</p>
+$$CNOT = \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & 1 & 0 \end{pmatrix}$$
+<p>The $2 \times 2$ blocks along the diagonal show the conditional action:</p>
+<ul>
+    <li>The upper-left $2 \times 2$ block is the <strong>Identity ($I$)</strong> matrix, acting when the Control is $|0\rangle$.</li>
+    <li>The lower-right $2 \times 2$ block is the <strong>Pauli-X ($X$)</strong> matrix, acting when the Control is $|1\rangle$.</li>
+</ul>
+<p>This block structure is often written as:</p>
+$$CNOT = |0\rangle \langle 0| \otimes I + |1\rangle \langle 1| \otimes X$$
+
+<h3>2. Physical Significance: Creating Entanglement</h3>
+<p>The CNOT gate is a <strong>reversible</strong> gate that acts on a specific basis. Crucially, when the Control qubit is in a <strong>superposition</strong> (e.g., $|+\rangle$), the CNOT links the two qubits' states, transforming a product state into an <strong>entangled state</strong>.</p>
+<p>This ability to couple the computational basis with the NOT operation is what creates the non-local correlations of entanglement.</p>
+
+<hr>
+
+<h3>Your Task: Entanglement by CNOT</h3>
+<p>As demonstrated when building the Bell states, the CNOT gate is the essential tool for linking the two qubits.</p>
+<p>Start with the product state $|\psi\rangle$ where the Control qubit ($Q_0$) is in superposition and the Target qubit ($Q_1$) is $|0\rangle$:</p>
+$$|\psi\rangle = |+\rangle \otimes |0\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |10\rangle)$$
+<p>Apply the $CNOT$ gate (Control $Q_0$, Target $Q_1$) to $|\psi\rangle$.</p>
+<ol>
+    <li>How does $CNOT$ transform the $|00\rangle$ component?</li>
+    <li>How does $CNOT$ transform the $|10\rangle$ component?</li>
+    <li>What is the resulting state vector in Dirac notation? (This should be one of the Bell states you previously derived.)</li>
+</ol>
                     """,
                     "position": 11,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Create the Bell State |Φ+> = (|00> + |11>)/√2. Start with |00>, apply H to q0, then CNOT (q0 controls q1).",
+                        "criteria": "bell_phi_plus",
+                        "qubits": 2
+                    }),
                     "section": "quantum-gates"
                 },
                 {
@@ -1922,6 +2221,470 @@ $$|0\\rangle \otimes |1\\rangle = |01\\rangle$$
                             (qs_quiz_id, q1_text, q1_options, q1_correct))
         else:
             print(f"Quiz '{quiz_title}' already exists.")
+
+    # 16. Add a Quiz for "The Qubit: The Bloch Sphere"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("the-qubit-bloch-sphere",))
+        bs_row = cur.fetchone()
+        bs_lesson_id = _row_get(bs_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("the-qubit-bloch-sphere",))
+        bs_row = cur.fetchone()
+        bs_lesson_id = _row_get(bs_row, 'id', 0)
+
+    if bs_lesson_id:
+        quiz_title = "Bloch Sphere Coordinates"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (bs_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (bs_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "For the state |+> = 1/√2(|0> + |1>), what is the value of the polar angle θ on the Bloch Sphere?"
+            q1_options = json.dumps([
+                "0",
+                "π (180°)",
+                "π/2 (90°)",
+                "π/4 (45°)"
+            ])
+            q1_correct = 2
+
+            q2_text = "For the same state |+>, what is the value of the azimuthal angle φ?"
+            q2_options = json.dumps([
+                "0",
+                "π",
+                "π/2",
+                "2π"
+            ])
+            q2_correct = 0
+
+            q3_text = "What happens to the state vector on the Bloch Sphere when you apply a Z gate?"
+            q3_options = json.dumps([
+                "It rotates 180° around the X-axis",
+                "It rotates around the Z-axis (changing φ)",
+                "It moves to the North Pole",
+                "It does nothing"
+            ])
+            q3_correct = 1
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (bs_lesson_id, quiz_title))
+                bs_quiz_row = cur.fetchone()
+                bs_quiz_id = _row_get(bs_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (bs_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (bs_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (bs_quiz_id, q3_text, q3_options, q3_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (bs_lesson_id, quiz_title))
+                bs_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (bs_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (bs_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (bs_quiz_id, q3_text, q3_options, q3_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # 17. Add a Quiz for "Multi-Qubit: Tensor Products"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("multi-qubit-tensor-products",))
+        mq_row = cur.fetchone()
+        mq_lesson_id = _row_get(mq_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("multi-qubit-tensor-products",))
+        mq_row = cur.fetchone()
+        mq_lesson_id = _row_get(mq_row, 'id', 0)
+
+    if mq_lesson_id:
+        quiz_title = "Tensor Product Calculation"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (mq_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (mq_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "What is the dimension of the combined Hilbert space for two qubits?"
+            q1_options = json.dumps(["2", "4", "8", "It depends on the state"])
+            q1_correct = 1
+
+            q2_text = "Calculate the tensor product |1> ⊗ |+>."
+            q2_options = json.dumps([
+                "1/√2 (|00> + |01>)",
+                "1/√2 (|10> + |11>)",
+                "1/√2 (|01> + |11>)",
+                "|11>"
+            ])
+            q2_correct = 1
+
+            q3_text = "If |ψ> = [a, b] and |φ> = [c, d], what is the first element of |ψ> ⊗ |φ>?"
+            q3_options = json.dumps(["ac", "ad", "bc", "bd"])
+            q3_correct = 0
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (mq_lesson_id, quiz_title))
+                mq_quiz_row = cur.fetchone()
+                mq_quiz_id = _row_get(mq_quiz_row, 'id', 0)
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (mq_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (mq_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (mq_quiz_id, q3_text, q3_options, q3_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (mq_lesson_id, quiz_title))
+                mq_quiz_id = cur.lastrowid
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (mq_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (mq_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (mq_quiz_id, q3_text, q3_options, q3_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # 18. Add a Quiz for "Multi-Qubit: Entanglement"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("multi-qubit-entanglement",))
+        me_row = cur.fetchone()
+        me_lesson_id = _row_get(me_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("multi-qubit-entanglement",))
+        me_row = cur.fetchone()
+        me_lesson_id = _row_get(me_row, 'id', 0)
+
+    if me_lesson_id:
+        quiz_title = "Entanglement & Bell States"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (me_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (me_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "What defines an Entangled State?"
+            q1_options = json.dumps([
+                "It is a product of two independent qubit states.",
+                "It cannot be written as a tensor product of individual qubit states.",
+                "It only happens when qubits are close together.",
+                "It has zero energy."
+            ])
+            q1_correct = 1
+
+            q2_text = "In the Bell State |Φ+> = (|00> + |11>)/√2, if you measure Qubit 1 and get '0', what is the state of Qubit 2?"
+            q2_options = json.dumps([
+                "|0> (100%)",
+                "|1> (100%)",
+                "Still in superposition |+>",
+                "Random (50/50)"
+            ])
+            q2_correct = 0
+
+            q3_text = "Why did the system of equations for factoring the Bell State fail (Proof of Impossibility)?"
+            q3_options = json.dumps([
+                "The math was too hard.",
+                "We needed complex numbers.",
+                "It led to a contradiction where non-zero terms were forced to be zero.",
+                "The Bell State is not a valid quantum state."
+            ])
+            q3_correct = 2
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (me_lesson_id, quiz_title))
+                me_quiz_row = cur.fetchone()
+                me_quiz_id = _row_get(me_quiz_row, 'id', 0)
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (me_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (me_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (me_quiz_id, q3_text, q3_options, q3_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (me_lesson_id, quiz_title))
+                me_quiz_id = cur.lastrowid
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (me_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (me_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (me_quiz_id, q3_text, q3_options, q3_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # 19. Add a Quiz for "Multi-Qubit: The Bell States"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("multi-qubit-bell-states",))
+        mb_row = cur.fetchone()
+        mb_lesson_id = _row_get(mb_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("multi-qubit-bell-states",))
+        mb_row = cur.fetchone()
+        mb_lesson_id = _row_get(mb_row, 'id', 0)
+
+    if mb_lesson_id:
+        quiz_title = "Bell Basis & Circuit Logic"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (mb_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (mb_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "Why do we use the Bell Basis instead of the computational basis (|00>, |01>, etc.)?"
+            q1_options = json.dumps([
+                "It is easier to measure physically.",
+                "It describes entangled states, enabling protocols like Teleportation.",
+                "It uses fewer qubits.",
+                "It avoids using complex numbers."
+            ])
+            q1_correct = 1
+
+            q2_text = "Which gate sequence creates the Bell State |Φ+> from |00>?"
+            q2_options = json.dumps([
+                "H on q0, then CNOT (q0→q1)",
+                "X on q0, then H on q1",
+                "CNOT (q0→q1), then H on q0",
+                "H on both q0 and q1"
+            ])
+            q2_correct = 0
+
+            q3_text = "What is the result of measuring the first qubit of a Bell State?"
+            q3_options = json.dumps([
+                "Always 0",
+                "Always 1",
+                "Random (50/50), but correlated with the second qubit",
+                "It destroys the qubit"
+            ])
+            q3_correct = 2
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (mb_lesson_id, quiz_title))
+                mb_quiz_row = cur.fetchone()
+                mb_quiz_id = _row_get(mb_quiz_row, 'id', 0)
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (mb_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (mb_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (mb_quiz_id, q3_text, q3_options, q3_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (mb_lesson_id, quiz_title))
+                mb_quiz_id = cur.lastrowid
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (mb_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (mb_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (mb_quiz_id, q3_text, q3_options, q3_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # 20. Add a Quiz for "Gates: Pauli Matrices"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("quantum-gates-pauli",))
+        gp_row = cur.fetchone()
+        gp_lesson_id = _row_get(gp_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("quantum-gates-pauli",))
+        gp_row = cur.fetchone()
+        gp_lesson_id = _row_get(gp_row, 'id', 0)
+
+    if gp_lesson_id:
+        quiz_title = "Pauli-Y Gate Analysis"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (gp_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (gp_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "Calculate Y|0>. What is the resulting column vector?"
+            q1_options = json.dumps([
+                "[0, i] (top: 0, bottom: i)",
+                "[i, 0] (top: i, bottom: 0)",
+                "[0, 1] (top: 0, bottom: 1)",
+                "[1, 0] (top: 1, bottom: 0)"
+            ])
+            q1_correct = 0
+
+            q2_text = "Rewrite the result in Dirac notation."
+            q2_options = json.dumps([
+                "i|1>",
+                "-i|1>",
+                "i|0>",
+                "|1>"
+            ])
+            q2_correct = 0
+
+            q3_text = "What is the physical effect of Y|0>?"
+            q3_options = json.dumps([
+                "Bit flip AND phase shift (factor of i)",
+                "Bit flip only (|0> -> |1>)",
+                "Phase flip only",
+                "No change"
+            ])
+            q3_correct = 0
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (gp_lesson_id, quiz_title))
+                gp_quiz_row = cur.fetchone()
+                gp_quiz_id = _row_get(gp_quiz_row, 'id', 0)
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (gp_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (gp_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (gp_quiz_id, q3_text, q3_options, q3_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (gp_lesson_id, quiz_title))
+                gp_quiz_id = cur.lastrowid
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (gp_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (gp_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (gp_quiz_id, q3_text, q3_options, q3_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+
+    # 15. Add a sample Quiz for "Gates: Hadamard"
+    # Find lesson id
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("quantum-gates-hadamard",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("quantum-gates-hadamard",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+        
+    if lesson_id:
+        quiz_title = "Hadamard Gate Check"
+        # Check if quiz exists
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (lesson_id, quiz_title))
+        
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            question_text = "What happens if you apply the Hadamard gate twice to a qubit starting in state |0>?"
+            # Options: 
+            # 1. It becomes |1>
+            # 2. It becomes |+> (Superposition)
+            # 3. It returns to |0>
+            # 4. It becomes |->
+            options = json.dumps(["It becomes |1>", "It becomes |+>", "It returns to |0>", "It becomes |->"])
+            correct_idx = 2
+            
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (lesson_id, quiz_title))
+                quiz_row = cur.fetchone()
+                quiz_id = _row_get(quiz_row, 'id', 0)
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)", 
+                    (quiz_id, question_text, options, correct_idx))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (lesson_id, quiz_title))
+                quiz_id = cur.lastrowid
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)", 
+                    (quiz_id, question_text, options, correct_idx))
+        else:
+             print(f"Quiz '{quiz_title}' already exists.")
+
+    
+    # 16. Add a Quiz for "Gates: CNOT"
+    # Find lesson id
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("quantum-gates-cnot",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("quantum-gates-cnot",))
+        lesson_row = cur.fetchone()
+        lesson_id = _row_get(lesson_row, 'id', 0)
+        
+    if lesson_id:
+        quiz_title = "CNOT Gate Check"
+        # Check if quiz exists
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (lesson_id, quiz_title))
+        
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            # Q1
+            q1_text = "What condition must be met for the CNOT gate to flip the Target qubit?"
+            q1_options = json.dumps([
+                "The Control qubit must be |0>",
+                "The Control qubit must be |1>",
+                "The Target qubit must be |1>",
+                "The Target qubit must be in superposition"
+            ])
+            q1_correct = 1
+            
+            # Q2
+            q2_text = "If the Control qubit is in superposition (|+>), what happens to the two qubits after a CNOT?"
+            q2_options = json.dumps([
+                "They remain independent product states.",
+                "They become entangled.",
+                "The Target qubit is always flipped.",
+                "The Control qubit collapses to |0> or |1>."
+            ])
+            q2_correct = 1
+            
+            # Q3
+            q3_text = "What is the matrix representation of the CNOT gate?"
+            q3_options = json.dumps([
+                "A 2x2 matrix",
+                "A 4x4 matrix where the bottom-right 2x2 block is X",
+                "A 4x4 matrix where the top-left 2x2 block is X",
+                "A 4x4 identity matrix"
+            ])
+            q3_correct = 1
+            
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (lesson_id, quiz_title))
+                quiz_row = cur.fetchone()
+                quiz_id = _row_get(quiz_row, 'id', 0)
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)", 
+                    (quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)", 
+                    (quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)", 
+                    (quiz_id, q3_text, q3_options, q3_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (lesson_id, quiz_title))
+                quiz_id = cur.lastrowid
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)", 
+                    (quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)", 
+                    (quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)", 
+                    (quiz_id, q3_text, q3_options, q3_correct))
+        else:
+             print(f"Quiz '{quiz_title}' already exists.")
+
 
     # CLEANUP: Remove quizzes that users requested to be deleted
     quizzes_to_remove = ["Linear Algebra Check", "Matrix Operation Check", "Eigenvalue Check"]

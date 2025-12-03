@@ -640,6 +640,13 @@ async function callBackend() {
             } else {
                 outStr += JSON.stringify(data, null, 2);
             }
+
+            // Debug helper: show statevector if available (for debugging phase issues)
+            if (data.statevector) {
+                // Only show first few chars to keep it clean, or full if it's short
+                outStr += '\n\n[Debug] Statevector:\n' + JSON.stringify(data.statevector, null, 2);
+            }
+
             output.textContent = outStr;
         }
     } catch (e) {
@@ -1112,6 +1119,35 @@ function validateTask(data) {
                  message = "You need to prepare the state |1> first (use X gate).";
              }
         }
+    } else if (criteria === 'state_y_0') {
+        // Goal: Apply Y to |0> to get i|1>
+        // Statevector should be [0, i] (approx)
+        if (data.statevector && data.statevector.length >= 2) {
+             const amp0 = parseComplexPython(data.statevector[0]);
+             const amp1 = parseComplexPython(data.statevector[1]);
+             
+             console.log("Validating state_y_0:", amp0, amp1);
+
+             // Check magnitude of 0 is ~0 and 1 is ~1
+             const mag0 = Math.sqrt(amp0.re**2 + amp0.im**2);
+             const mag1 = Math.sqrt(amp1.re**2 + amp1.im**2);
+             
+             if (Math.abs(mag0) < 0.1 && Math.abs(mag1 - 1.0) < 0.1) {
+                 // Check phase of amp1. Should be i (re ~ 0, im ~ 1)
+                 if (Math.abs(amp1.re) < 0.1 && Math.abs(amp1.im - 1.0) < 0.2) {
+                     success = true;
+                     message = "Correct! You applied the Y gate to |0> and got i|1>.";
+                 } else if (Math.abs(amp1.re) < 0.1 && Math.abs(amp1.im + 1.0) < 0.2) {
+                     message = "You have the state |1>, but the phase is -i. Did you apply the correct gate?";
+                 } else {
+                     message = `You have the correct state probability, but the phase is incorrect. (Im: ${amp1.im.toFixed(2)})`;
+                 }
+             } else if (Math.abs(mag0 - 1.0) < 0.1) {
+                 message = "You're still in the |0> state. Try applying the Y gate.";
+             } else {
+                 message = "Incorrect state. Aim for i|1> (Probability of 1 should be 100% with imaginary phase).";
+             }
+        }
     } else if (criteria === 'h_then_x') {
         // Goal: Apply H then X. Result is |+> (50/50)
         const hasH = state.gates.some(g => g.type === 'H');
@@ -1260,6 +1296,131 @@ function validateTask(data) {
                 } else {
                     message = `Not quite. Probabilities are P(0): ${(p0*100).toFixed(1)}%, P(1): ${(p1*100).toFixed(1)}%. Aim for 33.3% / 66.7%. Hint: Try Ry with angle ~1.91.`;
                 }
+            }
+        } else if (criteria === 'state_plus') {
+            // Goal: Create |+> state.
+            // Check probabilities 50/50 and phase (both positive real)
+            if (data.statevector && data.statevector.length >= 2) {
+                 const amp0 = parseComplexPython(data.statevector[0]);
+                 const amp1 = parseComplexPython(data.statevector[1]);
+                 
+                 const magSq0 = amp0.re**2 + amp0.im**2;
+                 const magSq1 = amp1.re**2 + amp1.im**2;
+                 
+                 if (Math.abs(magSq0 - 0.5) < 0.1 && Math.abs(magSq1 - 0.5) < 0.1) {
+                     // Check phase: amp0 and amp1 should be positive real
+                     if (amp0.re > 0.5 && amp1.re > 0.5) {
+                         success = true;
+                         message = "Correct! You created the |+> state.";
+                     } else if (amp1.re < -0.5) {
+                         message = "Close! You created the |-> state (phase flip). Use just the H gate.";
+                     } else {
+                         message = "Probabilities are correct, but check the phase.";
+                     }
+                 } else {
+                    message = "Aim for 50/50 probability superposition.";
+                }
+            }
+        } else if (criteria === 'tensor_product_1_plus') {
+            if (data.statevector && data.statevector.length >= 4) {
+                 const amp10 = parseComplexPython(data.statevector[2]); // |10>
+                 const amp11 = parseComplexPython(data.statevector[3]); // |11>
+                 const amp00 = parseComplexPython(data.statevector[0]); // |00>
+                 const amp01 = parseComplexPython(data.statevector[1]); // |01>
+                 
+                 const magSq10 = amp10.re**2 + amp10.im**2;
+                 const magSq11 = amp11.re**2 + amp11.im**2;
+                 const magSq00 = amp00.re**2 + amp00.im**2;
+                 const magSq01 = amp01.re**2 + amp01.im**2;
+                 
+                 if (Math.abs(magSq10 - 0.5) < 0.1 && Math.abs(magSq11 - 0.5) < 0.1 && magSq00 < 0.01 && magSq01 < 0.01) {
+                     if (amp10.re > 0.5 && amp11.re > 0.5) {
+                         success = true;
+                         message = "Correct! You created the product state |1> ⊗ |+>.";
+                     } else {
+                         message = "Probabilities are correct, but check the phases.";
+                     }
+                 } else {
+                     if (Math.abs(magSq01 - 0.5) < 0.1 && Math.abs(magSq11 - 0.5) < 0.1) {
+                         message = "You created |+> ⊗ |1>. Make sure Qubit 0 is |1> and Qubit 1 is |+>.";
+                     } else {
+                         message = "Aim for |1> on Qubit 0 and |+> on Qubit 1.";
+                     }
+                 }
+            } else {
+                message = "Make sure you are using 2 qubits.";
+            }
+        } else if (criteria === 'singlet_state_derivation') {
+            if (data.statevector && data.statevector.length >= 4) {
+                 const amp01 = parseComplexPython(data.statevector[1]); // |01>
+                 const amp10 = parseComplexPython(data.statevector[2]); // |10>
+                 const amp00 = parseComplexPython(data.statevector[0]);
+                 const amp11 = parseComplexPython(data.statevector[3]);
+
+                 const magSq01 = amp01.re**2 + amp01.im**2;
+                 const magSq10 = amp10.re**2 + amp10.im**2;
+                 const magSq00 = amp00.re**2 + amp00.im**2;
+                 const magSq11 = amp11.re**2 + amp11.im**2;
+
+                 if (Math.abs(magSq01 - 0.5) < 0.1 && Math.abs(magSq10 - 0.5) < 0.1 && magSq00 < 0.01 && magSq11 < 0.01) {
+                      // Check for relative phase -1 (Singlet state)
+                      const productRe = amp01.re * amp10.re;
+                      const imSmall = Math.abs(amp01.im) < 0.2 && Math.abs(amp10.im) < 0.2;
+                      
+                      if (productRe < -0.4 && imSmall) {
+                           success = true;
+                           message = "Correct! You derived the singlet state |Ψ-⟩ = (|01⟩ - |10⟩)/√2.";
+                      } else if (productRe > 0.4 && imSmall) {
+                           message = "Close! You created |Ψ+⟩ (|01⟩ + |10⟩). Check your CNOT or initial state.";
+                      } else {
+                           message = `Probabilities correct. Phase mismatch. (Re: ${amp01.re.toFixed(2)}, ${amp10.re.toFixed(2)})`;
+                      }
+                 } else {
+                     if (Math.abs(magSq01 - 0.5) < 0.1 && Math.abs(magSq11 - 0.5) < 0.1) {
+                         message = "It looks like your CNOT is flipped. You are targeting q0 (block on top) controlled by q1. Place the CNOT block on q1 (bottom) and set control to q0.";
+                     } else {
+                         message = "Aim for a superposition of |01⟩ and |10⟩. (Hint: Start with |11⟩, then H on q0, then CNOT).";
+                     }
+                 }
+            } else {
+                message = "Make sure you are using 2 qubits.";
+            }
+        } else if (criteria === 'bell_phi_plus') {
+            if (data.statevector && data.statevector.length >= 4) {
+                 const amp00 = parseComplexPython(data.statevector[0]); // |00>
+                 const amp11 = parseComplexPython(data.statevector[3]); // |11>
+                 const amp01 = parseComplexPython(data.statevector[1]); // |01>
+                 const amp10 = parseComplexPython(data.statevector[2]); // |10>
+
+                 const magSq00 = amp00.re**2 + amp00.im**2;
+                 const magSq11 = amp11.re**2 + amp11.im**2;
+                 const magSq01 = amp01.re**2 + amp01.im**2;
+                 const magSq10 = amp10.re**2 + amp10.im**2;
+
+                 if (Math.abs(magSq00 - 0.5) < 0.1 && Math.abs(magSq11 - 0.5) < 0.1 && magSq01 < 0.01 && magSq10 < 0.01) {
+                      // Check for relative phase +1 (Phi+ state)
+                      const productRe = amp00.re * amp11.re;
+                      const imSmall = Math.abs(amp00.im) < 0.2 && Math.abs(amp11.im) < 0.2;
+                      
+                      if (productRe > 0.4 && imSmall) {
+                           success = true;
+                           message = "Correct! You created the Bell state |Φ+⟩ = (|00⟩ + |11⟩)/√2.";
+                      } else if (productRe < -0.4 && imSmall) {
+                           message = "Close! You created |Φ-⟩ (|00⟩ - |11⟩). Check your gates.";
+                      } else {
+                           message = `Probabilities correct. Phase mismatch.`;
+                      }
+                 } else {
+                     if (magSq00 > 0.9 || magSq11 > 0.9) {
+                         message = "You have a classical state (either |00> or |11>). You need a superposition. Did you forget the Hadamard gate?";
+                     } else if (Math.abs(magSq00 - 0.25) < 0.1 && Math.abs(magSq01 - 0.25) < 0.1) {
+                         message = "It looks like you have a separable state (product state). You need to entangle them using CNOT.";
+                     } else {
+                         message = "Aim for a superposition of |00⟩ and |11⟩. (Hint: H on q0, then CNOT).";
+                     }
+                 }
+            } else {
+                message = "Make sure you are using 2 qubits.";
             }
         } else if (criteria === 'verify_hadamard_unitary') {
              // Goal: Verify H†H = I. In simulation, this means applying H then H† (which is H).
