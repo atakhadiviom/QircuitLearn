@@ -25,7 +25,7 @@
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <script defer src="/static/js/editor.js?v=2"></script>
+  <script defer src="{{ url_for('static', filename='js/editor.js') }}?v=9"></script>
   <script>
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('active');
@@ -210,14 +210,28 @@
                   window.MathJax.typesetPromise([content]);
                 }
 
-                document.getElementById('submit-quiz-btn').onclick = () => {
+                const submitBtn = document.getElementById('submit-quiz-btn');
+                submitBtn.onclick = () => {
+                  console.log("Submitting quiz...");
                   const answers = {};
+                  let answeredCount = 0;
                   data.questions.forEach(q => {
                     const selected = document.querySelector(`input[name="q_${q.id}"]:checked`);
                     if (selected) {
                       answers[q.id] = parseInt(selected.value);
+                      answeredCount++;
                     }
                   });
+
+                  if (answeredCount === 0) {
+                      const resultDiv = document.getElementById('quiz-result');
+                      resultDiv.classList.remove('hidden');
+                      resultDiv.innerHTML = `<p class="status-fail">Please answer at least one question.</p>`;
+                      return;
+                  }
+
+                  submitBtn.disabled = true;
+                  submitBtn.textContent = "Submitting...";
 
                   fetch('/api/quiz/submit', {
                     method: 'POST',
@@ -226,6 +240,9 @@
                   })
                     .then(r => r.json())
                     .then(res => {
+                      submitBtn.disabled = false;
+                      submitBtn.textContent = "Submit Answers";
+                      
                       const resultDiv = document.getElementById('quiz-result');
                       resultDiv.classList.remove('hidden');
                       if (res.error) {
@@ -239,6 +256,14 @@
                         }
                         resultDiv.innerHTML = `<p class="${cls}">${msg}</p>`;
                       }
+                    })
+                    .catch(err => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Submit Answers";
+                        console.error("Submit error:", err);
+                        const resultDiv = document.getElementById('quiz-result');
+                        resultDiv.classList.remove('hidden');
+                        resultDiv.innerHTML = `<p class="status-fail">Error submitting quiz. Check console.</p>`;
                     });
                 };
               })

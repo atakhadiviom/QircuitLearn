@@ -490,13 +490,29 @@ $$\\alpha_{total} = \\alpha_{path1} + \\alpha_{path2}$$
                     "slug": "classical-logic-boolean",
                     "title": "11. Classical Logic: Boolean Algebra",
                     "content": """
-<h2>Boolean Algebra</h2>
-<p>George Boole proved that logic could be reduced to math.</p>
+<h2>Classical Logic: Boolean Algebra</h2>
+<p>You have established the mathematical framework. Now we must understand the fundamental computational constraints that force us to use quantum mechanics.</p>
+
+<h3>1. Boolean Algebra: The Classical Baseline</h3>
+<p>Boolean Algebra is the math of logic. It describes the relationship between discrete states represented by a bit: True (1) or False (0). The entire classical computer is built from simple, truth-table driven gates:</p>
 <ul>
-    <li><strong>True</strong> = 1</li>
-    <li><strong>False</strong> = 0</li>
+  <li><strong>AND</strong> ($A \\land B$): Output is 1 only if both inputs are 1.</li>
+  <li><strong>OR</strong> ($A \\lor B$): Output is 1 if either input is 1.</li>
+  <li><strong>NOT</strong> ($\\neg A$): Flips the input.</li>
+  <li><strong>Bit values</strong>: <em>True</em> = 1, <em>False</em> = 0.</li>
 </ul>
-<p>In classical computers, everything is built from these 0s and 1s. In quantum, we extend this to vectors.</p>
+<div style=\"text-align:center; margin: 16px 0;\">
+  <img src=\"/static/images/Logic%20Gates%20Symbols%20With%20Truth%20Table.jpeg\" alt=\"Logic gate symbols and truth tables\" style=\"max-width: 680px; width: 100%; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.2);\" />
+  <p style=\"color: var(--text-muted); font-size: 0.9rem;\">Classical logic gates and their truth tables.</p>
+</div>
+
+<h3>2. The Problem: Irreversibility</h3>
+<p>Most classical gates, such as AND and OR, are <strong>irreversible</strong>. This means you cannot uniquely determine the input from the output. When a gate is irreversible, it loses information. This lost information is linked to thermodynamic entropy, and for every bit of information lost, the operation must dissipate energy (Landauer's Principle).</p>
+<p>Quantum computing is based on <strong>unitary</strong> operations (matrices that conserve probability/vector length), and all unitary operations are mathematically reversible. To create a quantum algorithm, we must use logic that is also reversible.</p>
+
+<h3>3. The Bridge: Reversible Logic</h3>
+<p>In quantum circuits, gates are constructed such that the input state can always be recovered from the output state. They do not lose information.</p>
+<p>For example, the <strong>Pauli-X</strong> gate (Quantum NOT) is reversible: if you apply it twice, you get back to the original state ($X^2 = I$). All quantum gates must be part of a reversible system.</p>
                     """,
                     "position": 11,
                     "task_json": None,
@@ -506,32 +522,122 @@ $$\\alpha_{total} = \\alpha_{path1} + \\alpha_{path2}$$
                     "slug": "classical-logic-gates",
                     "title": "12. Classical Logic: Logic Gates",
                     "content": """
-<h2>Logic Gates (AND, OR, NOT)</h2>
-<p>Complex decisions are built from simple gates.</p>
+<h2>Classical Logic: Logic Gates</h2>
+<p>You established why standard classical gates fail in a quantum system (information loss/irreversibility). Now, we look at the specific gates that serve as the direct mathematical blueprint for quantum circuits.</p>
+<p><strong>Goal:</strong> Use logic gates that take <em>N</em> inputs and produce <em>N</em> outputs, where the input can always be uniquely determined from the output.</p>
+
+<h3>1. The Controlled-NOT (CNOT)</h3>
+<p>The Controlled-NOT (CNOT) gate is the most fundamental two-bit reversible gate. It is the direct precursor to its quantum counterpart.</p>
+
+<table style=\"width:100%; max-width:600px; border-collapse:collapse; margin:12px 0;\">
+  <thead>
+    <tr>
+      <th style=\"border-bottom:1px solid var(--border); text-align:left; padding:6px;\">Control (A)</th>
+      <th style=\"border-bottom:1px solid var(--border); text-align:left; padding:6px;\">Target (B)</th>
+      <th style=\"border-bottom:1px solid var(--border); text-align:left; padding:6px;\">Output (A')</th>
+      <th style=\"border-bottom:1px solid var(--border); text-align:left; padding:6px;\">Output (B')</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td style=\"padding:6px;\">0</td><td style=\"padding:6px;\">0</td><td style=\"padding:6px;\">0</td><td style=\"padding:6px;\">0</td></tr>
+    <tr><td style=\"padding:6px;\">0</td><td style=\"padding:6px;\">1</td><td style=\"padding:6px;\">0</td><td style=\"padding:6px;\">1</td></tr>
+    <tr><td style=\"padding:6px;\">1</td><td style=\"padding:6px;\">0</td><td style=\"padding:6px;\">1</td><td style=\"padding:6px;\">1</td></tr>
+    <tr><td style=\"padding:6px;\">1</td><td style=\"padding:6px;\">1</td><td style=\"padding:6px;\">1</td><td style=\"padding:6px;\">0</td></tr>
+  </tbody>
+  </table>
+
+<p><strong>Rule:</strong> The Control bit remains unchanged (A' = A). The Target bit is flipped only if the Control bit is 1 (B' = B \u2295 A, where \u2295 is XOR).</p>
+<p><strong>Significance:</strong> Because the CNOT preserves the control bit and the operation on the target depends deterministically on the control, you can perfectly reverse this operation.</p>
+
+<h3>2. Universal Reversible Logic</h3>
+<p>A set of gates is universal if any logical function can be built using only those gates. Classical irreversible sets are universal (e.g., NAND alone or NOR alone). For reversible logic, we need more complex gates to achieve universality:</p>
 <ul>
-    <li><strong>NOT:</strong> Flips 0 to 1 (like the Quantum X-gate).</li>
-    <li><strong>AND:</strong> Returns 1 only if BOTH inputs are 1.</li>
-    <li><strong>OR:</strong> Returns 1 if EITHER input is 1.</li>
+  <li><strong>Toffoli (CCNOT):</strong> A 3-bit gate (2 controls, 1 target). It flips the target only if both control bits are 1. The Toffoli gate alone is universal for all classical reversible computation.</li>
+  <li><strong>Fredkin (CSWAP):</strong> A 3-bit gate that swaps two target bits only if the control bit is 1.</li>
 </ul>
+<p>The CNOT and Toffoli are crucial because they demonstrate that reversible logic is sufficient to perform any classical computation, and they are the two most important multi-qubit gates in any quantum circuit.</p>
                     """,
                     "position": 12,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Create a Bell Pair: Apply H on q0, then CNOT with control q0 and target q1. Run simulation and verify 50% |00> and 50% |11>.",
+                        "criteria": "bell_pair",
+                        "qubits": 2
+                    }),
                     "section": "classical-logic"
                 },
                 {
                     "slug": "classical-logic-reversible",
                     "title": "13. Classical Logic: Reversible Computing",
                     "content": """
-<h2>Reversible Computing</h2>
-<p>A process is <strong>reversible</strong> if you can reconstruct the input from the output.</p>
-<ul>
-    <li><strong>Irreversible:</strong> An AND gate. If output is 0, was the input (0,0), (0,1), or (1,0)? Information is lost (dissipated as heat).</li>
-    <li><strong>Reversible:</strong> A NOT gate. If output is 0, input was 1.</li>
-</ul>
-<p><strong>The Rule:</strong> Quantum evolution MUST be reversible (unitary). Information is never lost.</p>
+<h2>Classical Logic: Reversible Computing</h2>
+<p>This is the final conceptual hurdle before we enter the quantum realm proper. You need to unlearn how you think about memory.</p>
+
+<p>In classical coding, you are used to variables being overwritten.</p>
+<pre><code>x = 5
+x = x + 1  // The old '5' is gone
+</code></pre>
+
+<p>In Quantum Computing, <strong>you cannot overwrite data.</strong> This isn't just a rule; it's a law of physics. Because quantum operators are unitary (probability conserving), they must be reversible. If you erase information, you break the unitarity, and the quantum state collapses or decoheres.</p>
+
+<h3>1. Landauer's Principle: Information is Physical</h3>
+<p>Why does this matter? Rolf Landauer proved that <strong>erasing</strong> information (irreversible computing) necessarily dissipates heat.</p>
+<p>$$E \\ge k_B T \\ln 2$$</p>
+<p>Every bit you \"delete\" costs energy.</p>
+
+<p>Quantum computers must operate with effectively zero energy dissipation during the calculation to maintain the delicate quantum state. Therefore, <strong>every step must be logically reversible.</strong></p>
+
+<h3>2. The Consequence: \"Garbage\" Accumulation</h3>
+<p>Because you can't throw away intermediate data, quantum algorithms generate a massive amount of \"Garbage Qubits\" (ancilla bits holding intermediate results).</p>
+<p>If you compute $f(x)$ using temporary registers, you end up with:</p>
+<p>$$|x\\rangle \\to |x\\rangle |g(x)\\rangle |f(x)\\rangle$$</p>
+<p>where $|g(x)\\rangle$ is the garbage left over from the calculation.</p>
+
+<p><strong>The Trap:</strong> If you leave this garbage entangled with your result, it acts like a \"measurement\" by the environment. It will kill the interference pattern you are trying to create. You <strong>must</strong> clean it up.</p>
+
+<h3>3. The Solution: Uncomputation</h3>
+<p>How do you delete data without \"deleting\" it? You run the circuit in reverse.</p>
+
+<p>The standard pattern for a clean quantum calculation is:</p>
+<ol>
+  <li><strong>Compute:</strong> Calculate the result into a blank target register.<br>
+    $(|x\\rangle, |0\\rangle, |0\\rangle) \\xrightarrow{U} (|x\\rangle, |g\\rangle, |f(x)\\rangle)$
+  </li>
+  <li><strong>Copy:</strong> Copy the answer to a safe \"readout\" register (usually via CNOTs).<br>
+    $(|x\\rangle, |g\\rangle, |f(x)\\rangle, |0\\rangle) \\to (|x\\rangle, |g\\rangle, |f(x)\\rangle, |f(x)\\rangle)$
+  </li>
+  <li><strong>Uncompute:</strong> Apply the <em>inverse</em> of the compute operation ($U^\dagger$). This reverses the calculation of the garbage and the original result, returning the working registers to zero.<br>
+    $(|x\\rangle, |g\\rangle, |f(x)\\rangle, |f(x)\\rangle) \\xrightarrow{U^\\dagger} (|x\\rangle, |0\\rangle, |0\\rangle, |f(x)\\rangle)$
+  </li>
+  </ol>
+
+<p>Now you have the clean result $|f(x)\\rangle$ and empty working space, without having thermally erased anything.</p>
+
+<div style=\"text-align:center; margin: 16px 0;\">
+  <img src=\"/static/images/13.%20Classical%20Logic-%20Reversible%20Computing.jpeg\" alt=\"Reversible computing workflow schematic\" style=\"max-width: 720px; width: 100%; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.2);\" />
+  <p style=\"color: var(--text-muted); font-size: 0.9rem;\">Reversible compute–copy–uncompute pattern.</p>
+</div>
+
+<hr>
+
+<h3>Your Task: The Uncomputation Workflow</h3>
+<p>You have a circuit $U$ that takes input $x$ and a workspace $0$, and produces $(x, x \\oplus 1)$.</p>
+<p>$$U(x, 0) \\to (x, x \\oplus 1)$$</p>
+<p>You want to isolate the result $x \oplus 1$ and return the workspace to $0$.</p>
+
+<ol>
+  <li><strong>Step 1 (Compute):</strong> Prepare the input qubit to $|1\\rangle$ (apply X on <code>q0</code>). Build <code>U</code> using CNOT(control <code>q0</code>, target <code>q1</code>) then X on <code>q1</code>. What is the state?</li>
+  <li><strong>Step 2 (Copy):</strong> Apply a CNOT where the \"work\" qubit <code>q1</code> is the control and a new third qubit <code>q2</code> (initialized to $|0\\rangle$) is the target. What is the state of the three qubits?</li>
+  <li><strong>Step 3 (Uncompute):</strong> Apply $U^\\dagger$ (the inverse of <code>U</code>) to the first two qubits: X on <code>q1</code> then CNOT(control <code>q0</code>, target <code>q1</code>). What is the final state?</li>
+</ol>
+
+<p><em>Hint:</em> <code>U</code> is its own inverse.</p>
                     """,
                     "position": 13,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Uncomputation workflow: Prepare q0=1. Compute U as CNOT(q0→q1) then X on q1. Copy with CNOT(q1→q2). Uncompute with X on q1 then CNOT(q0→q1). Final state should be |1,0,0>.",
+                        "criteria": "uncompute_workflow",
+                        "qubits": 3
+                    }),
                     "section": "classical-logic"
                 }
             ]
@@ -545,67 +651,213 @@ $$\\alpha_{total} = \\alpha_{path1} + \\alpha_{path2}$$
                     "slug": "postulates-state-space",
                     "title": "1. Postulates: State Space",
                     "content": """
-<h2>Postulate 1: State Space</h2>
-<p>The first postulate of quantum mechanics tells us where everything happens.</p>
+<h2>1. Postulates: State Space</h2>
+<p>We have finished the pre-requisites (Math and Logic). Now we enter <strong>Physics</strong>.</p>
+<p>Quantum Mechanics is built on four \"Postulates\"—axioms that cannot be proven, only verified by experiment. If you accept them, everything else follows.</p>
+
+<h3>Postulate 1: The State Space</h3>
+<p><strong>The Rule:</strong> Associated to any isolated physical system is a complex vector space with an inner product (a Hilbert Space) known as the <strong>state space</strong> of the system. The system is completely described by its <strong>state vector</strong> ($|\\psi\\rangle$), which is a <strong>unit vector</strong> in the system's state space.</p>
+
+<h4>1. The Requirement: Normalization</h4>
+<p>The most critical phrase above is \"unit vector.\" Because the coefficients of the vector represent probability amplitudes, and total probability must equal 100% (1.0), every valid quantum state must satisfy the <strong>Normalization Condition</strong>:</p>
+<p>$$\\langle \\psi | \\psi \\rangle = 1$$</p>
+<p>If $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$, then $|\\alpha|^2 + |\\beta|^2 = 1$.</p>
+<p>If you have a vector where the squared magnitudes do not sum to 1, it is <strong>not</strong> a valid quantum state. It is just a mathematical abstraction until you normalize it.</p>
+
+<h4>2. The Implication: The Exponential Explosion</h4>
+<p>The state space for a single qubit is $\\mathbb{C}^2$ (2 complex dimensions). The state space for $N$ qubits is the tensor product of the individual spaces: $\\mathbb{C}^{2^N}$.</p>
 <ul>
-    <li><strong>The Rule:</strong> The state of an isolated quantum system is described by a unit vector $|\psi\\rangle$ in a complex vector space with an inner product (a Hilbert Space).</li>
-    <li><strong>Why it matters:</strong> This gives us the language. We aren't just listing properties; we are defining a single mathematical object that contains <em>all</em> the information about the system.</li>
-</ul>
-<p>The simplest quantum system is the Qubit, which lives in a 2-dimensional Hilbert space.</p>
+  <li>1 Qubit: 2 complex numbers.</li>
+  <li>10 Qubits: $2^{10} = 1,024$ complex numbers.</li>
+  <li>50 Qubits: $2^{50} \\approx 1.1 \\times 10^{15}$ (Petabytes of RAM to simulate).</li>
+  <li>300 Qubits: $2^{300}$ (More numbers than atoms in the visible universe).</li>
+  </ul>
+<p>This is why we build quantum computers. To simulate a 300-qubit system on a classical computer is physically impossible. Nature manages this information effortlessly.</p>
+
+<div style=\"text-align:center; margin: 16px 0;\">
+  <img src=\"/static/images/exponential%20growth%20graph.jpeg\" alt=\"Exponential growth of Hilbert space dimension (2^N)\" style=\"max-width: 720px; width: 100%; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.2);\" />
+  <p style=\"color: var(--text-muted); font-size: 0.9rem;\">Exponential growth: the state space dimension scales as $2^N$.</p>
+</div>
+
+<hr>
+
+<h3>Your Task: The \"Illegal\" State</h3>
+<p>You are given the following vector representing a potential system state:</p>
+<p>$$|\\phi\\rangle = 3|0\\rangle + 4i|1\\rangle$$</p>
+<ol>
+  <li><strong>Check Validity:</strong> Calculate the squared magnitude of the vector (the sum of the squared moduli of the coefficients). Does it equal 1?</li>
+  <li><strong>Fix It:</strong> Normalize the vector. Find a constant $N$ such that if you multiply $|\\phi\\rangle$ by $\\frac{1}{N}$, the resulting vector is a valid unit vector. (Hint: $N = \\sqrt{\\langle \\phi | \\phi \\rangle}$).</li>
+</ol>
+<p><strong>Warning:</strong> Don't forget that $|4i|^2$ is $16$, not $-16$. Modulus is always positive.</p>
                     """,
                     "position": 1,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Prepare the normalized state (3|0> + 4i|1>)/5. Use Ry(≈1.8546) then S gate to set amplitudes and phase. Confirm probabilities ≈36% and 64% with |1> carrying +i phase.",
+                        "criteria": "normalize_illegal_state",
+                        "qubits": 1
+                    }),
                     "section": "postulates-of-quantum-mechanics"
                 },
                 {
                     "slug": "postulates-evolution",
                     "title": "2. Postulates: Evolution",
                     "content": """
-<h2>Postulate 2: Evolution</h2>
-<p>How does the state change over time?</p>
+<h2>2. Postulates: Evolution</h2>
+<p>You have the state. Now you need to move it.</p>
+
+<h3>Postulate 2: Evolution (Unitary Dynamics)</h3>
+
+<p><strong>The Rule:</strong></p>
+<p>The evolution of a closed quantum system is described by a <strong>unitary transformation</strong>. That is, the state $|\\psi\\rangle$ of the system at time $t_1$ is related to the state $|\\psi'\\rangle$ at time $t_2$ by a unitary operator $U$ which depends only on the times $t_1$ and $t_2$.</p>
+
+<p>$$|\\psi'\\rangle = U|\\psi\\rangle$$</p>
+
+<p>(Note: In continuous physics, this is derived from the Schrödinger equation. In Quantum Computing, we discretize this into "Gates".)</p>
+
+<h3>1. What is "Unitary"?</h3>
+
+<p>A matrix $U$ is unitary if its conjugate transpose ($U^\\dagger$) is also its inverse ($U^{-1}$).</p>
+<p>Mathematically:</p>
+
+<p>$$U^\\dagger U = I$$</p>
+
+<p>Where $I$ is the Identity matrix.</p>
+
+<h3>2. Why do we care? (Conservation of Probability)</h3>
+
+<p>This is not just linear algebra jargon. It is a physical requirement.</p>
+<p>If you start with a valid quantum state (total probability = 1), you <strong>must</strong> end with a valid quantum state (total probability = 1).</p>
+
+<p>If our operators were not unitary, the length of the state vector would stretch or shrink.</p>
 <ul>
-    <li><strong>The Rule:</strong> The evolution of a closed quantum system is described by a <strong>Unitary Transformation</strong>.</li>
-    <li><strong>The Equation:</strong> $|\psi'\\rangle = U|\psi\\rangle$</li>
+    <li><strong>Stretch:</strong> Total probability > 100%. Impossible.</li>
+    <li><strong>Shrink:</strong> Total probability < 100%. The qubit "disappears."</li>
 </ul>
-<p><strong>Key Property:</strong> Unitary matrices preserve the length of the vector (probability must sum to 1) and are reversible ($U^{-1} = U^{\dagger}$). This means quantum information is never lost.</p>
-                    """,
+
+<p>Unitary matrices are effectively "complex rotations." They rotate the state vector around the Hilbert space without changing its length.</p>
+
+<h3>3. Reversibility</h3>
+
+<p>Because $U^{-1} = U^\\dagger$, <strong>quantum mechanics is reversible</strong>. If you apply a gate $U$, you can always undo it by applying $U^\\dagger$. This is fundamentally different from classical computing, where $x = 0$ destroys the previous value of $x$. In quantum, nothing is ever truly deleted until measurement.</p>
+
+<hr>
+
+<h3>Your Task: verifying the Hadamard Gate</h3>
+
+<p>The <strong>Hadamard Gate ($H$)</strong> is the most important single-qubit gate. It creates superposition.</p>
+<p>$$H = \\frac{1}{\\sqrt{2}} \\begin{pmatrix} 1 & 1 \\\\ 1 & -1 \\end{pmatrix}$$</p>
+
+<p>You need to prove it is a valid quantum operator.</p>
+
+<ol>
+    <li><strong>Find $H^\\dagger$:</strong> Calculate the conjugate transpose of $H$. (Note: Since $H$ has only real numbers, the complex conjugate is trivial).</li>
+    <li><strong>Multiply:</strong> Calculate the matrix product $H^\\dagger H$.</li>
+    <li><strong>Verify:</strong> Does the result equal the Identity matrix $\\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$?</li>
+</ol>
+
+<p>If it does, the gate preserves probability. If not, the math is broken.</p>
+""",
                     "position": 2,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Verify Unitarity: Apply H then H again. Does the state return to |0>?",
+                        "criteria": "verify_hadamard_unitary",
+                        "qubits": 1
+                    }),
                     "section": "postulates-of-quantum-mechanics"
                 },
                 {
                     "slug": "postulates-measurement",
                     "title": "3. Postulates: Measurement",
                     "content": """
-<h2>Postulate 3: Measurement</h2>
-<p>This is where things get weird. When we look at the system, we change it.</p>
+<h3>Postulate 3: Measurement (The Born Rule and State Collapse)</h3>
+
+<p><strong>The Rule:</strong><br>
+Quantum measurements are governed by observables, which are described by Hermitian operators ($M$).</p>
+
+<p><strong>The Outcome (Eigenvalues):</strong> The only possible results of a measurement are the eigenvalues ($\\lambda_i$) of the observable $M$. (Since measurement results must be real, $M$ must be Hermitian, as all Hermitian operators have real eigenvalues).</p>
+
+<p><strong>The Probability (Born Rule):</strong> The probability of observing a specific eigenvalue $\\lambda_i$ is given by the squared magnitude of the projection of the state vector $|\\psi\\rangle$ onto the corresponding eigenvector $|e_i\\rangle$:</p>
+
+$$P(\\lambda_i) = |\\langle e_i | \\psi \\rangle|^2$$
+
+<p><strong>The State Collapse:</strong> Immediately after the measurement yields the result $\\lambda_i$, the state of the system <strong>instantaneously collapses</strong> to the corresponding eigenvector $|e_i\\rangle$.</p>
+
+<p><strong>The Trap: Non-Determinism</strong><br>
+Before measurement, the qubit exists in a superposition of all possible outcomes. The state is perfectly known ($\\alpha$ and $\\beta$ are known). However, the <strong>result</strong> is fundamentally non-deterministic. We only know the probabilities. After measurement, the amplitude information is gone; the system is forced into one definite classical state ($|0\\rangle$ or $|1\\rangle$).</p>
+
+<hr>
+
+<h3>Your Task: Calculating Collapse</h3>
+
+<p>The standard measurement in quantum computing is performed with the <strong>Pauli-Z Observable</strong> ($M=Z$).</p>
+
+<p><strong>Z-Observable:</strong> $Z = \\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}$</p>
+
+<p><strong>Eigenvectors/Outcomes:</strong></p>
 <ul>
-    <li><strong>The Rule:</strong> Quantum measurements are described by a collection of measurement operators $\{M_m\}$. The probability of outcome $m$ is $P(m) = \langle \psi | M_m^{\dagger} M_m | \psi \rangle$.</li>
-    <li><strong>Collapse:</strong> Immediately after measurement, the state of the system collapses to the outcome state.</li>
+    <li>$|e_0\\rangle = |0\\rangle$ (Eigenvalue $\\lambda_0 = +1$)</li>
+    <li>$|e_1\\rangle = |1\\rangle$ (Eigenvalue $\\lambda_1 = -1$)</li>
 </ul>
-<p><strong>The Takeaway:</strong> Measurement is irreversible. Once you look, you destroy the superposition.</p>
-                    """,
+
+<p>Suppose you prepare the qubit in the balanced superposition state $|+\\rangle$:</p>
+
+$$|+\\rangle = \\frac{1}{\\sqrt{2}}|0\\rangle + \\frac{1}{\\sqrt{2}}|1\\rangle$$
+
+<p><strong>Calculate the Probability:</strong> What is the probability $P(+1)$ of measuring the eigenvalue $+1$ (i.e., collapsing to $|0\\rangle$)?</p>
+
+$$P(+1) = |\\langle 0 | + \\rangle|^2$$
+
+<p><strong>State After Measurement:</strong> If you perform the measurement and the result is $+1$, what is the state of the qubit <strong>immediately</strong> after the collapse?</p>
+""",
                     "position": 3,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Prepare the |+> state using the H gate, then add a Measurement gate. Observe the probabilities (approx 50/50).",
+                        "criteria": "measurement_collapse",
+                        "qubits": 1
+                    }),
                     "section": "postulates-of-quantum-mechanics"
                 },
                 {
                     "slug": "the-qubit-superposition",
                     "title": "4. The Qubit: Superposition",
                     "content": """
-<h2>Superposition</h2>
-<p>Let's upgrade our analogy.</p>
+<h2>The Qubit: Superposition</h2>
+<p>You have accepted the rules. Now, let’s define the key resource: the **Qubit**.</p>
+
+<h3>The Qubit: Superposition</h3>
+<p>A **Qubit** (Quantum bit) is the physical realization of a two-level quantum system. While a classical bit stores a value of 0 or 1, a qubit exists in a **superposition** of the two basis states, $|0\\rangle$ and $|1\\rangle$.</p>
+
+<p><strong>The Hard Truth:</strong> Superposition is the result of Postulate 1 (State Space). It simply means the state of the qubit is a **unit vector** that is a linear combination of the basis vectors $|0\\rangle$ and $|1\\rangle$:</p>
+$$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
+<p>where $\\alpha$ and $\\beta$ are the complex **probability amplitudes** you mastered earlier.</p>
+
+<h3>⚠️ The Misconception</h3>
+<p>You must avoid the naive interpretation that a qubit is "simultaneously 0 and 1." This analogy is fundamentally misleading.</p>
 <ul>
-    <li><strong>Classical Bit:</strong> A coin flat on the table. It is definitely <strong>Heads</strong> OR <strong>Tails</strong>.</li>
-    <li><strong>Qubit:</strong> A coin <em>spinning</em> on the table. Is it Heads or Tails? It’s <strong>both and neither</strong> at the same time.</li>
+    <li>A qubit is **one single state** ($|\\psi\\rangle$) that exists in the Hilbert space. It is a single vector, not two separate bits.</li>
+    <li>The "mixture" only reflects the **potential** outcomes upon measurement.</li>
 </ul>
-<p>This state is called <strong>Superposition</strong>. The coin keeps spinning until you slap your hand down on it—this is <strong>measurement</strong>. Only then does it force itself to be Heads or Tails.</p>
-<p><strong>Interactive Task:</strong> Drag an <strong>H</strong> (Hadamard) gate to the circuit and run it. You'll see a 50/50 chance of measuring 0 or 1. Look at the <strong>Bloch Sphere</strong> below the results—the arrow points to the equator, representing the superposition state!</p>
+<p>Until the moment you apply the measurement operator (Postulate 3), the state $|\\psi\\rangle$ is **pure** and single. It is the ability to manipulate the relationship between $\\alpha$ and $\\beta$ (especially their **relative phase**) that enables quantum computation.</p>
+
+<p>Every point on the surface of the sphere (except the poles) is a valid superposition state.</p>
+<div style="text-align: center; margin: 20px;">
+    <img src="/static/images/bloch-sphere.png" alt="Bloch Sphere" style="max-width: 300px; border-radius: 8px;">
+</div>
+
+<h3>Your Task: Constructing Bias</h3>
+<p>You must be able to translate desired measurement probabilities directly into a valid state vector.</p>
+<p>Construct a superposition state $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$ that meets the following criteria:</p>
+<ol>
+    <li>The probability of measuring **$|0\\rangle$** is $P_0 = 1/3$.</li>
+    <li>The probability of measuring **$|1\\rangle$** is $P_1 = 2/3$.</li>
+    <li>Assume the coefficients $\\alpha$ and $\\beta$ are **real numbers** (ignore complex phase for simplicity here).</li>
+</ol>
+<p>What are the specific numerical values for $\\alpha$ and $\\beta$ that define this state?</p>
                     """,
                     "position": 4,
                     "task_json": json.dumps({
-                        "description": "Create a Superposition State (50% chance of 0 or 1)",
-                        "criteria": "superposition",
+                        "description": "Construct a state with P(0) ≈ 33% and P(1) ≈ 67%. Hint: Use the Ry gate with theta ≈ 1.91.",
+                        "criteria": "bias_one_third",
                         "qubits": 1
                     }),
                     "section": "the-qubit"
@@ -1484,6 +1736,190 @@ $$|0\\rangle \otimes |1\\rangle = |01\\rangle$$
                             (ap_quiz_id, q2_text, q2_options, q2_correct))
                 cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
                             (ap_quiz_id, q3_text, q3_options, q3_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # 13. Add a Quiz for "Postulates: Evolution"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("postulates-evolution",))
+        pe_row = cur.fetchone()
+        pe_lesson_id = _row_get(pe_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("postulates-evolution",))
+        pe_row = cur.fetchone()
+        pe_lesson_id = _row_get(pe_row, 'id', 0)
+
+    if pe_lesson_id:
+        quiz_title = "Evolution & Unitarity Check"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (pe_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (pe_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "If a quantum operator U is unitary, what must be true about its inverse?"
+            q1_options = json.dumps([
+                "It is equal to its conjugate transpose (U†)",
+                "It is equal to the identity matrix (I)",
+                "It is equal to the matrix itself (U)",
+                "It is undefined"
+            ])
+            q1_correct = 0
+
+            q2_text = "Why must quantum evolution be unitary?"
+            q2_options = json.dumps([
+                "To ensure the total probability always sums to 1 (conservation of probability)",
+                "To make the math harder",
+                "To allow for faster computation",
+                "To ensure all numbers are real"
+            ])
+            q2_correct = 0
+
+            q3_text = "You apply a Hadamard gate (H) to |0>. What happens if you apply H again immediately?"
+            q3_options = json.dumps([
+                "The state returns to |0> (H is its own inverse)",
+                "The state becomes |1>",
+                "The state becomes a complex number",
+                "The system crashes"
+            ])
+            q3_correct = 0
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (pe_lesson_id, quiz_title))
+                pe_quiz_row = cur.fetchone()
+                pe_quiz_id = _row_get(pe_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (pe_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (pe_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (pe_quiz_id, q3_text, q3_options, q3_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (pe_lesson_id, quiz_title))
+                pe_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (pe_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (pe_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (pe_quiz_id, q3_text, q3_options, q3_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # 14. Add a Quiz for "Postulates: Measurement"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("postulates-measurement",))
+        pm_row = cur.fetchone()
+        pm_lesson_id = _row_get(pm_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("postulates-measurement",))
+        pm_row = cur.fetchone()
+        pm_lesson_id = _row_get(pm_row, 'id', 0)
+
+    if pm_lesson_id:
+        quiz_title = "Measurement & Collapse Check"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (pm_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (pm_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "What is the probability P(+1) of measuring +1 (collapsing to |0>) given the state |+> = 1/√2(|0> + |1>)?"
+            q1_options = json.dumps([
+                "1 (100%)",
+                "0.5 (50%)",
+                "0 (0%)",
+                "0.707 (70.7%)"
+            ])
+            q1_correct = 1
+
+            q2_text = "If the measurement result is +1, what is the state of the qubit immediately after?"
+            q2_options = json.dumps([
+                "The state remains |+> (superposition)",
+                "The state becomes |->",
+                "The state becomes |0>",
+                "The state becomes |1>"
+            ])
+            q2_correct = 2
+
+            q3_text = "What determines the possible results of a quantum measurement?"
+            q3_options = json.dumps([
+                "The eigenvalues of the observable operator",
+                "The user's choice",
+                "The amplitude of the state",
+                "Random chance"
+            ])
+            q3_correct = 0
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (pm_lesson_id, quiz_title))
+                pm_quiz_row = cur.fetchone()
+                pm_quiz_id = _row_get(pm_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (pm_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (pm_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (pm_quiz_id, q3_text, q3_options, q3_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (pm_lesson_id, quiz_title))
+                pm_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (pm_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (pm_quiz_id, q2_text, q2_options, q2_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (pm_quiz_id, q3_text, q3_options, q3_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # 15. Add a Quiz for "The Qubit: Superposition"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("the-qubit-superposition",))
+        qs_row = cur.fetchone()
+        qs_lesson_id = _row_get(qs_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("the-qubit-superposition",))
+        qs_row = cur.fetchone()
+        qs_lesson_id = _row_get(qs_row, 'id', 0)
+
+    if qs_lesson_id:
+        quiz_title = "Bias Construction Check"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (qs_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (qs_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "For a state |ψ> = α|0> + β|1> with P(0) = 1/3 and P(1) = 2/3 (α, β real), what are the values of α and β?"
+            q1_options = json.dumps([
+                "α = 1/3, β = 2/3",
+                "α = 1/√3, β = √(2/3)",
+                "α = 0.33, β = 0.66",
+                "α = 1/√2, β = 1/√2"
+            ])
+            q1_correct = 1
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (qs_lesson_id, quiz_title))
+                qs_quiz_row = cur.fetchone()
+                qs_quiz_id = _row_get(qs_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (qs_quiz_id, q1_text, q1_options, q1_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (qs_lesson_id, quiz_title))
+                qs_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (qs_quiz_id, q1_text, q1_options, q1_correct))
         else:
             print(f"Quiz '{quiz_title}' already exists.")
 

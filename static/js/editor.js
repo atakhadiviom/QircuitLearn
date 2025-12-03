@@ -621,6 +621,22 @@ async function callBackend() {
                     validateTask(data);
                 }
 
+                // Fallback success for uncomputation task if validator didn't catch due to bit-order quirks
+                try {
+                    if (window.currentTask && window.currentTask.criteria === 'uncompute_workflow') {
+                        const probs = data.probabilities || [];
+                        const p4 = probs[4] || 0; // |100⟩ in one ordering
+                        const p1 = probs[1] || 0; // |001⟩ in the other
+                        if (p4 > 0.9 || p1 > 0.9) {
+                            const taskStatus = document.getElementById('task-status');
+                            if (taskStatus) {
+                                taskStatus.className = 'status-success';
+                                taskStatus.textContent = '✅ Uncomputation complete: |1,0,0>. Workspace cleaned and result isolated.';
+                            }
+                        }
+                    }
+                } catch (e) {}
+
             } else {
                 outStr += JSON.stringify(data, null, 2);
             }
@@ -999,7 +1015,32 @@ function validateTask(data) {
     let success = false;
     let message = "";
 
-    if (criteria === 'superposition') {
+    if (criteria === 'measurement_collapse') {
+        const hasH = state.gates.some(g => g.type === 'H');
+        const hasMeasure = state.gates.some(g => g.type === 'MEASURE');
+
+        if (data.probabilities && data.probabilities.length >= 2) {
+            const p0 = data.probabilities[0];
+            const p1 = data.probabilities[1];
+            
+            // Debug info
+            console.log(`Validation: p0=${p0}, p1=${p1}, hasH=${hasH}, hasMeasure=${hasMeasure}`);
+
+            if (hasH && hasMeasure) {
+                 // Allow 15% tolerance to be safe (approx 0.35-0.65)
+                 if (Math.abs(p0 - 0.5) < 0.15 && Math.abs(p1 - 0.5) < 0.15) {
+                     success = true;
+                     message = "Correct! You prepared |+> and measured it. The probabilities reflect the Born rule (50/50).";
+                 } else {
+                     message = `You have the gates, but probabilities (${(p0*100).toFixed(1)}% / ${(p1*100).toFixed(1)}%) are not close enough to 50/50. Try running again.`;
+                 }
+             } else if (!hasH) {
+                 message = "First, create a superposition using the H gate.";
+             } else if (!hasMeasure) {
+                 message = "Now apply the Measurement (M) gate to observe the outcome.";
+             }
+        }
+    } else if (criteria === 'superposition') {
         // Check if probabilities are roughly 50/50 for 0 and 1
         // Assuming 1 qubit for now as per task description
         if (data.probabilities && data.probabilities.length >= 2) {
@@ -1145,7 +1186,102 @@ function validateTask(data) {
                  message = "First, create a superposition with the H gate, then apply Z.";
              }
         }
-    }
+    } else if (criteria === 'uncompute_workflow') {
+        if (data.probabilities && data.probabilities.length >= 8) {
+            const p4 = data.probabilities[4] || 0;
+            const p1 = data.probabilities[1] || 0;
+            const finalIs100 = (p4 > 0.9 || p1 > 0.9);
+
+            if (finalIs100) {
+                success = true;
+                message = "Uncomputation complete: |1,0,0>. Workspace cleaned and result isolated.";
+            } else if (!(p4 > 0.9 || p1 > 0.9)) {
+                message = "Final state should be |1,0,0>. Check gate order and steps.";
+            } else {
+                message = "Task not satisfied yet. Review steps and try again.";
+            }
+        } else {
+            message = "Run the simulation to produce a 3-qubit state.";
+        }
+    } else if (criteria === 'normalize_illegal_state') {
+            if (data.statevector && data.statevector.length >= 2 && data.probabilities && data.probabilities.length >= 2) {
+                // Check for extra qubits
+                if (data.statevector.length > 2) {
+                    success = false;
+                    message = "Please use exactly 1 qubit for this task. (Check the Qubits counter)";
+                } else {
+                    const amp0 = parseComplexPython(data.statevector[0]);
+                    const amp1 = parseComplexPython(data.statevector[1]);
+                    const p0 = data.probabilities[0];
+                    const p1 = data.probabilities[1];
+
+                    // Check for collapsed state (Measurement)
+                    if (p0 > 0.99 || p1 > 0.99) {
+                        success = false;
+                        message = "It looks like you measured the state. Remove the Measurement (M) gate to keep the superposition.";
+                    } else {
+                        const probsOk = Math.abs(p0 - 0.36) < 0.08 && Math.abs(p1 - 0.64) < 0.08;
+                        const phaseOk = Math.abs(amp1.re) < 0.12 && Math.abs(amp1.im - 0.8) < 0.12;
+                        const amp0Ok = Math.abs(amp0.re - 0.6) < 0.12 && Math.abs(amp0.im) < 0.12;
+
+                        if (probsOk && phaseOk && amp0Ok) {
+                            success = true;
+                            message = "Correct! The vector is normalized: (3|0> + 4i|1>)/5.";
+                        } else {
+                            if (!probsOk) {
+                                message = `Probabilities are incorrect (Got |0>: ${(p0*100).toFixed(1)}%, |1>: ${(p1*100).toFixed(1)}%). Aim for ~36% and ~64%. Use Ry(≈1.8546).`;
+                            } else if (!phaseOk) {
+                                message = "Probabilities are correct, but the phase of |1> is wrong. It should be imaginary (+0.8i). Did you apply the S gate?";
+                            } else if (!amp0Ok) {
+                                message = "The amplitude of |0> is not real/positive. Ensure you start from |0> and use Ry.";
+                            } else {
+                                message = "Not yet. Aim for probabilities 36% and 64%, with |1> carrying +i phase. Use Ry(≈1.8546) then S gate.";
+                            }
+                        }
+                    }
+                }
+            } else {
+                message = "Build the 1-qubit circuit and run the simulation.";
+            }
+        } else if (criteria === 'bias_one_third') {
+            // Goal: Create a state with P(0) ~ 1/3 and P(1) ~ 2/3
+            // Use Ry gate.
+            if (data.probabilities && data.probabilities.length >= 2) {
+                const p0 = data.probabilities[0];
+                const p1 = data.probabilities[1];
+                
+                const targetP0 = 1/3;
+                const targetP1 = 2/3;
+                const tolerance = 0.05; // 5% tolerance
+
+                if (Math.abs(p0 - targetP0) < tolerance && Math.abs(p1 - targetP1) < tolerance) {
+                    success = true;
+                    message = `Correct! P(0) is ${(p0*100).toFixed(1)}% and P(1) is ${(p1*100).toFixed(1)}%.`;
+                } else {
+                    message = `Not quite. Probabilities are P(0): ${(p0*100).toFixed(1)}%, P(1): ${(p1*100).toFixed(1)}%. Aim for 33.3% / 66.7%. Hint: Try Ry with angle ~1.91.`;
+                }
+            }
+        } else if (criteria === 'verify_hadamard_unitary') {
+             // Goal: Verify H†H = I. In simulation, this means applying H then H† (which is H).
+             // Result should be |0> (identity operation on |0>) with 100% probability.
+             
+             const hasTwoH = state.gates.filter(g => g.type === 'H').length >= 2;
+             
+             if (data.probabilities && data.probabilities.length >= 2) {
+                  const p0 = data.probabilities[0];
+                  
+                  if (hasTwoH) {
+                      if (p0 > 0.99) {
+                          success = true;
+                          message = "Correct! H applied twice returns the state to |0>. This proves H is its own inverse (H† = H) and H†H = I.";
+                      } else {
+                          message = "You applied H twice, but the state is not |0>. Did you add other gates?";
+                      }
+                  } else {
+                      message = "To verify unitarity, apply H, then apply its inverse (which is also H).";
+                  }
+             }
+        }
 
     const taskBox = document.getElementById('task-box');
     const taskStatus = document.getElementById('task-status');
