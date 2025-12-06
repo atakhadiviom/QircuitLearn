@@ -245,10 +245,10 @@ function handleDrop(e, qubit, step) {
         return;
     }
 
-    if (type === 'CNOT') {
-        state.pendingOp = { type: 'CNOT', target: qubit, step: step };
+    if (type === 'CNOT' || type === 'CZ') {
+        state.pendingOp = { type: type, target: qubit, step: step };
         // Temporarily add incomplete gate
-        state.gates.push({ type: 'CNOT', target: qubit, step: step, control: null });
+        state.gates.push({ type: type, target: qubit, step: step, control: null });
         render();
     } else if (type === 'SWAP') {
         state.pendingOp = { type: 'SWAP', target: qubit, step: step };
@@ -286,7 +286,7 @@ function handleZoneClick(qubit, step) {
         const gate = state.gates.find(g => g.target === op.target && g.step === op.step && g.type === op.type);
         
         if (gate) {
-            if (op.type === 'CNOT') {
+            if (op.type === 'CNOT' || op.type === 'CZ') {
                 gate.control = qubit;
             } else if (op.type === 'SWAP') {
                 gate.params = { other: qubit };
@@ -337,7 +337,7 @@ function render() {
         banner.style.borderRadius = '4px';
         banner.style.marginBottom = '10px';
         banner.style.fontWeight = 'bold';
-        if (state.pendingOp.type === 'CNOT') {
+        if (state.pendingOp.type === 'CNOT' || state.pendingOp.type === 'CZ') {
             banner.textContent = 'Select a Control Qubit (click a green zone)';
         } else {
             banner.textContent = 'Select the second qubit to SWAP with (click a green zone)';
@@ -408,7 +408,7 @@ function render() {
                      el.textContent = `${gate.type}\n(${gate.params.theta.toFixed(1)})`;
                 }
 
-                if (gate.type === 'CNOT' && gate.control === null) {
+                if ((gate.type === 'CNOT' || gate.type === 'CZ') && gate.control === null) {
                     el.style.opacity = '0.5';
                     el.textContent = '?';
                     el.title = "Click a control qubit in this column";
@@ -477,9 +477,9 @@ function updateCircuitLines(container) {
     const svgNS = "http://www.w3.org/2000/svg";
     const containerRect = container.getBoundingClientRect();
 
-    // Draw lines for CNOTs
+    // Draw lines for CNOTs and CZs
     state.gates.forEach(g => {
-        if (g.type === 'CNOT' && g.control !== null && g.control !== undefined) {
+        if ((g.type === 'CNOT' || g.type === 'CZ') && g.control !== null && g.control !== undefined) {
             const controlQ = g.control;
             const targetQ = g.target;
             const step = g.step;
@@ -566,7 +566,7 @@ async function callBackend() {
     try {
         // Sort gates by step
         const sortedGates = [...state.gates]
-            .filter(g => !(g.type === 'CNOT' && g.control === null) && !(g.type === 'SWAP' && (g.params === undefined || g.params.other === null))) // Filter incomplete CNOTs and SWAPs
+            .filter(g => !((g.type === 'CNOT' || g.type === 'CZ') && g.control === null) && !(g.type === 'SWAP' && (g.params === undefined || g.params.other === null))) // Filter incomplete CNOTs/CZs and SWAPs
             .sort((a, b) => a.step - b.step);
 
         const payload = {
@@ -1297,6 +1297,52 @@ function validateTask(data) {
                     message = `Not quite. Probabilities are P(0): ${(p0*100).toFixed(1)}%, P(1): ${(p1*100).toFixed(1)}%. Aim for 33.3% / 66.7%. Hint: Try Ry with angle ~1.91.`;
                 }
             }
+        } else if (criteria === 'dj_prep') {
+            // Goal: q0 in |+>, q1 in |->.
+            // Assuming q0 is MSB (as per other tasks).
+            // State: 0.5 * (|00> - |01> + |10> - |11>)
+            if (data.statevector && data.statevector.length >= 4) {
+                 const amp00 = parseComplexPython(data.statevector[0]);
+                 const amp01 = parseComplexPython(data.statevector[1]);
+                 const amp10 = parseComplexPython(data.statevector[2]);
+                 const amp11 = parseComplexPython(data.statevector[3]);
+
+                 // Check magnitudes
+                 const magSq00 = amp00.re**2 + amp00.im**2;
+                 const magSq01 = amp01.re**2 + amp01.im**2;
+                 const magSq10 = amp10.re**2 + amp10.im**2;
+                 const magSq11 = amp11.re**2 + amp11.im**2;
+                 
+                 const probsCorrect = Math.abs(magSq00 - 0.25) < 0.1 && 
+                                      Math.abs(magSq01 - 0.25) < 0.1 &&
+                                      Math.abs(magSq10 - 0.25) < 0.1 &&
+                                      Math.abs(magSq11 - 0.25) < 0.1;
+                 
+                 if (probsCorrect) {
+                     // Check phases
+                     // 00: +
+                     // 01: -
+                     // 10: +
+                     // 11: -
+                     const phasesCorrect = amp00.re > 0.4 && amp01.re < -0.4 && amp10.re > 0.4 && amp11.re < -0.4;
+                     
+                     if (phasesCorrect) {
+                         success = true;
+                         message = "Correct! You prepared the Deutsch-Jozsa input state: |+> on q0 and |-> on q1.";
+                     } else {
+                         message = "Probabilities are correct (25% each), but the phases are wrong. q1 should be |-> (minus phase).";
+                     }
+                 } else {
+                     // Check if q1 is |+> (all positive)
+                     if (amp00.re > 0.4 && amp01.re > 0.4 && amp10.re > 0.4 && amp11.re > 0.4) {
+                         message = "You have |+> on both qubits. Remember q1 (auxiliary) needs to be |->. Use X then H.";
+                     } else {
+                         message = "Prepare |+> on q0 (H) and |-> on q1 (X then H).";
+                     }
+                 }
+            } else {
+                message = "Use 2 qubits for this task.";
+            }
         } else if (criteria === 'state_plus') {
             // Goal: Create |+> state.
             // Check probabilities 50/50 and phase (both positive real)
@@ -1317,10 +1363,62 @@ function validateTask(data) {
                      } else {
                          message = "Probabilities are correct, but check the phase.";
                      }
+                  } else {
+                      message = "Aim for 50/50 probability superposition.";
+                  }
+             }
+        } else if (criteria === 'grover_search') {
+             // Goal: Find |11> using Grover's algorithm (or just amplitude amplification).
+             // Start with H on all. Mark |11>. Diffuse.
+             // For 2 qubits, 1 iteration gives 100% probability.
+             // Target state: |11>
+             if (data.probabilities && data.probabilities.length >= 4) {
+                 const p11 = data.probabilities[3]; // |11>
+                 
+                 if (p11 > 0.9) {
+                     // Check if they cheated with just X gates
+                      const hasH = state.gates.some(g => g.type === 'H');
+                      const hasEntangling = state.gates.some(g => g.type === 'CNOT' || g.type === 'CZ'); // Needed for Oracle/Diffusion usually
+                      
+                      if (hasH && hasEntangling) {
+                         success = true;
+                         message = "Correct! You successfully amplified the amplitude of the solution |11>.";
+                     } else {
+                         message = "You found |11>, but did you use Grover's Algorithm? Start with Superposition (H) and use Interference.";
+                     }
                  } else {
-                    message = "Aim for 50/50 probability superposition.";
-                }
-            }
+                     message = `Probability of |11> is ${(p11*100).toFixed(1)}%. Aim for nearly 100%.`;
+                 }
+             } else {
+                 message = "Use 2 qubits for this task.";
+             }
+        } else if (criteria === 'qpe_z_gate') {
+             // Goal: Estimate phase of Z gate (phase 0.5 -> binary 1 -> |1> on counting qubit).
+             // q0 (counting): |+> -> CZ -> H -> |1>
+             // q1 (eigenstate): |1> -> CZ -> |1> (with phase kickback to q0)
+             // Final state: |11> (if q0 is index 0 or 1, but both are 1 so |11>).
+             
+             if (data.probabilities && data.probabilities.length >= 4) {
+                 // Index 3 is |11>
+                 const p11 = data.probabilities[3];
+                 
+                 if (p11 > 0.9) {
+                     // Check for required gates
+                     const hasH = state.gates.some(g => g.type === 'H');
+                     const hasEntangling = state.gates.some(g => g.type === 'CZ' || g.type === 'CNOT');
+                     
+                     if (hasH && hasEntangling) {
+                         success = true;
+                         message = "Correct! You estimated the phase 0.5 (binary 1) on the counting qubit.";
+                     } else {
+                         message = "You have the correct state, but did you use the QPE algorithm? (Need H and Controlled-Operation).";
+                     }
+                 } else {
+                     message = `Probability of |11> is ${(p11*100).toFixed(1)}%. Aim for 100%. \nHint: Prepare q0 in |+>, q1 in |1>, apply CZ, then Inverse QFT (H) on q0.`;
+                 }
+             } else {
+                 message = "Use 2 qubits for this task.";
+             }
         } else if (criteria === 'tensor_product_1_plus') {
             if (data.statevector && data.statevector.length >= 4) {
                  const amp10 = parseComplexPython(data.statevector[2]); // |10>
@@ -1422,6 +1520,42 @@ function validateTask(data) {
             } else {
                 message = "Make sure you are using 2 qubits.";
             }
+        } else if (criteria === 'phase_s_gate') {
+             // Goal: Create |i> = 1/sqrt(2)(|0> + i|1>). Start with H then S.
+             // Statevector should be [0.707, 0.707i]
+             if (data.statevector && data.statevector.length >= 2) {
+                  const amp0 = parseComplexPython(data.statevector[0]);
+                  const amp1 = parseComplexPython(data.statevector[1]);
+                  console.log('Debug phase_s_gate:', amp0, amp1);
+                  
+                  const magSq0 = amp0.re**2 + amp0.im**2;
+                  const magSq1 = amp1.re**2 + amp1.im**2;
+                  
+                  // Check probabilities (0.5 each)
+                  if (Math.abs(magSq0 - 0.5) < 0.1 && Math.abs(magSq1 - 0.5) < 0.1) {
+                      // Check phase of amp1. Should be i (re ~ 0, im ~ 0.707)
+                      // And amp0 should be real (re ~ 0.707, im ~ 0)
+                      
+                      const correct0 = Math.abs(amp0.re - 0.707) < 0.1 && Math.abs(amp0.im) < 0.1;
+                      const correct1 = Math.abs(amp1.re) < 0.1 && Math.abs(amp1.im - 0.707) < 0.1;
+                      
+                      if (correct0 && correct1) {
+                          success = true;
+                          message = "Correct! You created the state |+i> (or |R>). The S gate rotated the phase by 90 degrees.";
+                      } else {
+                          // Check if it is |-> (H then Z)
+                          if (Math.abs(amp1.re + 0.707) < 0.1) {
+                              message = "You created the |-> state (180 degree rotation). Use the S gate for a 90 degree rotation.";
+                          } else if (Math.abs(amp1.re - 0.707) < 0.1) {
+                              message = "You have the |+> state. You need to apply the S gate to rotate the phase.";
+                          } else {
+                              message = `Probabilities are correct, but the phase is wrong. (amp1: ${amp1.re.toFixed(2)} + ${amp1.im.toFixed(2)}i)`;
+                          }
+                      }
+                  } else {
+                      message = "First, create a superposition with the H gate, then apply S.";
+                  }
+             }
         } else if (criteria === 'verify_hadamard_unitary') {
              // Goal: Verify H†H = I. In simulation, this means applying H then H† (which is H).
              // Result should be |0> (identity operation on |0>) with 100% probability.
@@ -1472,8 +1606,41 @@ async function saveProgress() {
             })
         });
         console.log("Progress saved!");
+        
+        // Update sidebar checkmark without reloading
         if (window.isLoggedIn) {
-            setTimeout(() => location.reload(), 1500);
+            const activeLesson = document.querySelector('.lesson-item.active a');
+            if (activeLesson && !activeLesson.querySelector('span[style*="color: #16a34a"]')) {
+                const check = document.createElement('span');
+                check.style.color = '#16a34a';
+                check.style.fontSize = '0.9em';
+                check.textContent = '✓';
+                activeLesson.appendChild(check);
+            }
+        }
+
+        // Mark task as passed locally
+        window.taskPassed = true;
+        if (typeof window.taskCompletedThisSession !== 'undefined') {
+            window.taskCompletedThisSession = true;
+        }
+
+        // Check if we can redirect (needs both task and quiz)
+        if (window.checkCompletionAndRedirect) {
+            window.checkCompletionAndRedirect();
+        } else {
+             // Fallback if function not defined (e.g. cached html)
+             // Redirect to next lesson if available
+            if (window.nextLessonUrl) {
+                 const taskStatus = document.getElementById('task-status');
+                 if (taskStatus) {
+                     const originalText = taskStatus.textContent;
+                     taskStatus.textContent = originalText + " Redirecting to next lesson...";
+                 }
+                 setTimeout(() => {
+                     window.location.href = window.nextLessonUrl;
+                 }, 2000);
+            }
         }
     } catch (e) {
         console.error("Failed to save progress", e);

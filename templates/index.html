@@ -87,7 +87,7 @@
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <script defer src="{{ url_for('static', filename='js/editor.js') }}?v=14"></script>
+  <script defer src="{{ url_for('static', filename='js/editor.js') }}?v=24"></script>
   <script>
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('active');
@@ -239,7 +239,63 @@
 
         <script>
           window.isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
+          {% if next_lesson %}
+          window.nextLessonUrl = "/learn/{{ course['slug'] }}/{{ next_lesson['slug'] }}";
+          {% else %}
+          window.nextLessonUrl = null;
+          {% endif %}
+          
+          window.quizPassed = false;
+          window.taskPassed = false;
+          // Assume quiz exists until proven otherwise to prevent premature redirect
+          window.hasQuiz = true; 
+          
+          // Track if completion happened in this session to prevent auto-redirect on revisit
+          window.taskCompletedThisSession = false;
+          window.quizCompletedThisSession = false;
+
+          window.checkCompletionAndRedirect = function() {
+              const taskBox = document.getElementById('task-box');
+              const hasTask = taskBox !== null;
+              const taskDone = !hasTask || window.taskPassed || (taskBox.querySelector('.status-success') !== null);
+              
+              // If quiz hasn't loaded yet, we can't be sure. But this function is called after interactions.
+              const quizDone = !window.hasQuiz || window.quizPassed;
+              
+              // Only redirect if requirements are met AND at least one requirement was completed in this session
+              const somethingCompletedNow = window.taskCompletedThisSession || window.quizCompletedThisSession;
+              
+              if (window.nextLessonUrl && taskDone && quizDone && somethingCompletedNow) {
+                   const feedbackId = 'redirect-feedback';
+                   if (!document.getElementById(feedbackId)) {
+                       const feedback = document.createElement('div');
+                       feedback.id = feedbackId;
+                       feedback.style.position = 'fixed';
+                       feedback.style.top = '20px';
+                       feedback.style.left = '50%';
+                       feedback.style.transform = 'translateX(-50%)';
+                       feedback.style.padding = '10px 20px';
+                       feedback.style.background = '#16a34a';
+                       feedback.style.color = 'white';
+                       feedback.style.borderRadius = '5px';
+                       feedback.style.zIndex = '1000';
+                       feedback.textContent = "Lesson Completed! Redirecting to next lesson...";
+                       document.body.appendChild(feedback);
+                       
+                       setTimeout(() => {
+                           window.location.href = window.nextLessonUrl;
+                       }, 2000);
+                   }
+              }
+          };
+
           document.addEventListener('DOMContentLoaded', () => {
+            // Check initial task status from server rendering
+            const taskBox = document.getElementById('task-box');
+            if (taskBox && taskBox.querySelector('.status-success')) {
+                window.taskPassed = true;
+            }
+
             const lessonId = "{{ current_lesson['id'] }}";
             fetch(`/api/quiz/${lessonId}`)
               .then(r => {
@@ -247,6 +303,7 @@
                 throw new Error('No quiz');
               })
               .then(data => {
+                window.hasQuiz = true;
                 const container = document.getElementById('quiz-container');
                 const content = document.getElementById('quiz-content');
                 container.classList.remove('hidden');
@@ -257,9 +314,11 @@
                     .then(r => r.json())
                     .then(status => {
                       if (status.passed) {
+                        window.quizPassed = true;
                         const msgDiv = document.getElementById('quiz-header-msg');
                         msgDiv.classList.remove('hidden');
                         msgDiv.innerHTML = `<div class="status-success">✅ You have already passed this quiz!</div>`;
+                        window.checkCompletionAndRedirect();
                       }
                     })
                     .catch(err => console.error("Failed to check quiz status", err));
@@ -323,9 +382,14 @@
                       } else {
                         const cls = res.passed ? 'status-success' : 'status-fail';
                         let msg = `Score: ${res.score}/${res.total} (${Math.round(res.score / res.total * 100)}%) - ${res.passed ? 'Passed!' : 'Try Again'}`;
-                        if (res.passed && isLoggedIn) {
-                            msg += ' <span style="font-size:0.8em; margin-left:10px;">(Marking complete...)</span>';
-                            setTimeout(() => location.reload(), 1500);
+                        if (res.passed) {
+                            window.quizPassed = true;
+                            window.quizCompletedThisSession = true;
+                            if (isLoggedIn) {
+                                msg += ' <span style="font-size:0.8em; margin-left:10px;">(Marking complete...)</span>';
+                                // Check completion instead of reload
+                                window.checkCompletionAndRedirect();
+                            }
                         }
                         resultDiv.innerHTML = `<p class="${cls}">${msg}</p>`;
                       }
@@ -340,7 +404,11 @@
                     });
                 };
               })
-              .catch(e => console.log("No quiz for this lesson"));
+              .catch(e => {
+                  console.log("No quiz for this lesson");
+                  window.hasQuiz = false;
+                  window.checkCompletionAndRedirect();
+              });
           });
         </script>
 
@@ -409,6 +477,7 @@
           <div class="gate-btn" data-type="RY" title="Rotation Y">Ry</div>
           <div class="gate-btn" data-type="RZ" title="Rotation Z">Rz</div>
           <div class="gate-btn" data-type="CNOT" title="Controlled-NOT">CNOT</div>
+          <div class="gate-btn" data-type="CZ" title="Controlled-Z">CZ</div>
           <div class="gate-btn" data-type="SWAP" title="Swap Qubits">SWAP</div>
           <div class="gate-btn" data-type="MEASURE" title="Measure">M</div>
         </div>

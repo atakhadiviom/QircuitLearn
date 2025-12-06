@@ -31,6 +31,8 @@ def circuit_from_json(data):
             c.append(cirq.rz(p.get("theta", 0))(qs[q]))
         elif t == "CNOT" and ctr is not None:
             c.append(cirq.CNOT(qs[ctr], qs[q]))
+        elif t == "CZ" and ctr is not None:
+            c.append(cirq.CZ(qs[ctr], qs[q]))
         elif t == "SWAP":
             c.append(cirq.SWAP(qs[q], qs[p.get("other", q)]))
         elif t == "MEASURE":

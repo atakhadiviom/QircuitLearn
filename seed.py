@@ -130,6 +130,23 @@ def seed():
                 (admin_user, admin_email, pwd_hash, 1) # SQLite uses 1 for True
             )
 
+    # CLEANUP: Remove misplaced Circuit Model lesson from Stage 2
+    print("Cleaning up misplaced Circuit Model lesson...")
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM courses WHERE slug=%s", ("stage-2-fundamentals",))
+        c2_row = cur.fetchone()
+        if c2_row:
+            c2_id = _row_get(c2_row, 'id', 0)
+            cur.execute("DELETE FROM lessons WHERE slug=%s AND course_id=%s", ("circuit-model-reading", c2_id))
+            conn.commit()
+    else:
+        cur.execute("SELECT id FROM courses WHERE slug=?", ("stage-2-fundamentals",))
+        c2_row = cur.fetchone()
+        if c2_row:
+            c2_id = c2_row[0]
+            cur.execute("DELETE FROM lessons WHERE slug=? AND course_id=?", ("circuit-model-reading", c2_id))
+            conn.commit()
+
     # 1. Define Courses & Lessons
     courses_data = [
         {
@@ -140,7 +157,7 @@ def seed():
                 {
                     "slug": "linear-algebra-vectors",
                     "title": "1. Linear Algebra: Vectors",
-                    "content": """
+                    "content": r"""
 <h2>Linear Algebra: Vectors</h2>
 <p>Let's get to work. In classical mechanics, we might use a vector to describe the position or velocity of a ball. In Quantum Computing, we use a vector to describe the <strong>state</strong> of the system—literally everything we know about it.</p>
 <p>These aren't just arrows in space; they are specific mathematical objects called <strong>State Vectors</strong>, and they live in a complex vector space called a <strong>Hilbert Space</strong>.</p>
@@ -169,7 +186,7 @@ $$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
                 {
                     "slug": "linear-algebra-matrices",
                     "title": "2. Linear Algebra: Matrices",
-                    "content": """
+                    "content": r"""
 <h2>Matrices</h2>
 <p>That's the correct progression. If <strong>vectors</strong> are the <strong>states</strong> of a quantum system, then <strong>matrices</strong> are the <strong>operations</strong> we perform on those states.</p>
 <p>In Quantum Computing, a single-qubit <strong>quantum gate</strong> is represented by a $2 \\times 2$ matrix. When you apply a gate to a qubit, you perform standard <strong>matrix-vector multiplication</strong>.</p>
@@ -203,7 +220,7 @@ $$|\\psi\\rangle = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$
                 {
                     "slug": "linear-algebra-eigenvalues",
                     "title": "3. Linear Algebra: Eigenvalues",
-                    "content": """
+                    "content": r"""
 <h2>Eigenvalues and Eigenvectors</h2>
 <p>In Quantum Computing, Eigenvalues and Eigenvectors are the language that translates a quantum operation into a physical, observable result.</p>
 
@@ -242,7 +259,7 @@ $$Z = \\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}$$
                 {
                     "slug": "linear-algebra-inner-products",
                     "title": "4. Linear Algebra: Inner Products",
-                    "content": """
+                    "content": r"""
 <h2>Inner Products</h2>
 <p>The <strong>Inner Product</strong> is the final, essential piece of single-qubit linear algebra. It is the tool that turns abstract vectors into concrete, measurable probabilities.</p>
 
@@ -279,7 +296,7 @@ $$|+\\rangle = \\frac{1}{\\sqrt{2}}|0\\rangle + \\frac{1}{\\sqrt{2}}|1\\rangle =
                 {
                     "slug": "linear-algebra-hilbert-spaces",
                     "title": "5. Linear Algebra: Hilbert Spaces",
-                    "content": """
+                    "content": r"""
 <h2>Hilbert Spaces</h2>
 <p>Excellent. You've built all the necessary components: states, operators, measurement. Now we need the <strong>container</strong> for all of it.</p>
 
@@ -312,7 +329,7 @@ $$\\text{Dimension}(\\mathcal{H}_N) = 2^N$$
                 {
                     "slug": "complex-numbers-arithmetic",
                     "title": "6. Complex Numbers: Arithmetic",
-                    "content": """
+                    "content": r"""
 <h2>Complex Arithmetic</h2>
 <p>That is the essential next step. If linear algebra is the <strong>structure</strong> of quantum mechanics, <strong>complex numbers</strong> are the very <strong>substance</strong> that makes it quantum. They are non-negotiable.</p>
 
@@ -348,7 +365,7 @@ $$\\alpha = \\frac{1}{\\sqrt{2}} + \\frac{i}{\\sqrt{2}}$$
                 {
                     "slug": "complex-numbers-euler",
                     "title": "7. Complex Numbers: Euler's Formula",
-                    "content": """
+                    "content": r"""
 <h2>Euler's Formula</h2>
 <p>You’ve grasped the core of probability with the Inner Product. Now, you need Euler's Formula because it is the fundamental engine of quantum operations. It connects the arithmetic of complex numbers to the geometry of rotation, which is how we manipulate a qubit.</p>
 
@@ -376,7 +393,7 @@ $$e^{i\\theta} = \cos(\\theta) + i \sin(\\theta)$$
                 {
                     "slug": "complex-numbers-phases",
                     "title": "8. Complex Numbers: Phases",
-                    "content": """
+                    "content": r"""
 <h2>Phases</h2>
 <p>You are drilled on the math, but here is where students often get tricked. In Quantum Computing, not all phases are created equal. You must distinguish between <strong>Global Phase</strong> and <strong>Relative Phase</strong>. One matters immensely; the other is mathematically real but physically meaningless.</p>
 
@@ -406,7 +423,7 @@ $$|\\psi\\rangle = \\cos(\\frac{\\theta}{2})|0\\rangle + e^{i\\phi}\\sin(\\frac{
                 {
                     "slug": "probability-theory-random-variables",
                     "title": "9. Probability Theory: Random Variables",
-                    "content": """
+                    "content": r"""
 <h2>Random Variables</h2>
 <p>This is where the "Physics" of quantum mechanics meets the "Statistics" of reality. A qubit in superposition is not a fuzzy value; it is a Random Variable waiting to be sampled.</p>
 <p>In classical probability, a random variable $X$ is a variable that takes on specific values with specific probabilities. In Quantum Computing, the act of measurement creates this random variable.</p>
@@ -446,7 +463,7 @@ $$E[X] = |\\alpha|^2 - |\\beta|^2$$
                 {
                     "slug": "gates-hadamard",
                     "title": "10. Gates: Hadamard",
-                    "content": """
+                    "content": r"""
 <h2>10. Gates: Hadamard</h2>
 <p>The <strong>Hadamard Gate ($H$)</strong> is the indispensable single-qubit tool. It is the gate that generates balanced <strong>superposition</strong> and enables the ability to measure the qubit in a new basis, which is necessary for algorithms like the Quantum Fourier Transform.</p>
 
@@ -484,7 +501,7 @@ $$H^2 = I$$
                 {
                     "slug": "classical-logic-boolean",
                     "title": "11. Classical Logic: Boolean Algebra",
-                    "content": """
+                    "content": r"""
 <h2>Classical Logic: Boolean Algebra</h2>
 <p>You have established the mathematical framework. Now we must understand the fundamental computational constraints that force us to use quantum mechanics.</p>
 
@@ -516,7 +533,7 @@ $$H^2 = I$$
                 {
                     "slug": "classical-logic-gates",
                     "title": "12. Classical Logic: Logic Gates",
-                    "content": """
+                    "content": r"""
 <h2>Classical Logic: Logic Gates</h2>
 <p>You established why standard classical gates fail in a quantum system (information loss/irreversibility). Now, we look at the specific gates that serve as the direct mathematical blueprint for quantum circuits.</p>
 <p><strong>Goal:</strong> Use logic gates that take <em>N</em> inputs and produce <em>N</em> outputs, where the input can always be uniquely determined from the output.</p>
@@ -563,7 +580,7 @@ $$H^2 = I$$
                 {
                     "slug": "classical-logic-reversible",
                     "title": "13. Classical Logic: Reversible Computing",
-                    "content": """
+                    "content": r"""
 <h2>Classical Logic: Reversible Computing</h2>
 <p>This is the final conceptual hurdle before we enter the quantum realm proper. You need to unlearn how you think about memory.</p>
 
@@ -645,7 +662,7 @@ x = x + 1  // The old '5' is gone
                 {
                     "slug": "postulates-state-space",
                     "title": "1. Postulates: State Space",
-                    "content": """
+                    "content": r"""
 <h2>1. Postulates: State Space</h2>
 <p>We have finished the pre-requisites (Math and Logic). Now we enter <strong>Physics</strong>.</p>
 <p>Quantum Mechanics is built on four \"Postulates\"—axioms that cannot be proven, only verified by experiment. If you accept them, everything else follows.</p>
@@ -696,7 +713,7 @@ x = x + 1  // The old '5' is gone
                 {
                     "slug": "postulates-evolution",
                     "title": "2. Postulates: Evolution",
-                    "content": """
+                    "content": r"""
 <h2>2. Postulates: Evolution</h2>
 <p>You have the state. Now you need to move it.</p>
 
@@ -763,7 +780,7 @@ x = x + 1  // The old '5' is gone
                 {
                     "slug": "postulates-measurement",
                     "title": "3. Postulates: Measurement",
-                    "content": """
+                    "content": r"""
 <h3>Postulate 3: Measurement (The Born Rule and State Collapse)</h3>
 
 <p><strong>The Rule:</strong><br>
@@ -815,7 +832,7 @@ $$P(+1) = |\\langle 0 | + \\rangle|^2$$
                 {
                     "slug": "the-qubit-superposition",
                     "title": "4. The Qubit: Superposition",
-                    "content": """
+                    "content": r"""
 <h2>The Qubit: Superposition</h2>
 <p>You have accepted the rules. Now, let’s define the key resource: the **Qubit**.</p>
 
@@ -860,7 +877,7 @@ $$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
                 {
                     "slug": "the-qubit-bloch-sphere",
                     "title": "5. The Qubit: The Bloch Sphere",
-                    "content": """
+                    "content": r"""
 <h2>The Bloch Sphere</h2>
 <p>The Bloch Sphere is not a physical object; it is the essential geometric visualization tool for the state space of a single qubit ($\mathbb{C}^2$). It ties together everything you’ve learned about normalization, superposition, and phase.</p>
 
@@ -913,7 +930,7 @@ $$|+\\rangle = \\frac{1}{\\sqrt{2}}|0\\rangle + \\frac{1}{\\sqrt{2}}|1\\rangle$$
                 {
                     "slug": "multi-qubit-tensor-products",
                     "title": "6. Multi-Qubit: Tensor Products",
-                    "content": """
+                    "content": r"""
 <h2>The Tensor Product</h2>
 <p>This is the mathematical machine that allows us to scale from one qubit to a million. It is the reason quantum simulation is so hard for classical computers.</p>
 
@@ -969,7 +986,7 @@ $$\\begin{pmatrix} a \\\\ b \\end{pmatrix} \\otimes \\begin{pmatrix} c \\\\ d \\
                 {
                     "slug": "multi-qubit-entanglement",
                     "title": "7. Multi-Qubit: Entanglement",
-                    "content": """
+                    "content": r"""
 <h2>Entanglement</h2>
 <p>This is the point where your intuition will try to fail you. Do not let it.</p>
 
@@ -1049,7 +1066,7 @@ Since you cannot describe the Bell State using individual qubit coefficients ($\
                 {
                     "slug": "multi-qubit-bell-states",
                     "title": "8. Multi-Qubit: The Bell States",
-                    "content": """
+                    "content": r"""
 <h2>The Bell States</h2>
 <p>You have analyzed the concept of entanglement (the "what"). Now you need the <strong>toolkit</strong> (the "how"). The <strong>Bell States</strong> are not just random entangled vectors. They are the <strong>four specific, maximally entangled states</strong> that form a complete orthonormal basis for the two-qubit Hilbert space. Just as $|00\\rangle, |01\\rangle, |10\\rangle, |11\\rangle$ form the standard "Computational Basis," the four Bell states form the "Bell Basis."</p>
 
@@ -1115,7 +1132,7 @@ Since you cannot describe the Bell State using individual qubit coefficients ($\
                 {
                     "slug": "quantum-gates-pauli",
                     "title": "9. Gates: Pauli Matrices",
-                    "content": """
+                    "content": r"""
 <h2>The Pauli Matrices</h2>
 <p>The <strong>Pauli Matrices</strong> are the alphabet of single-qubit quantum operations. Any single-qubit gate you ever see is a function or rotation based on these three matrices and the Identity matrix ($I$). They are the simplest, non-trivial, $2 \\times 2$ <strong>Hermitian</strong> matrices (Postulate 3: they can act as observables) and they are <strong>unitary</strong> (Postulate 2: they are valid gates).</p>
 
@@ -1277,17 +1294,82 @@ $$|\psi\rangle = |+\rangle \otimes |0\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |
                 {
                     "slug": "quantum-gates-phase",
                     "title": "12. Gates: Phase Gates",
-                    "content": """
-<h2>Phase Gates (S, T)</h2>
-<p>Sometimes we need finer control than a full Z-flip (180 degrees).</p>
-<ul>
-    <li><strong>S Gate:</strong> 90-degree rotation around Z axis ($\sqrt{Z}$).</li>
-    <li><strong>T Gate:</strong> 45-degree rotation around Z axis ($\sqrt[4]{Z}$).</li>
-</ul>
-<p>The T gate is crucial because H, S, and CNOT are not enough to build <em>any</em> quantum circuit. Adding the T gate makes the set "Universal".</p>
+                    "content": r"""
+<h2>Phase Gates</h2>
+<p>Phase Gates are the family of single-qubit operations that directly manipulate the <strong>relative phase ($\phi$)</strong> of a superposition. This ability to precisely dial in phase is where <strong>quantum interference</strong> originates, making this family of gates indispensable.</p>
+
+<h3>1. The General Phase Rotation ($R_z(\theta)$)</h3>
+<p>Phase gates perform a rotation of the state vector around the <strong>Z-axis</strong> of the Bloch sphere.</p>
+<p>The standard textbook matrix for a Z-axis rotation by an angle $\theta$ is:</p>
+$$R_z(\theta) = \begin{pmatrix} e^{-i\theta/2} & 0 \\\\ 0 & e^{i\theta/2} \end{pmatrix}$$
+
+<h4>⚛️ The Action</h4>
+<p>On a general state $\alpha|0\rangle + \beta|1\rangle$, this acts as:</p>
+$$R_z(\theta) (\alpha|0\rangle + \beta|1\rangle) = \alpha e^{-i\theta/2}|0\rangle + \beta e^{i\theta/2}|1\rangle.$$
+<p>You can factor out the global phase $e^{-i\theta/2}$ (which has no physical effect) to see that only the <strong>relative phase</strong> between $|0\rangle$ and $|1\rangle$ changes by $\theta$:</p>
+$$R_z(\theta) (\alpha|0\rangle + \beta|1\rangle) \sim \alpha|0\rangle + \beta e^{i\theta}|1\rangle.$$
+<p>This phase-only change leaves the measurement probabilities of $|0\rangle$ and $|1\rangle$ unchanged (since $|e^{i\theta}|^2 = 1$).</p>
+
+<hr>
+
+<h3>2. The Standard Library: $S$ and $T$ Gates</h3>
+<p>Most quantum hardware platforms implement the following fixed phase gates, as they are essential building blocks:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Gate</th>
+<th style="text-align: center;">Name</th>
+<th style="text-align: center;">Rotation $\theta$</th>
+<th style="text-align: center;">Matrix</th>
+<th style="text-align: center;">Significance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>Z</strong></td>
+<td style="text-align: center;">Pauli-Z</td>
+<td style="text-align: center;">$\pi$ ($180^\circ$)</td>
+<td style="text-align: center;">$\begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}$</td>
+<td style="text-align: center;">Flips sign of $|1\rangle$ coefficient.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>S</strong></td>
+<td style="text-align: center;">Phase Gate</td>
+<td style="text-align: center;">$\pi/2$ ($90^\circ$)</td>
+<td style="text-align: center;">$\begin{pmatrix} 1 & 0 \\ 0 & i \end{pmatrix}$</td>
+<td style="text-align: center;">Applies a $90^\circ$ rotation about Z-axis.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>T</strong></td>
+<td style="text-align: center;">$\pi/8$ Gate</td>
+<td style="text-align: center;">$\pi/4$ ($45^\circ$)</td>
+<td style="text-align: center;">$\begin{pmatrix} 1 & 0 \\ 0 & e^{i\pi/4} \end{pmatrix}$</td>
+<td style="text-align: center;">The smallest rotation, crucial for <strong>universality</strong>.</td>
+</tr>
+</tbody>
+</table>
+
+<h4>🔑 Universality</h4>
+<p>The $H$ gate combined with an arbitrary phase gate like $R_z(\theta)$ (or even just the $T$ gate) is sufficient to perform <strong>any arbitrary single-qubit unitary operation</strong>. $H$ allows you to rotate between bases, and $R_z(\theta)$ allows you to perform any rotation angle required for the algorithm.</p>
+
+<hr>
+
+<h3>Your Task: Applying the Phase Shift</h3>
+<p>The $S$ gate ($R_z(\pi/2)$) is often used to rotate states from the X-axis ($|+\rangle$) to the Y-axis ($|i+\rangle$) on the Bloch sphere.</p>
+<p>Apply the $S$ gate to the $|+\rangle$ state:</p>
+$$S|+\rangle = \frac{1}{\sqrt{2}} S(|0\rangle + |1\rangle)$$
+<ol>
+<li>Write the matrix multiplication to calculate the resulting column vector.</li>
+<li>Rewrite the result in Dirac notation.</li>
+<li>Does the coefficient of $|0\rangle$ change its magnitude or phase? Does the coefficient of $|1\rangle$ change its magnitude or phase?</li>
+</ol>
                     """,
                     "position": 12,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Create the state |+i> = (|0> + i|1>)/√2. Start with |0>, create a superposition, then apply the S gate to rotate the phase by 90 degrees.",
+                        "criteria": "phase_s_gate",
+                        "qubits": 1
+                    }),
                     "section": "quantum-gates"
                 }
             ]
@@ -1300,83 +1382,239 @@ $$|\psi\rangle = |+\rangle \otimes |0\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |
                 {
                     "slug": "circuit-model-reading",
                     "title": "1. The Circuit Model: Reading Scores",
-                    "content": """
-<h2>The Circuit Model</h2>
-<p>Quantum computing has a standard notation called the <strong>Circuit Model</strong>.</p>
-<p>Look at the simulator below. It looks like a musical score, right?</p>
-<ul>
-    <li><strong>Time:</strong> Moves from left to right.</li>
-    <li><strong>Qubits:</strong> Horizontal lines (like strings on a guitar).</li>
-    <li><strong>Gates:</strong> Boxes or symbols placed on the lines. These are operations happening at specific times.</li>
-</ul>
-<p><strong>The Takeaway:</strong> We compose quantum algorithms like music, sequencing operations in time to manipulate the state of the qubits.</p>
+                    "content": r"""
+<h2>The Circuit Model & Reading Scores</h2>
+<p>We are at the first stage of actually building algorithms: <strong>The Circuit Model</strong>. A quantum circuit is simply a sequence of unitary gates applied to an initial state, followed by <strong>measurement</strong>.</p>
+<p>Your ability to read the output—the <strong>reading scores</strong>—is the final translation step from quantum probability to classical data.</p>
+
+<h3>1. The Reality of Measurement (Shots)</h3>
+<p>Due to <strong>Postulate 3 (Measurement)</strong>, the quantum computer does not give you the state vector $|\psi\rangle$. It collapses the vector to a classical bit string. This outcome is <strong>probabilistic</strong> unless the state is a pure basis state (like $|0\rangle$).</p>
+<p>Therefore, to estimate the underlying probability distribution ($P(|x\rangle) = |\langle x | \psi \rangle|^2$), you must run the circuit many times. Each run is called a <strong>shot</strong>.</p>
+
+<h3>2. The Output: The Histogram</h3>
+<p>The output of a quantum computation is not a single number, but a <strong>histogram</strong> showing the count of each possible outcome over the total number of shots.</p>
+<p>For an $N$-qubit system, there are $2^N$ possible outcomes (bit strings $|00\dots\rangle$ to $|11\dots\rangle$). The histogram gives you $C_x$ (the count for outcome $x$) for all $2^N$ outcomes.</p>
+$$P_{estimated}(x) = \frac{C_x}{\text{Total Shots}}$$
+
+<h3>3. The Objective: Expectation Value</h3>
+<p>Recall the <strong>Expectation Value ($E[X]$)</strong> from our probability lesson. In practice, quantum algorithms are designed to bias the probability distribution so that the answer is highly likely to be the outcome with the highest count.</p>
+<p>The goal of reading the scores is to use the experimental counts to calculate the <strong>physical observable</strong> being estimated by the algorithm (e.g., the energy level of a molecule, or the bias $\langle Z \rangle$).</p>
                     """,
                     "position": 1,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Create a superposition state (|0> + |1>)/√2 using the H gate. Run the simulation (which defaults to 1024 shots for measurement tasks) and observe the histogram results.",
+                        "criteria": "state_plus",
+                        "qubits": 1
+                    }),
                     "section": "circuit-model"
                 },
                 {
                     "slug": "quantum-parallelism-deutsch-jozsa",
                     "title": "2. Parallelism: Deutsch-Jozsa",
-                    "content": """
+                    "content": r"""
 <h2>The Deutsch-Jozsa Algorithm</h2>
-<p>This was the first "proof of concept" that a quantum computer could do something faster than a classical one.</p>
-<p><strong>The Problem:</strong> You have a black box function $f(x)$ that takes a bit string input and outputs 0 or 1. The function is guaranteed to be either:</p>
+<p>You are now moving from the components to the system. The Deutsch-Jozsa (DJ) algorithm is the first demonstration of <strong>quantum parallelism</strong>—the ability of a quantum computer to evaluate a function for many inputs simultaneously.</p>
+
+<h3>1. The Problem Definition</h3>
+<p>The DJ algorithm solves a specific "black-box function" problem (known as an <strong>oracle problem</strong>). Given a function $f(x)$ that takes $N$ input bits and returns 1 output bit, we are promised that the function is either:</p>
+<ol>
+    <li><strong>Constant:</strong> $f(x)$ returns the same value (0 or 1) for all inputs $x$.</li>
+    <li><strong>Balanced:</strong> $f(x)$ returns 0 for exactly half of the inputs and 1 for the other half.</li>
+</ol>
+<p>The challenge is to determine which category $f(x)$ belongs to.</p>
+
+<h3>2. The Quantum Advantage: Exponential Speedup</h3>
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center;">Metric</th>
+      <th style="text-align: center;">Classical Worst Case</th>
+      <th style="text-align: center;">Quantum Solution</th>
+      <th style="text-align: center;">Speedup</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center;"><strong>Queries to $f(x)$</strong></td>
+      <td style="text-align: center;">$2^{N-1} + 1$</td>
+      <td style="text-align: center;"><strong>1</strong></td>
+      <td style="text-align: center;"><strong>Exponential</strong></td>
+    </tr>
+  </tbody>
+</table>
 <ul>
-    <li><strong>Constant:</strong> Always outputs 0 or always outputs 1.</li>
-    <li><strong>Balanced:</strong> Outputs 0 for half the inputs and 1 for the other half.</li>
+    <li><strong>Classical Failure:</strong> To guarantee the answer classically, you must query more than half the possible inputs. For $N=10$ qubits, that's $513$ queries.</li>
+    <li><strong>Quantum Success:</strong> DJ solves it in <strong>one single query</strong> to the function.</li>
 </ul>
-<p><strong>The Solution:</strong>
+
+<h3>3. The Mechanism: Phase Kickback</h3>
+<p>The speedup is achieved through two steps:</p>
+
+<h4>A. Quantum Parallelism</h4>
+<p>The circuit starts by applying a Hadamard gate to all $N$ input qubits, creating a uniform superposition over all $2^N$ possible inputs:</p>
+$$|\psi_{in}\rangle = |+\rangle^{\otimes N} |-\rangle$$
+$$|\psi_{in}\rangle = \frac{1}{\sqrt{2^N}} \sum_{x \in \{0, 1\}^N} |x\rangle \otimes |-\rangle$$
+<p>When the oracle $U_f$ (the quantum black box) is applied, it computes $f(x)$ for <strong>every single input $x$ simultaneously</strong>.</p>
+
+<h4>B. Phase Encoding (The Kickback)</h4>
+<p>The crucial trick involves setting the auxiliary qubit to $|-\rangle$. When the oracle acts, it results in a sign change on the input register based on $f(x)$—a process called <strong>phase kickback</strong>:</p>
+$$U_f |x\rangle |-\rangle = (-1)^{f(x)} |x\rangle |-\rangle$$
+<p>The final state of the input register contains all the function information encoded in the phase:</p>
+$$|\psi_{final}\rangle = \frac{1}{\sqrt{2^N}} \sum_{x} (-1)^{f(x)} |x\rangle$$
+
+<h3>4. The Measurement</h3>
+<p>The final state $|\psi_{final}\rangle$ is then passed through another layer of Hadamard gates. This acts as an interference mechanism:</p>
 <ul>
-    <li><strong>Classical:</strong> You might need to check $2^{n-1} + 1$ inputs to be sure.</li>
-    <li><strong>Quantum:</strong> You can determine the answer with exactly <strong>ONE</strong> query.</li>
+    <li>If $f(x)$ is <strong>constant</strong>, the phases are all the same, leading to <strong>constructive interference</strong> in the $|0\dots0\rangle$ state.</li>
+    <li>If $f(x)$ is <strong>balanced</strong>, the positive and negative phases cancel each other out, leading to <strong>destructive interference</strong> in the $|0\dots0\rangle$ state.</li>
 </ul>
-<p>It works by creating a superposition of all possible inputs, querying the function once, and using interference to separate the "constant" case from the "balanced" case.</p>
+
+<hr>
+
+<h3>Your Task: Interpreting the Result</h3>
+<p>The final measurement of the input register determines the function type.</p>
+<p>Below, you will find questions to test your understanding of these measurement outcomes.</p>
                     """,
                     "position": 2,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Prepare the input state for the Deutsch-Jozsa algorithm on 2 qubits. Qubit 0 (data) should be in superposition |+> (apply H) and Qubit 1 (aux) should be in state |-> (apply X then H).",
+                        "criteria": "dj_prep",
+                        "qubits": 2
+                    }),
                     "section": "quantum-parallelism"
                 },
                 {
                     "slug": "amplitude-amplification-grover",
                     "title": "3. Amplification: Grover’s Algorithm",
-                    "content": """
+                    "content": r"""
 <h2>Grover’s Algorithm</h2>
-<p>Imagine you have a phone book with $N$ names, but it's not alphabetized. You want to find a specific number.</p>
+<p>You have seen the power of quantum parallelism with DJ. Now you must master <strong>Amplitude Amplification</strong>—the core technique behind <strong>Grover's Algorithm</strong>. Grover's is the most powerful quantum algorithm to solve an <strong>unstructured search problem</strong>, providing a dramatic <strong>quadratic speedup</strong> over the best possible classical solution.</p>
+
+<h3>1. The Problem: Unstructured Search</h3>
+<p>Given a database or list of $N$ items where the items are <strong>unsorted</strong> (no index, no pattern), find the one item $x_w$ that satisfies a specific search condition (the "winner").</p>
 <ul>
-    <li><strong>Classical Search:</strong> You have to look through them one by one. On average, you check $N/2$ entries.</li>
-    <li><strong>Quantum Search:</strong> Grover's Algorithm can find it in roughly $\sqrt{N}$ steps.</li>
+    <li><strong>Classical Time:</strong> Finding $x_w$ requires querying the list, on average, $N/2$ times. The complexity is linear: $O(N)$.</li>
+    <li><strong>Quantum Time:</strong> Grover's algorithm finds $x_w$ in approximately $\frac{\pi}{4}\sqrt{N}$ queries. The complexity is $O(\sqrt{N})$.</li>
 </ul>
-<p>If $N = 1,000,000$, a classical computer checks 500,000 times. A quantum computer checks 1,000 times.</p>
-<p><strong>How it works:</strong> It uses a process called <strong>Amplitude Amplification</strong>. It repeatedly rotates the state vector towards the correct answer, increasing its probability while decreasing the probability of wrong answers.</p>
+<p>This is a polynomial speedup, not exponential, but for a large database (e.g., $N=10^{18}$), the difference is monumental.</p>
+
+<h3>2. The Mechanism: Amplitude Amplification</h3>
+<p>Grover's algorithm works by defining a 2D subspace spanned by the "winner" state $|x_w\rangle$ and the uniform superposition of the "non-winner" states. The process consists of two operations repeated iteratively:</p>
+
+<h4>A. The Oracle ($U_w$)</h4>
+<p>The quantum oracle, similar to DJ, <strong>marks</strong> the winning state $|x_w\rangle$ by flipping its phase. The goal is to identify this state by its sign change:</p>
+$$U_w |x\rangle = (-1)^{f(x)} |x\rangle$$
+
+<h4>B. The Diffusion Operator ($D$)</h4>
+<p>This is the heart of the amplification. The diffusion operator $D$ performs an <strong>inversion about the mean</strong> of all amplitudes.</p>
+<ol>
+    <li>The marked state has a negative amplitude.</li>
+    <li>The average amplitude $\langle A \rangle$ drops because of the negative contribution.</li>
+    <li>The diffusion operator reflects the state vector around the mean, performing a rotation that effectively <strong>boosts the amplitude of the marked state above the mean</strong> and suppresses the amplitudes of all non-marked states.</li>
+</ol>
+
+<h3>3. The Process: Iterative Rotation</h3>
+<p>The combination of the Oracle ($U_w$) and the Diffusion Operator ($D$) is called the <strong>Grover Iteration</strong> ($G = D U_w$). Each iteration is a single, identical rotation of the state vector toward the desired state $|x_w\rangle$. By applying $G$ for the correct number of times ($\approx \frac{\pi}{4}\sqrt{N}$), the probability of measuring the state $|x_w\rangle$ goes from $1/N$ to nearly $1$.</p>
+
+<hr>
+
+<h3>Your Task: The Cost of Over-Rotation</h3>
+<p>Amplitude amplification relies on a very precise number of rotations.</p>
+<ol>
+    <li>If you run the Grover iteration <strong>too few</strong> times, what is the consequence for the final measurement result?</li>
+    <li>If you run the Grover iteration <strong>too many</strong> times (e.g., $2 \times (\frac{\pi}{4}\sqrt{N})$), what happens to the amplitude of the marked state, and why is this disastrous for the algorithm?</li>
+</ol>
                     """,
                     "position": 3,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Use Grover's Amplitude Amplification to find the state |11>. 1. Start with H on both. 2. Oracle: Mark |11> (use CZ). 3. Diffusion: Apply H, X, CZ, X, H to reflect about the mean.",
+                        "criteria": "grover_search",
+                        "qubits": 2
+                    }),
                     "section": "amplitude-amplification"
                 },
                 {
                     "slug": "qft-phase-estimation",
                     "title": "4. QFT: Phase Estimation",
-                    "content": """
+                    "content": r"""
 <h2>Quantum Phase Estimation (QPE)</h2>
-<p>Many quantum algorithms rely on finding the <strong>eigenvalue</strong> of a unitary operator. If $U|\psi\\rangle = e^{i\theta}|\psi\\rangle$, we want to estimate $\theta$.</p>
-<p>The <strong>Quantum Fourier Transform (QFT)</strong> is the key. Just as a classical Fourier Transform extracts frequencies from a sound wave, the QFT extracts periodicity from quantum amplitudes.</p>
-<p>QPE is the engine under the hood of most advanced quantum algorithms, including Shor's Algorithm and Quantum Chemistry simulations.</p>
-                    """,
+<p>You have seen how the Hadamard creates superposition and how the CNOT creates entanglement. The Quantum Phase Estimation (QPE) algorithm combines these tools with the Quantum Fourier Transform (QFT) to solve problems exponentially faster than any classical counterpart.</p>
+
+<h3>1. The Problem: Finding the Phase $\phi$</h3>
+<p>Given a unitary operator $U$ and one of its eigenvectors $|\psi\rangle$, we know that applying $U$ results in a phase factor $e^{2\pi i \phi}$:</p>
+$$U|\psi\rangle = e^{2\pi i \phi}|\psi\rangle$$
+<p>The goal of QPE is to determine the unknown phase $\phi \in [0, 1)$ with high precision. This phase is the key to solving complex problems like factoring and simulating physics.</p>
+
+<h3>2. The Mechanism: Three Essential Steps</h3>
+<p>The QPE circuit uses two registers: a Counting Register (to store the phase result) and a State Register (to hold the eigenvector $|\psi\rangle$).</p>
+
+<h4>A. Preparation (Creating the Parallel Input)</h4>
+<p>Hadamard gates are applied to all $t$ qubits in the counting register to create a uniform superposition:</p>
+$$\frac{1}{\sqrt{2^t}} \sum_{j=0}^{2^t-1} |j\rangle$$
+
+<h4>B. Controlled-Unitary Operations</h4>
+<p>This is the heart of the algorithm. We apply a sequence of Controlled-$U^k$ gates. The $j^{th}$ control qubit controls the operation $U^{2^j}$.</p>
+<p>The Controlled-$U^k$ operation uses the <strong>phase kickback</strong> mechanism (like in Deutsch-Jozsa) to imprint the phase $e^{2\pi i \phi}$ onto the counting register. By using exponentially increasing powers of $U$ ($U^1, U^2, U^4, \dots, U^{2^{t-1}}$), the phase information is encoded into the full $t$-bit resolution of the counting register.</p>
+
+<h4>C. Inverse Quantum Fourier Transform ($\text{QFT}^\dagger$)</h4>
+<p>The state of the counting register after step B is a complex superposition whose amplitudes are Fourier components of the phase information $\phi$. Applying the Inverse QFT transforms this complex encoding back into the simple computational basis.</p>
+<p>The final state of the counting register is the binary approximation $|\tilde{\phi}\rangle$:</p>
+$$|\tilde{\phi}\rangle \otimes |\psi\rangle$$
+<p>Measurement of the counting register yields $\tilde{\phi}$.</p>
+
+<div class="text-center my-4">
+    <img src="/static/images/QFT.jpeg" class="img-fluid rounded shadow" alt="Quantum Fourier Transform and Phase Estimation" style="max-width: 600px;">
+</div>
+
+<h3>Your Task: The Necessity of Exponentiation</h3>
+<p>The controlled operations are not just $C-U$ repeated $t$ times. They are $C-U^1, C-U^2, C-U^4, \dots, C-U^{2^{t-1}}$.</p>
+<p>If the circuit used only $C-U$ gates (i.e., $C-U^1$ repeated $t$ times), the final measurement would only reveal the phase modulo $2\pi$. Why would this fail to distinguish between phases like $\phi=0.5$ and $\phi=0.0001$?</p>
+<p>Explain the role of the final term, $C-U^{2^{t-1}}$, in the context of precision.</p>
+""",
                     "position": 4,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Perform Phase Estimation on the Z gate. 1. Prepare eigenstate |1> on q1. 2. Create superposition on q0. 3. Apply Controlled-Z (kickback). 4. Apply Inverse QFT (H) on q0.",
+                        "criteria": "qpe_z_gate",
+                        "qubits": 2
+                    }),
                     "section": "quantum-fourier-transform"
                 },
                 {
                     "slug": "qft-shors",
                     "title": "5. QFT: Shor’s Algorithm",
-                    "content": """
-<h2>Shor’s Algorithm</h2>
-<p>Why is there so much hype (and fear) around quantum computing?</p>
-<p>Most internet security (like HTTPS/RSA) relies on the fact that factoring very large numbers is hard.</p>
-<p><strong>The Threat:</strong> Peter Shor discovered that by using Phase Estimation (and thus the QFT), a quantum computer could turn this "hard" math problem into an easy one.</p>
-<p><strong>The Impact:</strong> A powerful enough quantum computer could crack current encryption in hours, not millions of years. This is why the world is racing to build one.</p>
-                    """,
+                    "content": r"""
+<h2>Shor's Algorithm</h2>
+<p>You have arrived at the reason most governments and banks fear quantum computing. <strong>Shor's Algorithm</strong> offers an exponential speedup for the one computational problem whose difficulty protects modern public-key cryptography (RSA): <strong>factoring large numbers</strong>.</p>
+
+<h3>1. The Problem: Factoring</h3>
+<p>Given a large composite integer $N$, find its prime factors $p$ and $q$ such that $N = p \times q$.</p>
+<ul>
+    <li><strong>Classical Time:</strong> The best classical algorithm (General Number Field Sieve) runs in sub-exponential time $O(e^{c \sqrt[3]{\log N}})$. This is too slow for numbers with hundreds of digits, making RSA secure.</li>
+    <li><strong>Quantum Time:</strong> Shor's algorithm runs in polynomial time $O((\log N)^3)$. This is an <strong>exponential speedup</strong> that makes factoring large keys trivial.</li>
+</ul>
+
+<h3>2. The Insight: Reduction to Period Finding</h3>
+<p>Shor's algorithm does not factor $N$ directly. Instead, it uses number theory to reduce the hard problem (factoring) to an equivalent, but structured, problem (<strong>period finding</strong>) that is solvable by QPE.</p>
+
+<h4>A. Classical Reduction</h4>
+<p>Using properties of modular arithmetic (specifically, picking a random number $a$ coprime to $N$), factoring $N$ can be reduced to finding the <strong>period $r$</strong> of the function:</p>
+$$f(x) = a^x \pmod N$$
+<p>The period $r$ is the smallest positive integer such that $a^r \equiv 1 \pmod N$. Once $r$ is found, the factors of $N$ can be calculated with high probability using simple classical operations (like $\text{gcd}(a^{r/2} \pm 1, N)$).</p>
+
+<h4>B. The Quantum Solution (QPE)</h4>
+<p>The quantum computer's job is solely to find the period $r$ using the <strong>Quantum Phase Estimation (QPE)</strong> primitive.</p>
+<p>We define a unitary operator $U_a$:</p>
+$$U_a|x\rangle = |ax \pmod N\rangle$$
+<p>The period $r$ is deeply embedded within the eigenvalues of $U_a$. By finding the phase $\phi$ of the eigenvalues using <strong>QPE</strong>, we can extract the fraction $\frac{\text{integer}}{r}$.</p>
+<p>The $\text{QFT}^\dagger$ outputs an approximation of $\frac{s}{r}$ (where $s$ is an integer).</p>
+
+<h4>C. Classical Post-Processing</h4>
+<p>The approximate fraction $\frac{s}{r}$ is measured. A final, simple classical algorithm called the <strong>Continued Fraction Algorithm</strong> is used to extract the denominator $r$ (the period) from the measured fraction.</p>
+
+<h3>Your Task: The Necessity of Modular Arithmetic</h3>
+<p>Shor's algorithm is a hybrid of classical math and quantum computation.</p>
+<p>Why is it mathematically necessary to reduce the factoring problem (finding $p$ and $q$ of $N$) to the <strong>Period Finding Problem</strong> before applying the quantum step? (Hint: Think back to Postulate 2 and the requirements for QPE).</p>
+""",
                     "position": 5,
                     "task_json": None,
                     "section": "quantum-fourier-transform"
@@ -1391,7 +1629,7 @@ $$|\psi\rangle = |+\rangle \otimes |0\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |
                 {
                     "slug": "qec-decoherence",
                     "title": "1. QEC: Decoherence",
-                    "content": """
+                    "content": r"""
 <h2>Decoherence: The Enemy</h2>
 <p>Quantum states are fragile. Interaction with the environment (heat, radiation, magnetic fields) causes the quantum information to leak out.</p>
 <p>This process is called <strong>Decoherence</strong>.</p>
@@ -1408,7 +1646,7 @@ $$|\psi\rangle = |+\rangle \otimes |0\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |
                 {
                     "slug": "qec-surface-codes",
                     "title": "2. QEC: Surface Codes",
-                    "content": """
+                    "content": r"""
 <h2>Surface Codes & Fault Tolerance</h2>
 <p>How do we build a reliable computer from unreliable parts?</p>
 <p><strong>Quantum Error Correction (QEC):</strong> We spread the information of 1 <strong>Logical Qubit</strong> across many noisy <strong>Physical Qubits</strong>.</p>
@@ -1422,7 +1660,7 @@ $$|\psi\rangle = |+\rangle \otimes |0\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |
                 {
                     "slug": "complexity-bqp",
                     "title": "3. Complexity: BQP vs P vs NP",
-                    "content": """
+                    "content": r"""
 <h2>Quantum Complexity Theory</h2>
 <p>Where does quantum computing fit in the landscape of solvable problems?</p>
 <ul>
@@ -1440,7 +1678,7 @@ $$|\psi\rangle = |+\rangle \otimes |0\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |
                 {
                     "slug": "hardware-superconducting",
                     "title": "4. Hardware: Superconducting",
-                    "content": """
+                    "content": r"""
 <h2>Superconducting Qubits (Transmons)</h2>
 <p><strong>The Players:</strong> IBM, Google, Rigetti.</p>
 <p><strong>The Tech:</strong> Artificial atoms made from superconducting circuits (Josephson Junctions) cooled to near absolute zero.</p>
@@ -1456,7 +1694,7 @@ $$|\psi\rangle = |+\rangle \otimes |0\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |
                 {
                     "slug": "hardware-ions-photonics",
                     "title": "5. Hardware: Ions & Photonics",
-                    "content": """
+                    "content": r"""
 <h2>Trapped Ions & Photonics</h2>
 <p><strong>Trapped Ions (IonQ, Quantinuum):</strong>
 <ul>
@@ -1478,7 +1716,7 @@ $$|\psi\rangle = |+\rangle \otimes |0\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |
                 {
                     "slug": "qml-vqe",
                     "title": "6. QML: VQE",
-                    "content": """
+                    "content": r"""
 <h2>Variational Quantum Eigensolvers (VQE)</h2>
 <p>How do we use today's noisy quantum computers (NISQ) for useful work?</p>
 <p><strong>VQE</strong> is a hybrid algorithm. It uses a classical computer to optimize the parameters of a quantum circuit to find the ground state energy of a molecule.</p>
@@ -1491,7 +1729,7 @@ $$|\psi\rangle = |+\rangle \otimes |0\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |
                 {
                     "slug": "qml-qaoa",
                     "title": "7. QML: QAOA",
-                    "content": """
+                    "content": r"""
 <h2>Quantum Approximate Optimization (QAOA)</h2>
 <p><strong>QAOA</strong> is another hybrid algorithm designed for combinatorial optimization problems.</p>
 <p><strong>Example:</strong> The MaxCut problem (partitioning a graph). QAOA tries to find a "good enough" solution faster than classical brute force.</p>
@@ -1708,6 +1946,67 @@ $$|\psi\rangle = |+\rangle \otimes |0\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |
                     (quiz_id, question_text, options, correct_idx))
         else:
              print(f"Quiz '{quiz_title}' already exists.")
+
+
+    # 17. Add a Quiz for "Gates: Phase Gates"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("quantum-gates-phase",))
+        ph_row = cur.fetchone()
+        ph_lesson_id = _row_get(ph_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("quantum-gates-phase",))
+        ph_row = cur.fetchone()
+        ph_lesson_id = _row_get(ph_row, 'id', 0)
+
+    if ph_lesson_id:
+        quiz_title = "Phase Gate Knowledge Check"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (ph_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (ph_lesson_id, quiz_title))
+        
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            # Q1
+            q1_text = "The S gate applies a phase rotation of 90 degrees (π/2). If you apply the S gate twice (S^2), which gate is it equivalent to?"
+            q1_options = json.dumps([
+                "The Identity (I)",
+                "The Pauli-Z (Z)",
+                "The Pauli-X (X)",
+                "The Hadamard (H)"
+            ])
+            q1_correct = 1
+            
+            # Q2
+            q2_text = "If you start with the superposition |+> and apply the S gate, what is the resulting state?"
+            q2_options = json.dumps([
+                "|- > (Minus state)",
+                "|1 > (One state)",
+                "|+i> (or |R>: (|0> + i|1>)/√2)",
+                "|0 > (Zero state)"
+            ])
+            q2_correct = 2
+            
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (ph_lesson_id, quiz_title))
+                quiz_row = cur.fetchone()
+                quiz_id = _row_get(quiz_row, 'id', 0)
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)", 
+                    (quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)", 
+                    (quiz_id, q2_text, q2_options, q2_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (ph_lesson_id, quiz_title))
+                quiz_id = cur.lastrowid
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)", 
+                    (quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)", 
+                    (quiz_id, q2_text, q2_options, q2_correct))
+        else:
+             print(f"Quiz '{quiz_title}' already exists.")
+
 
     # 7. Add a sample Quiz for "Linear Algebra: Hilbert Spaces"
     # Find lesson id
@@ -2685,6 +2984,268 @@ $$|\psi\rangle = |+\rangle \otimes |0\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |
         else:
              print(f"Quiz '{quiz_title}' already exists.")
 
+
+    # 21. Add a Quiz for "The Circuit Model: Reading Scores"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("circuit-model-reading",))
+        cm_row = cur.fetchone()
+        cm_lesson_id = _row_get(cm_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("circuit-model-reading",))
+        cm_row = cur.fetchone()
+        cm_lesson_id = _row_get(cm_row, 'id', 0)
+
+    if cm_lesson_id:
+        quiz_title = "Circuit Model & Expectation Values"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (cm_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (cm_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "A two-qubit circuit is run for 4000 shots. The theoretical probabilities are P(00)=0.65, P(01)=0.15, P(10)=0.05, P(11)=0.15. What are the expected counts for |00> and |10>?"
+            q1_options = json.dumps([
+                "2600 and 200",
+                "650 and 50",
+                "2600 and 600",
+                "200 and 2600"
+            ])
+            q1_correct = 0
+
+            q2_text = "Using the same probabilities, what is the Expectation Value <Z1Z0> (Parity)? Recall: <Z1Z0> = P(00) + P(11) - P(01) - P(10)."
+            q2_options = json.dumps([
+                "0.60",
+                "0.80",
+                "1.00",
+                "0.00"
+            ])
+            q2_correct = 0
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (cm_lesson_id, quiz_title))
+                cm_quiz_row = cur.fetchone()
+                cm_quiz_id = _row_get(cm_quiz_row, 'id', 0)
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (cm_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (cm_quiz_id, q2_text, q2_options, q2_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (cm_lesson_id, quiz_title))
+                cm_quiz_id = cur.lastrowid
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (cm_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (cm_quiz_id, q2_text, q2_options, q2_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+
+    # 18. Add a Quiz for "Deutsch-Jozsa Algorithm"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("quantum-parallelism-deutsch-jozsa",))
+        dj_row = cur.fetchone()
+        dj_lesson_id = _row_get(dj_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("quantum-parallelism-deutsch-jozsa",))
+        dj_row = cur.fetchone()
+        dj_lesson_id = _row_get(dj_row, 'id', 0)
+
+    if dj_lesson_id:
+        quiz_title = "Deutsch-Jozsa Check"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (dj_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (dj_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "If the function f(x) is CONSTANT, what is the single, deterministic outcome you will measure on the input qubits?"
+            q1_options = json.dumps([
+                "|00...0>",
+                "|11...1>",
+                "A uniform superposition",
+                "It is random"
+            ])
+            q1_correct = 0
+
+            q2_text = "If the function f(x) is BALANCED, what is the probability of measuring the all-zero state |00...0>?"
+            q2_options = json.dumps([
+                "0",
+                "0.5",
+                "1",
+                "1/2^N"
+            ])
+            q2_correct = 0
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (dj_lesson_id, quiz_title))
+                dj_quiz_row = cur.fetchone()
+                dj_quiz_id = _row_get(dj_quiz_row, 'id', 0)
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (dj_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (dj_quiz_id, q2_text, q2_options, q2_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (dj_lesson_id, quiz_title))
+                dj_quiz_id = cur.lastrowid
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (dj_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (dj_quiz_id, q2_text, q2_options, q2_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+
+    # 22. Add a Quiz for "Grover's Algorithm"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("amplitude-amplification-grover",))
+        gr_row = cur.fetchone()
+        gr_lesson_id = _row_get(gr_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("amplitude-amplification-grover",))
+        gr_row = cur.fetchone()
+        gr_lesson_id = _row_get(gr_row, 'id', 0)
+
+    if gr_lesson_id:
+        quiz_title = "Grover's Algorithm Check"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (gr_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (gr_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "If you run the Grover iteration too few times, what is the consequence?"
+            q1_options = json.dumps([
+                "The quantum computer crashes.",
+                "The probability of the correct answer is low, and you are likely to measure a random wrong answer.",
+                "The state vector becomes all zeros.",
+                "The answer is still guaranteed, but with lower precision."
+            ])
+            q1_correct = 1
+
+            q2_text = "If you run the Grover iteration too many times (over-rotation), what happens?"
+            q2_options = json.dumps([
+                "The probability of the correct answer continues to increase towards 100%.",
+                "The probability of the correct answer starts to decrease as the state vector rotates past the target.",
+                "The system resets to the initial state.",
+                "Nothing happens; the state stays stable."
+            ])
+            q2_correct = 1
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (gr_lesson_id, quiz_title))
+                gr_quiz_row = cur.fetchone()
+                gr_quiz_id = _row_get(gr_quiz_row, 'id', 0)
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (gr_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (gr_quiz_id, q2_text, q2_options, q2_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (gr_lesson_id, quiz_title))
+                gr_quiz_id = cur.lastrowid
+                
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (gr_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (gr_quiz_id, q2_text, q2_options, q2_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+
+    # Add Quiz for "QFT: Phase Estimation"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("qft-phase-estimation",))
+        qpe_row = cur.fetchone()
+        qpe_lesson_id = _row_get(qpe_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("qft-phase-estimation",))
+        qpe_row = cur.fetchone()
+        qpe_lesson_id = _row_get(qpe_row, 'id', 0)
+
+    if qpe_lesson_id:
+        quiz_title = "QPE Precision & Exponentiation"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (qpe_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (qpe_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "Why do we use controlled-U^(2^j) gates instead of just repeating controlled-U?"
+            q1_options = json.dumps([
+                "To save energy by running fewer gates.",
+                "To encode phase information into higher bits for exponential precision.",
+                "Because U is unstable and decays.",
+                "To ensure the qubits remain entangled."
+            ])
+            q1_correct = 1
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (qpe_lesson_id, quiz_title))
+                qpe_quiz_row = cur.fetchone()
+                qpe_quiz_id = _row_get(qpe_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (qpe_quiz_id, q1_text, q1_options, q1_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (qpe_lesson_id, quiz_title))
+                qpe_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (qpe_quiz_id, q1_text, q1_options, q1_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # Add Quiz for "QFT: Shor's Algorithm"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("qft-shors",))
+        shor_row = cur.fetchone()
+        shor_lesson_id = _row_get(shor_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("qft-shors",))
+        shor_row = cur.fetchone()
+        shor_lesson_id = _row_get(shor_row, 'id', 0)
+
+    if shor_lesson_id:
+        quiz_title = "Shor's Algorithm Logic"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (shor_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (shor_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "Why must we reduce factoring to period finding (modular exponentiation) for the quantum step?"
+            q1_options = json.dumps([
+                "Because quantum computers can only solve problems involving periodicity.",
+                "Because the modular exponentiation operation U|x> = |ax mod N> is Unitary (reversible), fitting the requirement for QPE.",
+                "Because factoring N directly is impossible even for a quantum computer.",
+                "Because classical computers cannot calculate the greatest common divisor (GCD)."
+            ])
+            q1_correct = 1
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (shor_lesson_id, quiz_title))
+                shor_quiz_row = cur.fetchone()
+                shor_quiz_id = _row_get(shor_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (shor_quiz_id, q1_text, q1_options, q1_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (shor_lesson_id, quiz_title))
+                shor_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (shor_quiz_id, q1_text, q1_options, q1_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
 
     # CLEANUP: Remove quizzes that users requested to be deleted
     quizzes_to_remove = ["Linear Algebra Check", "Matrix Operation Check", "Eigenvalue Check"]
