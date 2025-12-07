@@ -1631,14 +1631,38 @@ $$U_a|x\rangle = |ax \pmod N\rangle$$
                     "title": "1. QEC: Decoherence",
                     "content": r"""
 <h2>Decoherence: The Enemy</h2>
-<p>Quantum states are fragile. Interaction with the environment (heat, radiation, magnetic fields) causes the quantum information to leak out.</p>
-<p>This process is called <strong>Decoherence</strong>.</p>
-<ul>
-    <li><strong>T1 (Relaxation):</strong> The time it takes for $|1\\rangle$ to decay to $|0\\rangle$.</li>
-    <li><strong>T2 (Dephasing):</strong> The time it takes for the relative phase ($\alpha|0\\rangle + \beta|1\\rangle$) to scramble.</li>
-</ul>
-<p>Without error correction, decoherence limits the depth of our circuits.</p>
-                    """,
+<p>You have moved from the theory of what quantum computers <em>can</em> do to the hard engineering problem of what they <em>must</em> overcome. <strong>Decoherence</strong> is the primary enemy of quantum computation.</p>
+
+<h3>1. The Definition: Loss of Coherence</h3>
+<p><strong>Decoherence</strong> is the process by which a quantum system loses its characteristic quantum properties—<strong>superposition</strong> and <strong>entanglement</strong>—due to unwanted interaction with its external environment.</p>
+<p>It is the physical consequence of violating <strong>Postulate 2</strong>: the requirement that the quantum system must remain <strong>isolated and closed</strong>. In reality, no system is perfectly isolated. Any stray photon, thermal fluctuation, or magnetic field is the environment coupling to the qubit.</p>
+
+<h3>2. The Cause: Uncontrolled Measurement</h3>
+<p>The environmental interaction acts like an uncontrolled, continuous <strong>measurement</strong> (an uncontrolled application of Postulate 3). The environment "learns" something about the qubit's state, but because the environment is non-unitary and we can't observe it, the information is effectively lost.</p>
+<p>This interaction forces the qubit's state vector $|\psi\rangle$ to evolve into a <strong>classical, mixed state</strong> (a probabilistic mixture) instead of evolving unitarily as a pure state.</p>
+
+<h3>3. The Two Fundamental Quantum Errors</h3>
+<p>Decoherence results in two primary types of errors that Quantum Error Correction (QEC) schemes are designed to detect and fix:</p>
+
+<h4>A. Bit-Flip Error ($X$ Error)</h4>
+<p>This is the quantum analog of a classical data flip: $|0\rangle \leftrightarrow |1\rangle$. This is caused by energy fluctuations (e.g., a thermal jump).</p>
+
+<h4>B. Phase-Flip Error ($Z$ Error)</h4>
+<p>This error is purely quantum. It flips the <strong>relative sign</strong> of the superposition:</p>
+$$\alpha|0\rangle + \beta|1\rangle \to \alpha|0\rangle - \beta|1\rangle$$
+<p>This destroys the interference pattern. A phase error is often caused by magnetic field fluctuations affecting the phase evolution.</p>
+
+<div class="text-center my-4">
+    <img src="/static/images/Decoherence.jpeg" class="img-fluid rounded shadow" alt="Quantum Decoherence" style="max-width: 600px;">
+</div>
+
+<hr>
+
+<h3>Your Task: The Phase-Flip Trap</h3>
+<p>Classical error correction codes (like Hamming codes) can easily detect a <strong>bit-flip error</strong> (0 becomes 1).</p>
+<p>Explain why a <strong>Phase-Flip Error</strong> ($|\psi\rangle \to Z|\psi\rangle$) is fundamentally impossible to detect using only classical error correction techniques based on <strong>measuring the $|0\rangle/|1\rangle$ basis</strong>.</p>
+<p>(Hint: What is the probability distribution $P(|0\rangle)$ and $P(|1\rangle)$ for the state $|\psi\rangle$ compared to the state $Z|\psi\rangle$?)</p>
+""",
                     "position": 1,
                     "task_json": None,
                     "section": "quantum-error-correction"
@@ -1648,11 +1672,57 @@ $$U_a|x\rangle = |ax \pmod N\rangle$$
                     "title": "2. QEC: Surface Codes",
                     "content": r"""
 <h2>Surface Codes & Fault Tolerance</h2>
-<p>How do we build a reliable computer from unreliable parts?</p>
-<p><strong>Quantum Error Correction (QEC):</strong> We spread the information of 1 <strong>Logical Qubit</strong> across many noisy <strong>Physical Qubits</strong>.</p>
-<p><strong>The Surface Code:</strong> The leading candidate for QEC. It uses a checkerboard pattern of data and measurement qubits to detect and correct errors without collapsing the state.</p>
-<p><strong>Threshold Theorem:</strong> If the physical error rate is below a certain threshold (~1%), we can make the logical error rate arbitrarily low by adding more physical qubits.</p>
-                    """,
+<p>You have reached the bleeding edge. This is where the dream of quantum computing meets the nightmare of engineering reality.</p>
+<p><strong>Surface Codes</strong> are currently the industry standard for Quantum Error Correction (QEC). Why? Because they are the only known architecture that balances high error tolerance with the physical constraints of building chips (connections are only required between nearest neighbors).</p>
+
+<h3>1. The Fundamental Paradox</h3>
+<p>Here is the problem you must solve: To fix an error, you must know what the error is. But if you measure a quantum state to find the error, <strong>you destroy the quantum state</strong> (Postulate 3).</p>
+<p><strong>The Solution:</strong> You never look at the data qubits directly. You only look at the <strong>parity</strong> (correlations) between them. This is called <strong>Syndrome Measurement</strong>.</p>
+
+<h3>2. The Architecture: The Checkerboard</h3>
+<p>The Surface Code arranges qubits in a 2D lattice.</p>
+<ul>
+    <li><strong>Data Qubits:</strong> These hold the actual quantum information.</li>
+    <li><strong>Ancilla (Measurement) Qubits:</strong> These are interspersed between the data qubits. Their <em>only</em> job is to constantly query their neighbors.</li>
+</ul>
+
+<div style="text-align: center; margin: 20px 0;">
+    <div style="background-color: #f0f0f0; padding: 40px; border-radius: 8px; border: 2px dashed #ccc;">
+        <p style="color: #666; font-style: italic;">[Interactive Surface Code Checkerboard Visualization]</p>
+    </div>
+</div>
+
+<p>The ancilla qubits perform "stabilizer measurements."</p>
+<ol>
+    <li><strong>Z-Ancillas:</strong> Measure the parity of 4 surrounding data qubits to detect <strong>Bit-Flips (X errors)</strong>.</li>
+    <li><strong>X-Ancillas:</strong> Measure the parity of 4 surrounding data qubits to detect <strong>Phase-Flips (Z errors)</strong>.</li>
+</ol>
+
+<h3>3. Topological Protection</h3>
+<p>This is why it's called "Surface" code. The information isn't stored in a single particle; it is stored <strong>topologically</strong> across the entire grid (a "patch" of qubits).</p>
+<ul>
+    <li><strong>Logical "0" and "1":</strong> Defined by a chain of operators spanning the entire lattice from one boundary to another.</li>
+    <li><strong>The Error Chain:</strong> When a physical error occurs, it flips a measurement outcome on the nearby ancilla. This creates a "defect" or "anyon" on the surface.</li>
+    <li><strong>Correction:</strong> A classical decoding algorithm (running on a fast classical CPU) looks at these defects, matches them up, and applies a correction to neutralize the error chain.</li>
+</ul>
+
+<h3>4. The Cost: The "Physical-to-Logical" Ratio</h3>
+<p>This is the brutal reality check for anyone optimistic about quantum timelines.</p>
+<p>To build <strong>one</strong> perfect, error-corrected "Logical Qubit," you cannot just use one physical qubit. You need a massive patch of them to suppress the errors.</p>
+<ul>
+    <li><strong>Current Estimates:</strong> You need between <strong>1,000 and 10,000 physical qubits</strong> to build <strong>1 single logical qubit</strong>.</li>
+    <li><strong>Implication:</strong> To run Shor's Algorithm (which needs ~4,000 logical qubits), you don't need a 4,000-qubit processor. You need a <strong>4 to 40 million</strong> qubit processor. We are currently at ~1,000 physical qubits.</li>
+</ul>
+
+<h3>Your Task: The Threshold Theorem</h3>
+<p>The beauty of the Surface Code is the <strong>Threshold Theorem</strong>. It states that if the physical error rate ($p$) of your individual gates is below a specific constant ($p_{th} \approx 1\%$), you can make the logical error rate ($P_L$) arbitrarily low by increasing the size of the grid (distance $d$).</p>
+<p><strong>Scenario:</strong> You have a quantum processor where the physical gate error rate is $p = 0.5\%$. The threshold for your surface code is $p_{th} = 1\%$.</p>
+<ol>
+    <li><strong>Case A:</strong> You build a small surface code grid ($d=3$). It has a certain logical error rate.</li>
+    <li><strong>Case B:</strong> You decide to "upgrade" to a massive surface code grid ($d=9$).</li>
+</ol>
+<p><strong>Question:</strong> Does the logical error rate <strong>increase</strong> or <strong>decrease</strong> in Case B compared to Case A? <em>Conversely, what would happen if your physical error rate was $2\%$ (above the threshold)?</em></p>
+""",
                     "position": 2,
                     "task_json": None,
                     "section": "quantum-error-correction"
@@ -1662,14 +1732,63 @@ $$U_a|x\rangle = |ax \pmod N\rangle$$
                     "title": "3. Complexity: BQP vs P vs NP",
                     "content": r"""
 <h2>Quantum Complexity Theory</h2>
-<p>Where does quantum computing fit in the landscape of solvable problems?</p>
+<p>This is the reality check. If you tell a computer scientist "Quantum computers can solve NP-Complete problems," they will laugh you out of the room. You need to understand exactly where quantum computers fit in the hierarchy of computational hardness to avoid making embarrassing, hype-driven claims.</p>
+
+<h3>1. The Cast of Characters</h3>
 <ul>
-    <li><strong>P (Polynomial):</strong> Problems solvable quickly by a classical computer (Multiplication).</li>
-    <li><strong>NP (Nondeterministic Polynomial):</strong> Problems where a solution can be <em>verified</em> quickly (Sudoku, Traveling Salesman).</li>
-    <li><strong>BQP (Bounded-error Quantum Polynomial):</strong> Problems solvable quickly by a quantum computer.</li>
+    <li><strong>P (Polynomial Time):</strong> Problems a <strong>classical</strong> computer can solve efficiently (e.g., multiplication, sorting a list).</li>
+    <li><strong>NP (Nondeterministic Polynomial Time):</strong> Problems where, if you are <em>given</em> the answer, a classical computer can <strong>verify</strong> it efficiently. (e.g., Sudoku, Factoring).
+        <ul>
+            <li><em>Note:</em> All <strong>P</strong> problems are also <strong>NP</strong> (if you can solve it, you can verify it).</li>
+        </ul>
+    </li>
+    <li><strong>NP-Complete:</strong> The hardest problems in NP (e.g., The Traveling Salesman Problem). If you solve one of these efficiently, you solve <em>all</em> NP problems efficiently.</li>
 </ul>
-<p><strong>The Reality:</strong> $P \subseteq BQP$. Quantum computers can solve everything classical computers can. But can they solve NP-Complete problems? <strong>Probably not.</strong></p>
-<p>They excel at specific "hidden structure" problems (like Factoring) that are likely in <strong>NP-Intermediate</strong>.</p>
+
+<h3>2. Enter BQP (Bounded-Error Quantum Polynomial Time)</h3>
+<p><strong>BQP</strong> is the class of problems a <strong>quantum</strong> computer can solve efficiently (in polynomial time) with a probability of error $\le 1/3$.</p>
+<p><strong>The Hierarchy:</strong></p>
+<ol>
+    <li><strong>P $\subseteq$ BQP:</strong> Anything a classical computer can do, a quantum computer can do (it can simulate classical logic).</li>
+    <li><strong>BQP $\neq$ NP-Complete (Most Likely):</strong> Quantum computers are <strong>not</strong> magic machines that try every combination instantly. They require <strong>mathematical structure</strong> (like periodicity) to create interference. NP-Complete problems generally lack this structure.</li>
+</ol>
+<p><em>Brutal Truth:</em> We do not expect quantum computers to solve the Traveling Salesman Problem efficiently.</p>
+
+<h3>3. The Sweet Spot: BQP, but not P</h3>
+<p>The "Holy Grail" of quantum computing lies in the specific region where a problem is <strong>inside BQP</strong> (quantum solvable) but <strong>outside P</strong> (classically hard).</p>
+<ul>
+    <li><strong>Factoring (Shor's Algorithm):</strong> This is the poster child. It is in NP (easy to check: just multiply the factors). It is likely <em>not</em> in P (we haven't found a fast classical way). It <strong>is</strong> in BQP.</li>
+    <li><strong>Simulation of Quantum Systems:</strong> Predicting chemical reactions or material properties. This is naturally in BQP but exponentially hard for P.</li>
+</ul>
+
+<h3>4. The Misconception: The "Brute Force" Myth</h3>
+<p>You often hear: "A quantum computer checks all answers at once." <strong>False.</strong></p>
+<p>While it creates a superposition of all answers, measuring it gives you a <strong>random</strong> answer. You need an algorithm (like Grover's) to amplify the right one.</p>
+<ul>
+    <li>Grover's Algorithm gives a <strong>Quadratic Speedup</strong> ($N \to \sqrt{N}$).</li>
+    <li>To solve NP-Complete problems efficiently, you need an <strong>Exponential Speedup</strong> ($2^N \to N$).</li>
+    <li>Therefore, for unstructured search problems, quantum computers provide a boost, but they do not break the complexity barrier.</li>
+</ul>
+
+<hr>
+
+<h3>Your Task: Classifying the Threat</h3>
+<p>You are a security analyst evaluating encryption algorithms.</p>
+<ol>
+    <li><strong>AES-256 (Symmetric Key):</strong> Security relies on the fact that you have to guess the key. There is no hidden mathematical "period" to exploit. The best attack is a search.
+        <ul>
+            <li><em>Which algorithm applies?</em> (Shor's or Grover's?)</li>
+            <li><em>Is the speedup Exponential or Quadratic?</em></li>
+        </ul>
+    </li>
+    <li><strong>RSA-2048 (Public Key):</strong> Security relies on the difficulty of factoring large numbers, which has a hidden periodic structure.
+        <ul>
+            <li><em>Which algorithm applies?</em></li>
+            <li><em>Is the speedup Exponential or Quadratic?</em></li>
+        </ul>
+    </li>
+</ol>
+<p><em>Based on this, which encryption standard is effectively "dead" in a post-quantum world, and which one just needs a larger key size?</em></p>
                     """,
                     "position": 3,
                     "task_json": None,
@@ -1680,12 +1799,55 @@ $$U_a|x\rangle = |ax \pmod N\rangle$$
                     "title": "4. Hardware: Superconducting",
                     "content": r"""
 <h2>Superconducting Qubits (Transmons)</h2>
-<p><strong>The Players:</strong> IBM, Google, Rigetti.</p>
-<p><strong>The Tech:</strong> Artificial atoms made from superconducting circuits (Josephson Junctions) cooled to near absolute zero.</p>
+<p>This is the leading candidate. When you see a "quantum computer" in the news—the golden chandeliers from IBM, Google, or Rigetti—you are looking at <strong>Superconducting Qubits</strong>.</p>
+<p>These are not natural particles like atoms or electrons. They are <strong>artificial atoms</strong>: macroscopic electrical circuits printed on a silicon chip that behave quantum mechanically because they are cooled to near absolute zero ($~15 \text{ mK}$).</p>
+
+<h3>1. The Harmonic Oscillator Problem</h3>
+<p>To build a qubit, you need two isolated energy levels, $|0\rangle$ and $|1\rangle$.</p>
+<p>A standard electrical circuit with a Capacitor ($C$) and an Inductor ($L$) creates an <strong>LC Oscillator</strong>.</p>
+<p>Classically, the energy sloshes back and forth between the electric field of the capacitor and the magnetic field of the inductor. Quantum mechanically, this is a <strong>Quantum Harmonic Oscillator</strong>.</p>
+<p>The energy levels are:</p>
+$$E_n = \hbar \omega \left(n + \frac{1}{2}\right)$$
+<p><strong>The Fatal Flaw:</strong> The levels are <strong>equally spaced</strong>. The energy gap between $|0\rangle \to |1\rangle$ is exactly the same as $|1\rangle \to |2\rangle$.</p>
+$$\Delta E = E_1 - E_0 = E_2 - E_1 = \hbar \omega$$
+<p>If you send a microwave pulse at frequency $\omega$ to flip the qubit from $|0\rangle$ to $|1\rangle$, you might accidentally push it up to $|2\rangle$, $|3\rangle$, and so on. You cannot isolate the qubit. It is uncontrollable.</p>
+
+<h3>2. The Solution: The Josephson Junction</h3>
+<p>To fix this, we need to make the circuit <strong>anharmonic</strong> (unevenly spaced). We need a non-linear inductor.</p>
+<p>Enter the <strong>Josephson Junction (JJ)</strong>. It consists of two superconducting metals separated by a vanishingly thin insulating barrier.</p>
 <ul>
-    <li><strong>Pros:</strong> Very fast gate speeds (nanoseconds). Standard microchip fabrication.</li>
-    <li><strong>Cons:</strong> Short coherence times (microseconds). Wiring complexity grows with size. Needs massive dilution refrigerators.</li>
+    <li>Instead of the linear relationship of a normal inductor ($V = L \cdot dI/dt$), the supercurrent $I$ tunnels through the barrier: $I = I_c \sin(\delta)$.</li>
+    <li>This changes the potential energy landscape from a Parabola (Harmonic) to a <strong>Cosine</strong> wave.</li>
 </ul>
+
+<p>Now, the energy levels get closer together as you go up.</p>
+$$E_{1} - E_{0} \neq E_{2} - E_{1}$$
+<p>This difference is called the <strong>Anharmonicity ($\alpha$)</strong>. It allows us to tune our microwave laser to exactly the $|0\rangle \to |1\rangle$ frequency without touching the $|1\rangle \to |2\rangle$ transition.</p>
+
+<h3>3. The Transmon Design</h3>
+<p>The most popular design today is the <strong>Transmon</strong> (Transmission Line Shunted Plasma Oscillation). It puts a large Capacitor in parallel with the Josephson Junction.</p>
+<ul>
+    <li><strong>Benefit:</strong> It dramatically reduces sensitivity to <strong>charge noise</strong> (electric field fluctuations), which was the killer of early superconducting qubits (Cooper Pair Boxes).</li>
+    <li><strong>Trade-off:</strong> It reduces the anharmonicity ($\alpha$), meaning we have to be very precise with our control pulses to avoid leakage into higher states.</li>
+</ul>
+
+<hr>
+
+<h3>Your Task: The Leakage Danger</h3>
+<p>You are calibrating a Transmon qubit.</p>
+<ul>
+    <li>The transition frequency from $|0\rangle$ to $|1\rangle$ is $f_{01} = 5.0 \text{ GHz}$.</li>
+    <li>The anharmonicity is $\alpha = -300 \text{ MHz}$. (This means the next gap is smaller by $300 \text{ MHz}$).</li>
+</ul>
+<ol>
+    <li>Calculate the transition frequency for the "leakage" state, $f_{12}$ (the gap between $|1\rangle$ and $|2\rangle$).
+        $$f_{12} = f_{01} + \alpha$$
+    </li>
+    <li><strong>The Engineering Constraint:</strong> You act on the qubit with a microwave pulse. In frequency space, a short pulse is "wide" (it covers a range of frequencies).
+        If your control pulse has a bandwidth of $400 \text{ MHz}$ centered at $5.0 \text{ GHz}$, will you accidentally excite the $|1\rangle \to |2\rangle$ transition?
+        <em>(Compare the pulse range to your answer in step 1).</em>
+    </li>
+</ol>
                     """,
                     "position": 4,
                     "task_json": None,
@@ -1696,18 +1858,93 @@ $$U_a|x\rangle = |ax \pmod N\rangle$$
                     "title": "5. Hardware: Ions & Photonics",
                     "content": r"""
 <h2>Trapped Ions & Photonics</h2>
-<p><strong>Trapped Ions (IonQ, Quantinuum):</strong>
+<p>You have reviewed the current leader (Superconducting). Now you must understand the two primary competitors. Trapped Ions offer the highest fidelity, and Photonics offers the greatest speed. Both pose distinct scaling challenges.</p>
+
+<hr>
+
+<h3>1. Trapped Ions (The Perfect Qubit)</h3>
+<p>Trapped Ion systems use nature's qubits: individual atoms (ions) whose energy levels are fundamentally stable. They are the <strong>gold standard for qubit quality and fidelity</strong>.</p>
+
+<h4>The Mechanism: Laser Control</h4>
+<p>The qubit is encoded in the long-lived <strong>electronic energy levels</strong> of an ion (e.g., Ytterbium, Barium).</p>
 <ul>
-    <li><strong>Tech:</strong> Individual atoms levitated by electric fields.</li>
-    <li><strong>Pros:</strong> Perfect qubits (nature makes them identical). Long coherence (seconds/minutes). High connectivity.</li>
-    <li><strong>Cons:</strong> Slow gates. Hard to scale trap size.</li>
-</ul></p>
-<p><strong>Photonics (PsiQuantum, Xanadu):</strong>
+    <li><strong>Trapping:</strong> The ions are suspended in a high vacuum using electric fields generated by microscopic electrodes (the <strong>Paul Trap</strong>). This prevents physical contact and decoherence.</li>
+    <li><strong>Initialization & Gates:</strong> Highly precise <strong>lasers</strong> are used to perform all operations:
+        <ul>
+            <li><strong>Initialization:</strong> Lasers cool the ions to near-motionless states.</li>
+            <li><strong>Single-Qubit Gates:</strong> Lasers drive transitions between $|0\rangle$ and $|1\rangle$.</li>
+            <li><strong>Two-Qubit Gates:</strong> Lasers couple the internal state of one ion to the <strong>collective motion</strong> (vibrational mode) shared by all ions, which then couples to the second ion. This mechanism allows <strong>all-to-all connectivity</strong>—any qubit can talk to any other qubit in the trap.</li>
+        </ul>
+    </li>
+</ul>
+
+<h4>The Trade-Offs (High Fidelity, Low Speed)</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Metric</th>
+            <th>Pro</th>
+            <th>Con (The Scaling Hurdle)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Fidelity</strong></td>
+            <td><strong>Highest in the industry</strong> ($>99.9\%$). Long coherence times (minutes).</td>
+            <td><strong>Slowest gate speed</strong> ($\approx 10$ milliseconds). Very slow circuit execution.</td>
+        </tr>
+        <tr>
+            <td><strong>Connectivity</strong></td>
+            <td><strong>All-to-all connectivity</strong> in a single trap.</td>
+            <td><strong>Hard to scale</strong> past $\approx 50$ qubits in a single, stable chain.</td>
+        </tr>
+    </tbody>
+</table>
+
+<hr>
+
+<h3>2. Photonics (The Speed Demon)</h3>
+<p>Photonic quantum computing uses <strong>photons</strong> (particles of light) as qubits. This system operates at room temperature and at the speed of light, making it the fastest platform.</p>
+
+<h4>The Mechanism: Integrated Optics</h4>
+<p>The qubit state is typically encoded in the <strong>polarization</strong> (horizontal $|H\rangle=|0\rangle$ or vertical $|V\rangle=|1\rangle$) or the <strong>path</strong> of the single photon.</p>
 <ul>
-    <li><strong>Tech:</strong> Encoding information in particles of light.</li>
-    <li><strong>Pros:</strong> Works at room temperature (mostly). Integration with fiber optics.</li>
-    <li><strong>Cons:</strong> Photons don't like to interact (hard to do 2-qubit gates). Loss is a major issue.</li>
-</ul></p>
+    <li><strong>Circuits:</strong> Operations are performed using standard optical components (lenses, mirrors, beam splitters), often integrated onto a silicon chip (integrated optics).</li>
+    <li><strong>Single-Qubit Gates:</strong> Phase shifters and waveplates perform arbitrary single-qubit rotations.</li>
+    <li><strong>Measurement:</strong> Detectors measure the final state.</li>
+</ul>
+
+<h4>The Trade-Offs (Fast but Probabilistic)</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Metric</th>
+            <th>Pro</th>
+            <th>Con (The Reliability Hurdle)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Speed</strong></td>
+            <td><strong>Extremely Fast</strong> (operations at the speed of light). Room temperature operation.</td>
+            <td><strong>No quantum memory.</strong> The qubit is lost once it moves past the detector.</td>
+        </tr>
+        <tr>
+            <td><strong>Reliability</strong></td>
+            <td><strong>Networking potential</strong> (can send qubits long distance).</td>
+            <td><strong>Probabilistic two-qubit gates.</strong> Entangling gates often succeed less than $1\%$ of the time (using the required KLM protocol).</td>
+        </tr>
+    </tbody>
+</table>
+
+<hr>
+
+<h3>Your Task: The Engineering Constraint</h3>
+<p>Imagine you are designing a quantum algorithm.</p>
+<ol>
+    <li>If your algorithm requires extremely <strong>deep circuits</strong> (thousands of sequential gates), which hardware platform—<strong>Trapped Ions</strong> or <strong>Superconducting</strong> (which typically have $\sim 100 \text{ nanosecond}$ gate times)—will impose the greater time penalty and why?</li>
+    <li>If your algorithm requires highly reliable, near-perfect entanglement between non-neighboring qubits, which platform—<strong>Trapped Ions</strong> or <strong>Photonics</strong>—provides a structural advantage?</li>
+</ol>
                     """,
                     "position": 5,
                     "task_json": None,
@@ -1718,9 +1955,55 @@ $$U_a|x\rangle = |ax \pmod N\rangle$$
                     "title": "6. QML: VQE",
                     "content": r"""
 <h2>Variational Quantum Eigensolvers (VQE)</h2>
-<p>How do we use today's noisy quantum computers (NISQ) for useful work?</p>
-<p><strong>VQE</strong> is a hybrid algorithm. It uses a classical computer to optimize the parameters of a quantum circuit to find the ground state energy of a molecule.</p>
-<p><strong>Application:</strong> Drug discovery and Material science. Simulating molecular bonds is one of the "killer apps" for near-term quantum.</p>
+<p>The Variational Quantum Eigensolver (<strong>VQE</strong>) is arguably the most promising <strong>near-term</strong> quantum algorithm. It is the flagship application of Quantum Machine Learning (QML), designed not for exponential speedup, but for <strong>pragmatism</strong> on current noisy hardware.</p>
+
+<hr>
+
+<h3>1. The Problem: The Ground State Energy ⚛️</h3>
+<p>The primary goal of quantum chemistry is to calculate the <strong>ground state energy</strong> ($E_0$) of a molecule (e.g., the energy of the stable state of Lithium Hydride, $\text{LiH}$). This is required to predict chemical reaction rates, bond strengths, and material properties.</p>
+<p>Classically, solving the <strong>Schrödinger Equation</strong> for large molecules is exponentially hard.</p>
+
+<hr>
+
+<h3>2. The Variational Principle (The Foundation)</h3>
+<p>VQE is based entirely on the <strong>Variational Principle</strong> from quantum mechanics:</p>
+<p>For any arbitrary normalized quantum state $|\psi\rangle$, the expectation value of the Hamiltonian $H$ is always <strong>greater than or equal to</strong> the true ground state energy $E_0$.</p>
+$$E(\theta) = \frac{\langle \psi(\theta) | H | \psi(\theta) \rangle}{\langle \psi(\theta) | \psi(\theta) \rangle} \ge E_0$$
+<p>The goal is to iteratively adjust the state $|\psi(\theta)\rangle$ until $E(\theta)$ converges to the minimum possible value, thereby finding $E_0$.</p>
+
+<hr>
+
+<h3>3. The Mechanism: The Hybrid Loop 🔄</h3>
+<p>VQE is a <strong>hybrid quantum-classical algorithm</strong>. It intelligently splits the computational burden: the hard quantum evaluation happens on the QPU, and the optimization happens on the classical CPU.</p>
+
+<ol>
+    <li><strong>Classical Initialization:</strong> A classical computer selects initial parameters $\theta = (\theta_1, \theta_2, \dots)$ for the quantum circuit.</li>
+    <li><strong>Quantum Evaluation (The Ansatz):</strong> The parameters $\theta$ are used to build and run a <strong>parameterized quantum circuit</strong> (the <strong>Ansatz</strong>), which prepares the trial state $|\psi(\theta)\rangle$. The QPU then measures the energy $E(\theta)$.
+        <ul>
+            <li><em>The Hamiltonian ($H$) is measured piece by piece via <strong>Expectation Value</strong> (Reading Scores).</em></li>
+        </ul>
+    </li>
+    <li><strong>Classical Optimization:</strong> The classical CPU receives the measured energy $E(\theta)$. It uses a classical optimizer (e.g., gradient descent) to calculate new, better parameters $\theta'$ that minimize the energy.</li>
+    <li><strong>Iteration:</strong> The new parameters $\theta'$ are sent back to the QPU, and the loop repeats until the energy converges to a stable minimum.</li>
+</ol>
+
+<hr>
+
+<h3>4. Significance: The NISQ Advantage</h3>
+<p>VQE is perfect for <strong>NISQ</strong> (Noisy Intermediate-Scale Quantum) devices because:</p>
+<ul>
+    <li><strong>Shallow Circuits:</strong> The Ansatz circuits are typically much shallower than those required for complex exponential-speedup algorithms (like Shor's). This limits the chance of <strong>decoherence</strong> destroying the computation.</li>
+    <li><strong>Error Management:</strong> The classical optimizer can often adapt to and filter out some of the inherent noise and measurement error.</li>
+</ul>
+
+<hr>
+
+<h3>Your Task: The Ansatz Trade-off</h3>
+<p>The <strong>Ansatz</strong> ($|\psi(\theta)\rangle$) is the parameterized circuit designed to explore the possible state space of the molecule.</p>
+<ol>
+    <li>If the Ansatz is <strong>too simple</strong> (too shallow, too few parameters), what is the inevitable consequence for the final energy calculation $E(\theta)$?</li>
+    <li>If the Ansatz is <strong>too complex</strong> (too deep, too many parameters), what is the inevitable consequence for both the <strong>quantum hardware</strong> and the <strong>classical optimizer</strong>?</li>
+</ol>
                     """,
                     "position": 6,
                     "task_json": None,
@@ -1731,9 +2014,47 @@ $$U_a|x\rangle = |ax \pmod N\rangle$$
                     "title": "7. QML: QAOA",
                     "content": r"""
 <h2>Quantum Approximate Optimization (QAOA)</h2>
-<p><strong>QAOA</strong> is another hybrid algorithm designed for combinatorial optimization problems.</p>
-<p><strong>Example:</strong> The MaxCut problem (partitioning a graph). QAOA tries to find a "good enough" solution faster than classical brute force.</p>
-<p>It is a leading candidate for demonstrating "Quantum Advantage" in practical industry problems like logistics and finance.</p>
+<p>You are moving deeper into pragmatic NISQ (Noisy Intermediate-Scale Quantum) applications. The <strong>Quantum Approximate Optimization Algorithm (QAOA)</strong> is designed to tackle <strong>Combinatorial Optimization</strong>—finding the best discrete configuration—a class that includes many NP-hard problems.</p>
+
+<h3>1. The Problem: Combinatorial Optimization</h3>
+<p>QAOA aims to find a <strong>high-quality approximation</strong> of the optimal solution for problems like:</p>
+<ul>
+    <li><strong>Max-Cut:</strong> Dividing a network's nodes into two groups to maximize the number of connections between the groups.</li>
+    <li><strong>Traveling Salesman Problem (TSP):</strong> Finding the shortest possible route that visits a list of cities and returns to the origin.</li>
+    <li><strong>Scheduling/Logistics:</strong> Optimizing complex resource allocation.</li>
+</ul>
+<p>The core difficulty is that the possible number of configurations is often exponential ($2^N$), making classical brute-force impossible.</p>
+
+<h3>2. The Mechanism: Alternating Unitaries 🔄</h3>
+<p>Like VQE, QAOA is a <strong>hybrid quantum-classical algorithm</strong>. The quantum circuit (the Ansatz) is very specific, designed to explore the solution space by alternating two types of simple, parameterized unitary operations.</p>
+
+<h4>A. The Cost Unitary ($U_C$)</h4>
+<p>The Cost Unitary is based on the problem's cost Hamiltonian ($H_C$). It takes the current state and applies a phase shift proportional to how good that state is (how high the cost is):</p>
+<p>$$U_C(\gamma) = e^{-i\gamma H_C}$$</p>
+<p>This operator "marks" the good solutions by rotating their phase, similar to the oracle in Grover's algorithm. The parameter $\gamma$ controls the magnitude of the rotation.</p>
+
+<h4>B. The Mixer Unitary ($U_B$)</h4>
+<p>The Mixer Unitary (usually just a simple Pauli-X operation on all qubits) is responsible for <strong>driving the search</strong> and <strong>creating superposition</strong> to explore new states:</p>
+<p>$$U_B(\beta) = e^{-i\beta H_B}$$</p>
+<p>This introduces quantum fluctuations, allowing the system to jump out of local minima. The parameter $\beta$ controls the degree of mixing.</p>
+
+<h3>3. The QAOA Loop</h3>
+<p>The entire circuit (the <strong>Ansatz</strong>) is built by repeating the $U_C(\gamma_k) U_B(\beta_k)$ sequence $p$ times:</p>
+<p>$$|\psi(\vec{\gamma}, \vec{\beta})\rangle = U_B(\beta_p) U_C(\gamma_p) \dots U_B(\beta_1) U_C(\gamma_1) |+\rangle^{\otimes n}$$</p>
+<ol>
+    <li><strong>Quantum Step:</strong> The QPU runs the parameterized circuit and measures the expectation value of the cost Hamiltonian: $F(\vec{\gamma}, \vec{\beta}) = \langle \psi | H_C | \psi \rangle$.</li>
+    <li><strong>Classical Step:</strong> A classical optimizer (running on a CPU) receives the result $F$. It adjusts the parameters $\vec{\gamma}$ and $\vec{\beta}$ to find the maximum cost $F$ (the best approximation).</li>
+    <li><strong>The Result:</strong> QAOA provides a solution with a provable approximation ratio for certain problems (e.g., $0.6924$ for Max-Cut with $p=1$), which improves as $p$ increases.</li>
+</ol>
+
+<hr>
+
+<h3>Your Task: The Layer ($p$) Trade-off</h3>
+<p>The variable $p$ represents the number of alternating layers in the QAOA circuit. This is the primary tuning knob for the algorithm's power and depth.</p>
+<ol>
+    <li>If the number of layers is set to $p=1$, the circuit is shallow and fast, but the search space exploration is limited. What is the consequence for the quality of the final solution?</li>
+    <li>If the number of layers $p$ becomes very large, the circuit theoretically approaches the optimal solution. However, this dramatically increases the number of parameters the classical optimizer must tune ($2p$ total parameters). This leads to the problem known as <strong>"Barren Plateaus."</strong> Explain this consequence for the <strong>classical optimization step</strong> when $p$ is large.</li>
+</ol>
                     """,
                     "position": 7,
                     "task_json": None,
@@ -3244,6 +3565,353 @@ $$U_a|x\rangle = |ax \pmod N\rangle$$
 
                 cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
                             (shor_quiz_id, q1_text, q1_options, q1_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # Add Quiz for "QEC: Decoherence"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("qec-decoherence",))
+        decoherence_row = cur.fetchone()
+        decoherence_lesson_id = _row_get(decoherence_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("qec-decoherence",))
+        decoherence_row = cur.fetchone()
+        decoherence_lesson_id = _row_get(decoherence_row, 'id', 0)
+
+    if decoherence_lesson_id:
+        quiz_title = "The Phase-Flip Trap"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (decoherence_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (decoherence_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "Why is a Phase-Flip Error (Z error) undetectable if you only measure in the computational basis (|0>, |1>)?"
+            q1_options = json.dumps([
+                "It changes the probability of measuring 0.",
+                "It changes the probability of measuring 1.",
+                "It only changes the relative phase, leaving the probabilities |α|^2 and |β|^2 unchanged.",
+                "It causes the qubit to decay to |0> immediately."
+            ])
+            q1_correct = 2
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (decoherence_lesson_id, quiz_title))
+                decoherence_quiz_row = cur.fetchone()
+                decoherence_quiz_id = _row_get(decoherence_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (decoherence_quiz_id, q1_text, q1_options, q1_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (decoherence_lesson_id, quiz_title))
+                decoherence_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (decoherence_quiz_id, q1_text, q1_options, q1_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # Add Quiz for "QEC: Surface Codes"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("qec-surface-codes",))
+        sc_row = cur.fetchone()
+        sc_lesson_id = _row_get(sc_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("qec-surface-codes",))
+        sc_row = cur.fetchone()
+        sc_lesson_id = _row_get(sc_row, 'id', 0)
+
+    if sc_lesson_id:
+        quiz_title = "The Threshold Theorem"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (sc_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (sc_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "If your physical error rate (p=0.5%) is BELOW the threshold (pth=1%), what happens to the logical error rate as you increase the grid size (distance d)?"
+            q1_options = json.dumps([
+                "The logical error rate decreases exponentially (it gets better).",
+                "The logical error rate increases (it gets worse because there are more components to fail).",
+                "The logical error rate stays the same.",
+                "The quantum computer explodes."
+            ])
+            q1_correct = 0
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (sc_lesson_id, quiz_title))
+                sc_quiz_row = cur.fetchone()
+                sc_quiz_id = _row_get(sc_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (sc_quiz_id, q1_text, q1_options, q1_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (sc_lesson_id, quiz_title))
+                sc_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (sc_quiz_id, q1_text, q1_options, q1_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # Add Quiz for "Complexity: BQP vs P vs NP"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("complexity-bqp",))
+        bqp_row = cur.fetchone()
+        bqp_lesson_id = _row_get(bqp_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("complexity-bqp",))
+        bqp_row = cur.fetchone()
+        bqp_lesson_id = _row_get(bqp_row, 'id', 0)
+
+    if bqp_lesson_id:
+        quiz_title = "Post-Quantum Security Check"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (bqp_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (bqp_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "Which encryption standard is considered effectively 'dead' (broken by exponential speedup) and which one just needs larger keys (weakened by quadratic speedup)?"
+            q1_options = json.dumps([
+                "RSA is dead (Shor's exp speedup); AES needs larger keys (Grover's quad speedup).",
+                "AES is dead (Grover's exp speedup); RSA needs larger keys (Shor's quad speedup).",
+                "Both are dead.",
+                "Neither is affected."
+            ])
+            q1_correct = 0
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (bqp_lesson_id, quiz_title))
+                bqp_quiz_row = cur.fetchone()
+                bqp_quiz_id = _row_get(bqp_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (bqp_quiz_id, q1_text, q1_options, q1_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (bqp_lesson_id, quiz_title))
+                bqp_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (bqp_quiz_id, q1_text, q1_options, q1_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # Add Quiz for "Hardware: Superconducting"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("hardware-superconducting",))
+        hw_row = cur.fetchone()
+        hw_lesson_id = _row_get(hw_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("hardware-superconducting",))
+        hw_row = cur.fetchone()
+        hw_lesson_id = _row_get(hw_row, 'id', 0)
+
+    if hw_lesson_id:
+        quiz_title = "The Leakage Danger"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (hw_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (hw_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "Given f_01 = 5.0 GHz and anharmonicity alpha = -300 MHz, what is f_12? If a control pulse has a bandwidth of 400 MHz centered at 5.0 GHz, is there a risk of leakage?"
+            q1_options = json.dumps([
+                "f_12 = 5.3 GHz. No risk.",
+                "f_12 = 4.7 GHz. No risk (strictly outside the 4.8-5.2 GHz range).",
+                "f_12 = 4.7 GHz. Yes, risk exists (bandwidth > anharmonicity implies spectral overlap).",
+                "f_12 = 5.0 GHz. Yes, risk is inevitable."
+            ])
+            q1_correct = 2
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (hw_lesson_id, quiz_title))
+                hw_quiz_row = cur.fetchone()
+                hw_quiz_id = _row_get(hw_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (hw_quiz_id, q1_text, q1_options, q1_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (hw_lesson_id, quiz_title))
+                hw_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (hw_quiz_id, q1_text, q1_options, q1_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # Add Quiz for "Hardware: Ions & Photonics"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("hardware-ions-photonics",))
+        ions_row = cur.fetchone()
+        ions_lesson_id = _row_get(ions_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("hardware-ions-photonics",))
+        ions_row = cur.fetchone()
+        ions_lesson_id = _row_get(ions_row, 'id', 0)
+
+    if ions_lesson_id:
+        quiz_title = "The Engineering Constraint"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (ions_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (ions_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "Your algorithm requires extremely deep circuits (thousands of sequential gates). Comparing Trapped Ions (gate time ~10ms) vs Superconducting (gate time ~100ns), which platform imposes the greater execution time penalty?"
+            q1_options = json.dumps([
+                "Superconducting (slower gates)",
+                "Trapped Ions (slower gates)",
+                "Both are equivalent",
+                "Photonics (fastest)"
+            ])
+            q1_correct = 1
+            
+            q2_text = "You need highly reliable, near-perfect entanglement between non-neighboring qubits. Which platform offers 'all-to-all' connectivity natively?"
+            q2_options = json.dumps([
+                "Superconducting (Transmons)",
+                "Photonics (Integrated Optics)",
+                "Trapped Ions (Paul Trap)",
+                "Neutral Atoms"
+            ])
+            q2_correct = 2
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (ions_lesson_id, quiz_title))
+                ions_quiz_row = cur.fetchone()
+                ions_quiz_id = _row_get(ions_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (ions_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (ions_quiz_id, q2_text, q2_options, q2_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (ions_lesson_id, quiz_title))
+                ions_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (ions_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (ions_quiz_id, q2_text, q2_options, q2_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # Add Quiz for "QML: VQE"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("qml-vqe",))
+        vqe_row = cur.fetchone()
+        vqe_lesson_id = _row_get(vqe_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("qml-vqe",))
+        vqe_row = cur.fetchone()
+        vqe_lesson_id = _row_get(vqe_row, 'id', 0)
+
+    if vqe_lesson_id:
+        quiz_title = "The Ansatz Trade-off"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (vqe_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (vqe_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "If the VQE Ansatz is too simple (shallow, few parameters), what is the inevitable consequence?"
+            q1_options = json.dumps([
+                "It will be too slow to execute on the QPU.",
+                "It cannot reach the true ground state energy (Underfitting).",
+                "The classical optimizer will diverge.",
+                "It will cause excessive decoherence."
+            ])
+            q1_correct = 1
+            
+            q2_text = "If the VQE Ansatz is too complex (deep, many parameters), what are the consequences?"
+            q2_options = json.dumps([
+                "The QPU suffers from decoherence/noise (Barren Plateaus) AND the classical optimizer struggles to converge.",
+                "It guarantees finding the exact ground state quickly.",
+                "It requires less classical memory.",
+                "The energy calculation becomes perfectly accurate."
+            ])
+            q2_correct = 0
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (vqe_lesson_id, quiz_title))
+                vqe_quiz_row = cur.fetchone()
+                vqe_quiz_id = _row_get(vqe_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (vqe_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (vqe_quiz_id, q2_text, q2_options, q2_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (vqe_lesson_id, quiz_title))
+                vqe_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (vqe_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (vqe_quiz_id, q2_text, q2_options, q2_correct))
+        else:
+            print(f"Quiz '{quiz_title}' already exists.")
+
+    # Add Quiz for "QML: QAOA"
+    if db_type == "postgres":
+        cur.execute("SELECT id FROM lessons WHERE slug=%s", ("qml-qaoa",))
+        qaoa_row = cur.fetchone()
+        qaoa_lesson_id = _row_get(qaoa_row, 'id', 0)
+    else:
+        cur.execute("SELECT id FROM lessons WHERE slug=?", ("qml-qaoa",))
+        qaoa_row = cur.fetchone()
+        qaoa_lesson_id = _row_get(qaoa_row, 'id', 0)
+
+    if qaoa_lesson_id:
+        quiz_title = "The Layer (p) Trade-off"
+        if db_type == "postgres":
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=%s AND title=%s", (qaoa_lesson_id, quiz_title))
+        else:
+            cur.execute("SELECT id FROM quizzes WHERE lesson_id=? AND title=?", (qaoa_lesson_id, quiz_title))
+
+        existing_quiz = cur.fetchone()
+        if not existing_quiz:
+            q1_text = "If the number of layers is set to p=1, what is the consequence for the quality of the final solution?"
+            q1_options = json.dumps([
+                "It will be the optimal solution.",
+                "It will be a low-quality approximation due to limited search space exploration.",
+                "It will be too slow to execute on the QPU.",
+                "It will cause excessive decoherence."
+            ])
+            q1_correct = 1
+            
+            q2_text = "If the number of layers p becomes very large, what is the consequence of barren plateaus for the classical optimization step?"
+            q2_options = json.dumps([
+                "The classical optimizer will converge faster.",
+                "The classical optimizer will struggle to find meaningful parameter updates due to vanishing gradients.",
+                "The quantum circuit will run more efficiently.",
+                "The solution quality will decrease."
+            ])
+            q2_correct = 1
+
+            if db_type == "postgres":
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(%s, %s) RETURNING id", (qaoa_lesson_id, quiz_title))
+                qaoa_quiz_row = cur.fetchone()
+                qaoa_quiz_id = _row_get(qaoa_quiz_row, 'id', 0)
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (qaoa_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(%s, %s, %s, %s)",
+                            (qaoa_quiz_id, q2_text, q2_options, q2_correct))
+            else:
+                cur.execute("INSERT INTO quizzes(lesson_id, title) VALUES(?, ?)", (qaoa_lesson_id, quiz_title))
+                qaoa_quiz_id = cur.lastrowid
+
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (qaoa_quiz_id, q1_text, q1_options, q1_correct))
+                cur.execute("INSERT INTO quiz_questions(quiz_id, question_text, options_json, correct_option_index) VALUES(?, ?, ?, ?)",
+                            (qaoa_quiz_id, q2_text, q2_options, q2_correct))
         else:
             print(f"Quiz '{quiz_title}' already exists.")
 

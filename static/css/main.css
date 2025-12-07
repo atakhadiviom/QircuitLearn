@@ -761,3 +761,12 @@ body, html {
   padding-left: 40px; /* Indent nested lessons */
   font-size: 0.95em;
 }
+
+/* Full width lesson pane when no task is present */
+@media (min-width: 1024px) {
+  .lesson-pane.full-width {
+    max-width: 100%;
+    border-right: none;
+    flex: 1;
+  }
+}

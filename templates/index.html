@@ -177,7 +177,7 @@
     </nav>
     <main class="main-content">
       {% if current_lesson %}
-      <div class="lesson-pane">
+      <div class="lesson-pane {{ 'full-width' if not (current_lesson and current_lesson['task_json']) else '' }}">
         {% if current_lesson %}
         <nav aria-label="Breadcrumb" style="margin-bottom: 1rem; font-size: 0.9rem;">
           <a href="/" style="color: var(--text-muted); text-decoration:none;">Home</a>
@@ -426,6 +426,7 @@
       </div>
       {% endif %}
 
+      {% if current_lesson and current_lesson['task_json'] %}
       <div class="editor-pane">
         <!-- Rotation Modal -->
         <div id="rotation-modal" class="modal hidden">
@@ -501,6 +502,7 @@
             style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin-top: 20px;"></div>
         </div>
       </div>
+      {% endif %}
     </main>
   </div>
   {% endif %}
