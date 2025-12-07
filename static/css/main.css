@@ -418,6 +418,19 @@ body, html {
 .gate-btn[data-type="MEASURE"] { background: #4b5563; }
 .gate-btn[data-type="CNOT"] { background: var(--accent); }
 
+/* Gate Specific Colors */
+.gate-btn[data-type="H"], .placed-gate.gate-H { background: #f59e0b; } /* Amber */
+.gate-btn[data-type="X"], .placed-gate.gate-X { background: #3b82f6; } /* Blue */
+.gate-btn[data-type="Y"], .placed-gate.gate-Y { background: #3b82f6; }
+.gate-btn[data-type="Z"], .placed-gate.gate-Z { background: #3b82f6; }
+.gate-btn[data-type="S"], .placed-gate.gate-S { background: #8b5cf6; } /* Violet */
+.gate-btn[data-type="T"], .placed-gate.gate-T { background: #8b5cf6; }
+.gate-btn[data-type="RX"], .placed-gate.gate-RX { background: #ec4899; } /* Pink */
+.gate-btn[data-type="RY"], .placed-gate.gate-RY { background: #ec4899; }
+.gate-btn[data-type="RZ"], .placed-gate.gate-RZ { background: #ec4899; }
+.gate-btn[data-type="CNOT"], .placed-gate.gate-CNOT { background: var(--accent); }
+.gate-btn[data-type="SWAP"], .placed-gate.gate-SWAP { background: var(--accent); }
+
 /* Circuit Editor */
 .circuit-editor {
   background: var(--surface);
@@ -491,14 +504,26 @@ body, html {
   height: 40px;
   background: var(--primary);
   color: white;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  font-family: 'Courier New', monospace;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  z-index: 5; /* Ensure above lines */
+}
+
+.placed-gate.gate-CNOT {
+  border-radius: 50%;
+  font-size: 1.5rem;
+}
+
+.placed-gate.gate-SWAP {
+  font-size: 1.2rem;
 }
 
 .placed-gate.control {
@@ -507,6 +532,7 @@ body, html {
   border-radius: 50%;
   background: transparent;
   opacity: 0; /* Hidden hit target for SVG dot */
+  z-index: 10;
 }
 
 /* SVG Overlay */

@@ -397,8 +397,17 @@ function render() {
             const gate = state.gates.find(g => g.target === q && g.step === s);
             if (gate) {
                 const el = document.createElement('div');
-                el.className = 'placed-gate';
-                el.textContent = gate.type;
+                el.className = `placed-gate gate-${gate.type}`;
+                
+                // Default symbol
+                if (gate.type === 'CNOT') {
+                    el.textContent = '⊕';
+                    el.classList.add('cnot-target');
+                } else if (gate.type === 'SWAP') {
+                    el.textContent = '×';
+                } else {
+                    el.textContent = gate.type;
+                }
                 
                 if (gate.params && gate.params.theta !== undefined) {
                      el.style.fontSize = '0.7em';
@@ -441,8 +450,8 @@ function render() {
             const swapGate = state.gates.find(g => g.type === 'SWAP' && g.params && g.params.other === q && g.step === s);
             if (swapGate) {
                 const el = document.createElement('div');
-                el.className = 'placed-gate';
-                el.textContent = 'SWAP';
+                el.className = 'placed-gate gate-SWAP';
+                el.textContent = '×';
                 // We can style it slightly differently or just rely on the line connecting them
                 el.title = `Swapping with q${swapGate.target}`;
                 zone.appendChild(el);
@@ -925,88 +934,138 @@ function drawBlochSphere(canvas, vec) {
     ctx.clearRect(0, 0, w, h);
 
     // Helper to project 3D (x,y,z) to 2D canvas (u,v)
-    // Coordinate system:
-    // Z is UP (canvas -y)
-    // Y is RIGHT (canvas +x)
-    // X is FRONT-LEFT (diagonal)
     function project(x, y, z) {
-        const u = cx + y * r - x * r * 0.5;
-        const v = cy - z * r + x * r * 0.3;
+        // Simple cabinet projection or similar isometric-ish view
+        // Adjust angles for better 3D effect
+        const u = cx + y * r * 0.9 - x * r * 0.4;
+        const v = cy - z * r * 0.9 + x * r * 0.4;
         return { u, v };
     }
 
-    // Draw sphere background
+    // --- 1. Draw Sphere Background (Back Hemisphere) ---
+    // We can't easily do true 3D clipping in 2D canvas, but we can fake depth
+    // by drawing back elements, then sphere body, then front elements.
+    
+    // Draw Sphere Fill (Subtle glass effect)
     const grad = ctx.createRadialGradient(cx - r/3, cy - r/3, r/10, cx, cy, r);
-    grad.addColorStop(0, '#f8fafc');
-    grad.addColorStop(1, '#e2e8f0');
-    ctx.fillStyle = grad;
+    grad.addColorStop(0, 'rgba(248, 250, 252, 0.9)'); // Light highlight
+    grad.addColorStop(0.5, 'rgba(226, 232, 240, 0.4)');
+    grad.addColorStop(1, 'rgba(203, 213, 225, 0.2)'); // Darker edge
+    
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+    ctx.fillStyle = grad;
     ctx.fill();
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.stroke();
-
-    // Draw Equator (approximate ellipse)
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, r, r * 0.3, -0.2, 0, 2 * Math.PI); // Slight tilt
-    ctx.strokeStyle = '#dae1e7';
-    ctx.stroke();
-
-    // Draw Back Axes (behind the vector if possible, but we just draw first)
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = '#94a3b8';
     
-    // Z Axis (dashed for negative?)
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - r);
-    ctx.lineTo(cx, cy + r);
+    // Outer rim
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
-    // Label Z
-    ctx.fillStyle = '#64748b';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('|0⟩', cx - 15, cy - r - 5);
-    ctx.fillText('|1⟩', cx - 15, cy + r + 15);
 
-    // Y Axis
-    const pY = project(0, 1, 0);
+    // --- 2. Draw Wireframe (Latitude/Longitude) ---
+    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.3)'; // Subtle slate
+
+    // Equator
     ctx.beginPath();
-    ctx.moveTo(cx, cy);
+    ctx.ellipse(cx, cy, r, r * 0.3, -0.4, 0, 2 * Math.PI); // Tilted
+    ctx.stroke();
+
+    // Meridian (Vertical loop)
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, r * 0.3, r, -0.1, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    // --- 3. Draw Axes (Back parts) ---
+    // We'll draw full axes but try to be smart about depth if possible. 
+    // For now, simple axes are fine.
+    
+    const axisColor = '#94a3b8';
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = axisColor;
+    ctx.fillStyle = '#64748b';
+    ctx.font = 'bold 12px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Z Axis (Vertical)
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - r - 10);
+    ctx.lineTo(cx, cy + r + 10);
+    ctx.stroke();
+    // Z Labels
+    ctx.fillText('|0⟩', cx, cy - r - 20);
+    ctx.fillText('|1⟩', cx, cy + r + 20);
+
+    // Y Axis (Right)
+    const pY = project(0, 1.2, 0);
+    const pY_neg = project(0, -1.2, 0);
+    ctx.beginPath();
+    ctx.moveTo(pY_neg.u, pY_neg.v);
     ctx.lineTo(pY.u, pY.v);
     ctx.stroke();
-    ctx.fillText('+Y', pY.u + 5, pY.v);
+    ctx.fillText('+Y', pY.u + 10, pY.v);
 
-    // X Axis
-    const pX = project(1, 0, 0);
+    // X Axis (Front-Left)
+    const pX = project(1.2, 0, 0);
+    const pX_neg = project(-1.2, 0, 0);
     ctx.beginPath();
-    ctx.moveTo(cx, cy);
+    ctx.moveTo(pX_neg.u, pX_neg.v);
     ctx.lineTo(pX.u, pX.v);
     ctx.stroke();
-    ctx.fillText('+X', pX.u - 20, pX.v + 10);
+    ctx.fillText('+X', pX.u - 10, pX.v + 10);
 
-    // Draw Vector
+    // --- 4. Draw State Vector ---
     const tip = project(vec.x, vec.y, vec.z);
-    
-    // Shadow/Line
+
+    // Shadow (projected to "floor" / equator plane approx)
+    // Simple fake shadow: line to equator plane
+    /*
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    const shadowTip = project(vec.x, vec.y, 0);
+    ctx.lineTo(shadowTip.u, shadowTip.v);
+    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    */
+
+    // The Vector Line
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.lineTo(tip.u, tip.v);
     ctx.strokeStyle = '#ea580c'; // Orange-600
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
+    ctx.shadowColor = 'rgba(234, 88, 12, 0.4)';
+    ctx.shadowBlur = 10;
     ctx.stroke();
+    ctx.shadowBlur = 0; // Reset
 
-    // Tip point
+    // Vector Tip (Sphere)
     ctx.beginPath();
-    ctx.arc(tip.u, tip.v, 5, 0, 2 * Math.PI);
+    ctx.arc(tip.u, tip.v, 6, 0, 2 * Math.PI);
     ctx.fillStyle = '#ea580c';
     ctx.fill();
+    // Highlight on tip
+    ctx.beginPath();
+    ctx.arc(tip.u - 2, tip.v - 2, 2, 0, 2 * Math.PI);
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fill();
     
-    // Debug info
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '10px monospace';
-    ctx.fillText(`x:${vec.x.toFixed(2)}`, 10, h - 35);
-    ctx.fillText(`y:${vec.y.toFixed(2)}`, 10, h - 20);
-    ctx.fillText(`z:${vec.z.toFixed(2)}`, 10, h - 5);
+    // --- 5. Coordinate Info ---
+    ctx.fillStyle = '#64748b';
+    ctx.font = '11px monospace';
+    ctx.textAlign = 'left';
+    // ctx.fillText(`x:${vec.x.toFixed(2)}`, 10, h - 35);
+    // ctx.fillText(`y:${vec.y.toFixed(2)}`, 10, h - 20);
+    // ctx.fillText(`z:${vec.z.toFixed(2)}`, 10, h - 5);
+    
+    // Combined Label
+    const theta = Math.acos(vec.z).toFixed(2);
+    const phi = Math.atan2(vec.y, vec.x).toFixed(2);
+    ctx.fillText(`θ: ${theta} rad`, 10, h - 20);
+    ctx.fillText(`φ: ${phi} rad`, 10, h - 8);
 }
 
 // Init
