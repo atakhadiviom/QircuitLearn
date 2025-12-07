@@ -165,15 +165,15 @@ def seed():
 <h3>1. The Standard Basis (The "Axes")</h3>
 <p>In a classical computer, a bit is either 0 or 1. In a quantum computer, we treat these as column vectors. We call this the "Computational Basis."</p>
 <ul>
-    <li>The state "Zero" is denoted as $|0\\rangle$: $$|0\\rangle = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$$</li>
-    <li>The state "One" is denoted as $|1\\rangle$: $$|1\\rangle = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}$$</li>
+    <li>The state "Zero" is denoted as $|0\rangle$: $$|0\rangle = \begin{pmatrix} 1 \\\\ 0 \end{pmatrix}$$</li>
+    <li>The state "One" is denoted as $|1\rangle$: $$|1\rangle = \begin{pmatrix} 0 \\\\ 1 \end{pmatrix}$$</li>
 </ul>
-<p><em>(Note: The symbol $|\\psi\\rangle$ is called a "ket". This is Dirac Notation, and it's the standard language of quantum mechanics.)</em></p>
+<p><em>(Note: The symbol $|\psi\rangle$ is called a "ket". This is Dirac Notation, and it's the standard language of quantum mechanics.)</em></p>
 
 <h3>2. Superposition (Linear Combination)</h3>
-<p>The power of quantum computing comes from <strong>Linearity</strong>. We can add these vectors together. A qubit can be in a state that is a linear combination (superposition) of $|0\\rangle$ and $|1\\rangle$:</p>
-$$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
-<p>Here, $\\alpha$ (alpha) and $\\beta$ (beta) are numbers that describe "how much" of 0 and 1 are in the state.</p>
+<p>The power of quantum computing comes from <strong>Linearity</strong>. We can add these vectors together. A qubit can be in a state that is a linear combination (superposition) of $|0\rangle$ and $|1\rangle$:</p>
+$$|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$$
+<p>Here, $\alpha$ (alpha) and $\beta$ (beta) are numbers that describe "how much" of 0 and 1 are in the state.</p>
                     """,
                     "position": 1,
                     "task_json": json.dumps({
@@ -189,25 +189,25 @@ $$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
                     "content": r"""
 <h2>Matrices</h2>
 <p>That's the correct progression. If <strong>vectors</strong> are the <strong>states</strong> of a quantum system, then <strong>matrices</strong> are the <strong>operations</strong> we perform on those states.</p>
-<p>In Quantum Computing, a single-qubit <strong>quantum gate</strong> is represented by a $2 \\times 2$ matrix. When you apply a gate to a qubit, you perform standard <strong>matrix-vector multiplication</strong>.</p>
-$$|\\psi'\\rangle = U |\\psi\\rangle$$
-<p>Where $U$ is the matrix (the gate) and $|\\psi\\rangle$ is the state vector.</p>
+<p>In Quantum Computing, a single-qubit <strong>quantum gate</strong> is represented by a $2 \times 2$ matrix. When you apply a gate to a qubit, you perform standard <strong>matrix-vector multiplication</strong>.</p>
+$$|\psi'\rangle = U |\psi\rangle$$
+<p>Where $U$ is the matrix (the gate) and $|\psi\rangle$ is the state vector.</p>
 
 <h3>⚛️ Key Gate: The Pauli-X (Quantum NOT)</h3>
-<p>The most fundamental operation is the <strong>Pauli-X</strong> gate, often simply called $X$. This is the quantum equivalent of the classical NOT gate, which flips the bit: $0 \\leftrightarrow 1$.</p>
+<p>The most fundamental operation is the <strong>Pauli-X</strong> gate, often simply called $X$. This is the quantum equivalent of the classical NOT gate, which flips the bit: $0 \leftrightarrow 1$.</p>
 <p>The matrix for the $X$ gate is:</p>
-$$X = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$$
+$$X = \begin{pmatrix} 0 & 1 \\\\ 1 & 0 \end{pmatrix}$$
 
 <p>You can verify that:</p>
 <ul>
-    <li>$X|0\\rangle = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix} \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} = |1\\rangle$</li>
-    <li>$X|1\\rangle = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix} \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = |0\\rangle$</li>
+    <li>$X|0\rangle = \begin{pmatrix} 0 & 1 \\\\ 1 & 0 \end{pmatrix} \begin{pmatrix} 1 \\\\ 0 \end{pmatrix} = \begin{pmatrix} 0 \\\\ 1 \end{pmatrix} = |1\rangle$</li>
+    <li>$X|1\rangle = \begin{pmatrix} 0 & 1 \\\\ 1 & 0 \end{pmatrix} \begin{pmatrix} 0 \\\\ 1 \end{pmatrix} = \begin{pmatrix} 1 \\\\ 0 \end{pmatrix} = |0\rangle$</li>
 </ul>
 
 <h3>Your Task: Applying $X$ to Superposition</h3>
-<p>Let's test the linearity. Consider a superposition state $|\\psi\\rangle$ where the chance of being $|0\\rangle$ or $|1\\rangle$ is equal. Its normalized vector is:</p>
-$$|\\psi\\rangle = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$$
-<p>Calculate the resulting state, $|\\psi'\\rangle$, when you apply the $X$ gate to $|\\psi\\rangle$. What is the final column vector?</p>
+<p>Let's test the linearity. Consider a superposition state $|\psi\rangle$ where the chance of being $|0\rangle$ or $|1\rangle$ is equal. Its normalized vector is:</p>
+$$|\psi\rangle = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\\\ 1 \end{pmatrix}$$
+<p>Calculate the resulting state, $|\psi'\rangle$, when you apply the $X$ gate to $|\psi\rangle$. What is the final column vector?</p>
                     """,
                     "position": 2,
                     "task_json": json.dumps({
@@ -225,28 +225,28 @@ $$|\\psi\\rangle = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$
 <p>In Quantum Computing, Eigenvalues and Eigenvectors are the language that translates a quantum operation into a physical, observable result.</p>
 
 <h3>1. 🔑 The Core Equation</h3>
-<p>An Eigenvector is a special vector $|\\psi\\rangle$ that, when acted upon by a matrix $U$, only gets scaled, not rotated.</p>
-<p>The amount it is scaled by is the Eigenvalue $\\lambda$:</p>
-$$U|\\psi\\rangle = \\lambda|\\psi\\rangle$$
+<p>An Eigenvector is a special vector $|\psi\rangle$ that, when acted upon by a matrix $U$, only gets scaled, not rotated.</p>
+<p>The amount it is scaled by is the Eigenvalue $\lambda$:</p>
+$$U|\psi\rangle = \lambda|\psi\rangle$$
 
 <h3>🧠 QC Interpretation: Observables and Outcomes</h3>
 <ul>
     <li><strong>The Matrix $U$ is the Observable:</strong> A matrix that represents a physical property we can measure, like energy or spin. In our case, this is the measurement operator (usually the Pauli-Z gate).</li>
-    <li><strong>The Eigenvectors are the Measurable States:</strong> These special states ($\\{|\\psi\\rangle\\}$) are the only states the qubit can collapse into upon measurement. For a single qubit measured in the standard basis, the eigenvectors are simply $|0\\rangle$ and $|1\\rangle$.</li>
-    <li><strong>The Eigenvalues are the Measurement Results:</strong> The values ($\\lambda$) tell us what the result of the measurement is. In quantum mechanics, these are real numbers. We map them to the outcomes 0 and 1.</li>
+    <li><strong>The Eigenvectors are the Measurable States:</strong> These special states ($\{|\psi\rangle\}$) are the only states the qubit can collapse into upon measurement. For a single qubit measured in the standard basis, the eigenvectors are simply $|0\rangle$ and $|1\rangle$.</li>
+    <li><strong>The Eigenvalues are the Measurement Results:</strong> The values ($\lambda$) tell us what the result of the measurement is. In quantum mechanics, these are real numbers. We map them to the outcomes 0 and 1.</li>
 </ul>
 
 <h3>🚪 Introducing the Pauli-Z Gate ($Z$)</h3>
 <p>The Pauli-Z gate is the standard observable for measurement in the computational basis. Its matrix is:</p>
-$$Z = \\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}$$
+$$Z = \begin{pmatrix} 1 & 0 \\\\ 0 & -1 \end{pmatrix}$$
 
 <h3>Your Task:</h3>
-<p>Apply the Pauli-Z matrix ($Z$) to our basis states, $|0\\rangle$ and $|1\\rangle$.</p>
+<p>Apply the Pauli-Z matrix ($Z$) to our basis states, $|0\rangle$ and $|1\rangle$.</p>
 <ul>
-    <li>Calculate $Z|0\\rangle$. What is the resulting vector and its corresponding eigenvalue ($\\lambda_0$)?</li>
-    <li>Calculate $Z|1\\rangle$. What is the resulting vector and its corresponding eigenvalue ($\\lambda_1$)?</li>
+    <li>Calculate $Z|0\rangle$. What is the resulting vector and its corresponding eigenvalue ($\lambda_0$)?</li>
+    <li>Calculate $Z|1\rangle$. What is the resulting vector and its corresponding eigenvalue ($\lambda_1$)?</li>
 </ul>
-<p>This will reveal why $|0\\rangle$ and $|1\\rangle$ are the special states we measure.</p>
+<p>This will reveal why $|0\rangle$ and $|1\rangle$ are the special states we measure.</p>
                     """,
                     "position": 3,
                     "task_json": json.dumps({
@@ -264,29 +264,29 @@ $$Z = \\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}$$
 <p>The <strong>Inner Product</strong> is the final, essential piece of single-qubit linear algebra. It is the tool that turns abstract vectors into concrete, measurable probabilities.</p>
 
 <h3>1. The Bra Vector and Dirac Notation</h3>
-<p>To perform the Inner Product, we need the <strong>bra</strong> vector. The bra $\\langle \\phi |$ is the Hermitian conjugate (the complex conjugate transpose) of the ket $|\\phi\\rangle$.</p>
-<p>If the ket for $|0\\rangle$ is:</p>
-$$|0\\rangle = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$$
-<p>Then the corresponding bra $\\langle 0 |$ is a row vector:</p>
-$$\\langle 0 | = \\begin{pmatrix} 1 & 0 \\end{pmatrix}$$
+<p>To perform the Inner Product, we need the <strong>bra</strong> vector. The bra $\langle \phi |$ is the Hermitian conjugate (the complex conjugate transpose) of the ket $|\phi\rangle$.</p>
+<p>If the ket for $|0\rangle$ is:</p>
+$$|0\rangle = \begin{pmatrix} 1 \\\\ 0 \end{pmatrix}$$
+<p>Then the corresponding bra $\langle 0 |$ is a row vector:</p>
+$$\langle 0 | = \begin{pmatrix} 1 & 0 \end{pmatrix}$$
 
 <h3>2. The Inner Product (Bra-Ket)</h3>
-<p>The <strong>Inner Product</strong> of two state vectors, $|\\psi\\rangle$ and $|\\phi\\rangle$, is the matrix multiplication of the bra $\\langle \\phi |$ and the ket $|\\psi\\rangle$, resulting in a single complex number (a scalar):</p>
-$$\\langle \\phi | \\psi \\rangle = \\begin{pmatrix} \\phi_0^* & \\phi_1^* \\end{pmatrix} \\begin{pmatrix} \\psi_0 \\\\ \\psi_1 \\end{pmatrix} = \\phi_0^* \\psi_0 + \\phi_1^* \\psi_1$$
+<p>The <strong>Inner Product</strong> of two state vectors, $|\psi\rangle$ and $|\phi\rangle$, is the matrix multiplication of the bra $\langle \phi |$ and the ket $|\psi\rangle$, resulting in a single complex number (a scalar):</p>
+$$\langle \phi | \psi \rangle = \begin{pmatrix} \phi_0^* & \phi_1^* \end{pmatrix} \begin{pmatrix} \psi_0 \\\\ \psi_1 \end{pmatrix} = \phi_0^* \psi_0 + \phi_1^* \psi_1$$
 
 <h3>3. Measurement Probability 🎯</h3>
-<p>In quantum mechanics, the probability ($P$) of measuring a state $|\\psi\\rangle$ to be in a specific state $|\\phi\\rangle$ is given by the squared magnitude of their inner product:</p>
-$$P(|\\psi\\rangle \\text{ collapses to } |\\phi\\rangle) = |\\langle \\phi | \\psi \\rangle|^2$$
+<p>In quantum mechanics, the probability ($P$) of measuring a state $|\psi\rangle$ to be in a specific state $|\phi\rangle$ is given by the squared magnitude of their inner product:</p>
+$$P(|\psi\rangle \text{ collapses to } |\phi\rangle) = |\langle \phi | \psi \rangle|^2$$
 
 <hr>
 
 <h3>Your Task:</h3>
-<p>Consider the common superposition state $|+\\rangle$:</p>
-$$|+\\rangle = \\frac{1}{\\sqrt{2}}|0\\rangle + \\frac{1}{\\sqrt{2}}|1\\rangle = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$$
-<p>Calculate the probability $P$ that when we measure the state $|+\\rangle$, it collapses to the $|0\\rangle$ state.</p>
+<p>Consider the common superposition state $|+\rangle$:</p>
+$$|+\rangle = \frac{1}{\sqrt{2}}|0\rangle + \frac{1}{\sqrt{2}}|1\rangle = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\\\ 1 \end{pmatrix}$$
+<p>Calculate the probability $P$ that when we measure the state $|+\rangle$, it collapses to the $|0\rangle$ state.</p>
 <ol>
-    <li>First, calculate the inner product $\\langle 0 | + \\rangle$.</li>
-    <li>Then, find the probability $P = |\\langle 0 | + \\rangle|^2$.</li>
+    <li>First, calculate the inner product $\langle 0 | + \rangle$.</li>
+    <li>Then, find the probability $P = |\langle 0 | + \rangle|^2$.</li>
 </ol>
                     """,
                     "position": 4,
@@ -303,8 +303,8 @@ $$|+\\rangle = \\frac{1}{\\sqrt{2}}|0\\rangle + \\frac{1}{\\sqrt{2}}|1\\rangle =
 <p>A <strong>Hilbert Space ($\mathcal{H}$)</strong> is simply the formal, mathematical environment where all the rules of quantum computing live. It is a specific type of vector space with three core properties that make it suitable for quantum mechanics:</p>
 
 <ol>
-    <li><strong>It is a Vector Space:</strong> 🌌 This means it contains all possible linear combinations (superpositions) of the basis states. If $|0\\rangle$ and $|1\\rangle$ are in the space, then the vector $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$ must also be in the space.</li>
-    <li><strong>It has an Inner Product:</strong> $\\langle \\cdot | \\cdot \\rangle$ This allows us to calculate the <strong>length</strong> of vectors (normalization, ensuring $|\\alpha|^2 + |\\beta|^2 = 1$) and the <strong>angle</strong> between them (orthogonality, ensuring we can distinguish basis states).</li>
+    <li><strong>It is a Vector Space:</strong> 🌌 This means it contains all possible linear combinations (superpositions) of the basis states. If $|0\rangle$ and $|1\rangle$ are in the space, then the vector $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$ must also be in the space.</li>
+    <li><strong>It has an Inner Product:</strong> $\langle \cdot | \cdot \rangle$ This allows us to calculate the <strong>length</strong> of vectors (normalization, ensuring $|\alpha|^2 + |\beta|^2 = 1$) and the <strong>angle</strong> between them (orthogonality, ensuring we can distinguish basis states).</li>
     <li><strong>It is Complete:</strong> This is a technical property that ensures every sequence of vectors that "should" converge, does converge to a valid vector within the space. Physically, this means every possible measurement outcome corresponds to a valid quantum state.</li>
 </ol>
 
@@ -315,7 +315,7 @@ $$|+\\rangle = \\frac{1}{\\sqrt{2}}|0\\rangle + \\frac{1}{\\sqrt{2}}|1\\rangle =
 <p>The true power of the Hilbert space concept is in describing systems with multiple qubits. To describe $N$ independent qubits, we use a mathematical operation called the <strong>tensor product</strong> (which we'll cover next) to combine their individual spaces.</p>
 
 <p>For an $N$-qubit system, the dimension of the Hilbert space is:</p>
-$$\\text{Dimension}(\\mathcal{H}_N) = 2^N$$
+$$\text{Dimension}(\mathcal{H}_N) = 2^N$$
 
 <hr>
 
@@ -333,14 +333,14 @@ $$\\text{Dimension}(\\mathcal{H}_N) = 2^N$$
 <h2>Complex Arithmetic</h2>
 <p>That is the essential next step. If linear algebra is the <strong>structure</strong> of quantum mechanics, <strong>complex numbers</strong> are the very <strong>substance</strong> that makes it quantum. They are non-negotiable.</p>
 
-<p>In quantum computing, the numbers $\\alpha$ and $\\beta$ in your state vector are not just any scalars; they are <strong>complex numbers</strong>. They are called <strong>probability amplitudes</strong>.</p>
+<p>In quantum computing, the numbers $\alpha$ and $\beta$ in your state vector are not just any scalars; they are <strong>complex numbers</strong>. They are called <strong>probability amplitudes</strong>.</p>
 
 <h3>1. The Imaginary Unit and Complex Number Definition</h3>
 <p>A complex number $z$ is composed of a real part ($a$) and an imaginary part ($b$):</p>
 $$z = a + bi$$
 <p>where $i$ is the imaginary unit, defined such that $i^2 = -1$.</p>
 
-<p>The crucial concept for QC is the <strong>phase</strong>. The complex number $z$ can be visualized on the complex plane (the Argand diagram), where its position defines both its <strong>magnitude</strong> (length from the origin) and its <strong>phase</strong> (the angle $\\phi$ it makes with the real axis). It is this phase that quantum gates manipulate to create interference.</p>
+<p>The crucial concept for QC is the <strong>phase</strong>. The complex number $z$ can be visualized on the complex plane (the Argand diagram), where its position defines both its <strong>magnitude</strong> (length from the origin) and its <strong>phase</strong> (the angle $\phi$ it makes with the real axis). It is this phase that quantum gates manipulate to create interference.</p>
 
 <h3>2. The Complex Conjugate ($z^*$)</h3>
 <p>The <strong>complex conjugate</strong> $z^*$ is found by flipping the sign of the imaginary part:</p>
@@ -353,10 +353,10 @@ $$P = |z|^2 = z^* z$$
 <hr>
 
 <h3>Your Task: Calculating Probability</h3>
-<p>Suppose we have an amplitude $\\alpha$ for the $|0\\rangle$ state, defined as:</p>
-$$\\alpha = \\frac{1}{\\sqrt{2}} + \\frac{i}{\\sqrt{2}}$$
+<p>Suppose we have an amplitude $\alpha$ for the $|0\rangle$ state, defined as:</p>
+$$\alpha = \frac{1}{\sqrt{2}} + \frac{i}{\sqrt{2}}$$
 
-<p>Calculate the probability $P$ of measuring the state $|0\\rangle$. Remember, $P = \\alpha^* \\alpha$.</p>
+<p>Calculate the probability $P$ of measuring the state $|0\rangle$. Remember, $P = \alpha^* \alpha$.</p>
                     """,
                     "position": 6,
                     "task_json": None,
@@ -371,15 +371,15 @@ $$\\alpha = \\frac{1}{\\sqrt{2}} + \\frac{i}{\\sqrt{2}}$$
 
 <h3>1. The Formula</h3>
 <p>Euler's formula provides a compact way to represent any complex number $z$ that lies on the unit circle (a complex number with a magnitude of 1, like your probability amplitudes):</p>
-$$e^{i\\theta} = \cos(\\theta) + i \sin(\\theta)$$
-<p>Here, $e$ is Euler's number (the base of the natural logarithm), $i$ is the imaginary unit, and $\\theta$ (theta) is the phase angle in radians.</p>
+$$e^{i\theta} = \cos(\theta) + i \sin(\theta)$$
+<p>Here, $e$ is Euler's number (the base of the natural logarithm), $i$ is the imaginary unit, and $\theta$ (theta) is the phase angle in radians.</p>
 
 <h3>2. ⚛️ QC Interpretation: The Phase Factor</h3>
-<p>In quantum computing, this complex exponential $e^{i\\theta}$ is called a Phase Factor.</p>
+<p>In quantum computing, this complex exponential $e^{i\theta}$ is called a Phase Factor.</p>
 <ul>
-    <li><strong>Magnitude is 1:</strong> Because $\cos^2(\\theta) + \sin^2(\\theta) = 1$, the length (magnitude) of $e^{i\\theta}$ is always 1. When you multiply a state vector by $e^{i\\theta}$, you rotate it without changing its length, meaning probability is conserved.</li>
-    <li><strong>Rotation:</strong> Multiplying a complex number $z$ by $e^{i\\theta}$ rotates $z$ by an angle $\\theta$ on the complex plane. This is how all single-qubit gates work—they are just rotations.</li>
-    <li><strong>The Power of Interference:</strong> The phase $\\theta$ is the physical degree of freedom we exploit for quantum interference. By applying phase gates (like the $R_z$ gate), we introduce a specific $\\theta$ to the $|1\\rangle$ component of a superposition, which is necessary for algorithms like the Quantum Fourier Transform.</li>
+    <li><strong>Magnitude is 1:</strong> Because $\cos^2(\theta) + \sin^2(\theta) = 1$, the length (magnitude) of $e^{i\theta}$ is always 1. When you multiply a state vector by $e^{i\theta}$, you rotate it without changing its length, meaning probability is conserved.</li>
+    <li><strong>Rotation:</strong> Multiplying a complex number $z$ by $e^{i\theta}$ rotates $z$ by an angle $\theta$ on the complex plane. This is how all single-qubit gates work—they are just rotations.</li>
+    <li><strong>The Power of Interference:</strong> The phase $\theta$ is the physical degree of freedom we exploit for quantum interference. By applying phase gates (like the $R_z$ gate), we introduce a specific $\theta$ to the $|1\rangle$ component of a superposition, which is necessary for algorithms like the Quantum Fourier Transform.</li>
 </ul>
                     """,
                     "position": 7,
@@ -398,22 +398,22 @@ $$e^{i\\theta} = \cos(\\theta) + i \sin(\\theta)$$
 <p>You are drilled on the math, but here is where students often get tricked. In Quantum Computing, not all phases are created equal. You must distinguish between <strong>Global Phase</strong> and <strong>Relative Phase</strong>. One matters immensely; the other is mathematically real but physically meaningless.</p>
 
 <h3>1. Global Phase (The Ghost)</h3>
-<p>If we multiply the <em>entire</em> state vector $|\psi\\rangle$ by a phase factor $e^{i\\gamma}$, we get a new state $|\psi'\\rangle = e^{i\\gamma}|\psi\\rangle$.</p>
-$$|\psi'\\rangle = e^{i\\gamma}(\\alpha|0\\rangle + \\beta|1\\rangle) = (e^{i\\gamma}\\alpha)|0\\rangle + (e^{i\\gamma}\\beta)|1\\rangle$$
-<p>Here is the brutal truth: <strong>Global phase has zero physical effect.</strong> You cannot measure it. It does not change the statistics of measurement outcomes. To the observer, $|\psi\\rangle$ and $-|\psi\\rangle$ (where $\\gamma = \\pi$) are identical states.</p>
+<p>If we multiply the <em>entire</em> state vector $|\psi\rangle$ by a phase factor $e^{i\gamma}$, we get a new state $|\psi'\rangle = e^{i\gamma}|\psi\rangle$.</p>
+$$|\psi'\rangle = e^{i\gamma}(\alpha|0\rangle + \beta|1\rangle) = (e^{i\gamma}\alpha)|0\rangle + (e^{i\gamma}\beta)|1\rangle$$
+<p>Here is the brutal truth: <strong>Global phase has zero physical effect.</strong> You cannot measure it. It does not change the statistics of measurement outcomes. To the observer, $|\psi\rangle$ and $-|\psi\rangle$ (where $\gamma = \pi$) are identical states.</p>
 
 <h3>2. Relative Phase (The Engine)</h3>
-<p>Relative phase is the difference in phase <em>between</em> the coefficients $\\alpha$ and $\\beta$. This is the parameter $\\phi$ on the Bloch Sphere.</p>
+<p>Relative phase is the difference in phase <em>between</em> the coefficients $\alpha$ and $\beta$. This is the parameter $\phi$ on the Bloch Sphere.</p>
 
 <div style="text-align: center; margin: 20px;">
     <img src="/static/images/bloch-sphere.png" alt="Bloch Sphere showing relative phase phi" style="max-width: 300px; border-radius: 8px;">
-    <p><em>The angle $\\phi$ around the Z-axis is the Relative Phase.</em></p>
+    <p><em>The angle $\phi$ around the Z-axis is the Relative Phase.</em></p>
 </div>
 
 <p>We can rewrite the state vector to isolate this relative phase:</p>
-$$|\\psi\\rangle = \\cos(\\frac{\\theta}{2})|0\\rangle + e^{i\\phi}\\sin(\\frac{\\theta}{2})|1\\rangle$$
-<p>(Note: We often ignore the global phase on $\\alpha$ by convention).</p>
-<p>When you change $\\phi$ (the <strong>Relative Phase</strong>), you rotate the state vector around the Z-axis of the Bloch sphere. This changes the state's superposition profile. While it doesn't change the probabilities of measuring $|0\\rangle$ or $|1\\rangle$ immediately (since $|e^{i\\phi}|^2 = 1$), it <strong>crucially changes how the state interferes</strong> with other states in subsequent gates (like the Hadamard gate).</p>
+$$|\psi\rangle = \cos(\frac{\theta}{2})|0\rangle + e^{i\phi}\sin(\frac{\theta}{2})|1\rangle$$
+<p>(Note: We often ignore the global phase on $\alpha$ by convention).</p>
+<p>When you change $\phi$ (the <strong>Relative Phase</strong>), you rotate the state vector around the Z-axis of the Bloch sphere. This changes the state's superposition profile. While it doesn't change the probabilities of measuring $|0\rangle$ or $|1\rangle$ immediately (since $|e^{i\phi}|^2 = 1$), it <strong>crucially changes how the state interferes</strong> with other states in subsequent gates (like the Hadamard gate).</p>
 <p><strong>If you don't control the relative phase, you don't have a quantum algorithm. You just have a probabilistic coin flip.</strong></p>
 """,
                     "position": 8,
@@ -431,28 +431,28 @@ $$|\\psi\\rangle = \\cos(\\frac{\\theta}{2})|0\\rangle + e^{i\\phi}\\sin(\\frac{
 <h3>1. The Discrete Random Variable (The Outcome)</h3>
 <p>When you measure a qubit in the $Z$-basis, you are querying a discrete random variable that can only take one of two specific values (the eigenvalues of the $Z$-operator):</p>
 <ul>
-    <li><strong>+1</strong> (corresponding to state $|0\\rangle$)</li>
-    <li><strong>-1</strong> (corresponding to state $|1\\rangle$)</li>
+    <li><strong>+1</strong> (corresponding to state $|0\rangle$)</li>
+    <li><strong>-1</strong> (corresponding to state $|1\rangle$)</li>
 </ul>
 <p><strong>Crucial Note:</strong> Computer scientists often map these to the bits $0$ and $1$, but physically/mathematically, the math works on the eigenvalues $+1$ and $-1$.</p>
 
 <h3>2. The Probability Distribution (The State)</h3>
-<p>The quantum state vector $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$ defines the Probability Mass Function (PMF) for this random variable.</p>
-$$P(X = +1) = |\\alpha|^2$$
-$$P(X = -1) = |\\beta|^2$$
-<p><strong>Constraint:</strong> Since something must happen, $|\\alpha|^2 + |\\beta|^2 = 1$.</p>
+<p>The quantum state vector $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$ defines the Probability Mass Function (PMF) for this random variable.</p>
+$$P(X = +1) = |\alpha|^2$$
+$$P(X = -1) = |\beta|^2$$
+<p><strong>Constraint:</strong> Since something must happen, $|\alpha|^2 + |\beta|^2 = 1$.</p>
 
 <h3>3. The Expectation Value (The Average)</h3>
-<p>This is the most misunderstood concept for beginners. The Expectation Value (denoted as $E[X]$ or $\\langle Z \\rangle$) is <strong>NOT</strong> the value you expect to see in a single measurement.</p>
+<p>This is the most misunderstood concept for beginners. The Expectation Value (denoted as $E[X]$ or $\langle Z \rangle$) is <strong>NOT</strong> the value you expect to see in a single measurement.</p>
 <p>Since the outcomes are only $+1$ or $-1$, you will never see the expectation value (which is usually a decimal, like $0.5$) in a single shot.</p>
 <p>The Expectation Value is the average of the results if you repeated the experiment 1000 times.</p>
-$$E[X] = \\sum x_i P(x_i)$$
-$$E[X] = (+1) \\cdot P(0) + (-1) \\cdot P(1)$$
-$$E[X] = |\\alpha|^2 - |\\beta|^2$$
+$$E[X] = \sum x_i P(x_i)$$
+$$E[X] = (+1) \cdot P(0) + (-1) \cdot P(1)$$
+$$E[X] = |\alpha|^2 - |\beta|^2$$
 <p>This number tells us the "bias" of the qubit.</p>
 <ul>
-    <li>If $E[X] = 1$, the qubit is definitely $|0\\rangle$.</li>
-    <li>If $E[X] = -1$, the qubit is definitely $|1\\rangle$.</li>
+    <li>If $E[X] = 1$, the qubit is definitely $|0\rangle$.</li>
+    <li>If $E[X] = -1$, the qubit is definitely $|1\rangle$.</li>
     <li>If $E[X] = 0$, the qubit is perfectly balanced (50/50 superposition).</li>
 </ul>
                     """,
@@ -469,9 +469,9 @@ $$E[X] = |\\alpha|^2 - |\\beta|^2$$
 
 <h3>1. The Matrix and the Operation</h3>
 <p>The Hadamard gate is a $2\times 2$ unitary matrix:</p>
-$$H = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}$$
+$$H = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\\\ 1 & -1 \end{pmatrix}$$
 <p>Its action is to map the computational basis states ($|0\rangle, |1\rangle$) to the new basis states, often called the <strong>Hadamard Basis</strong> or the <strong>X-Basis</strong> states ($|+\rangle, |-\rangle$):</p>
-$$\begin{array}{l} H|0\rangle = |+\rangle = \frac{1}{\sqrt{2}}|0\rangle + \frac{1}{\sqrt{2}}|1\rangle \\ H|1\rangle = |-\rangle = \frac{1}{\sqrt{2}}|0\rangle - \frac{1}{\sqrt{2}}|1\rangle \end{array}$$
+$$\begin{array}{l} H|0\rangle = |+\rangle = \frac{1}{\sqrt{2}}|0\rangle + \frac{1}{\sqrt{2}}|1\rangle \\\\ H|1\rangle = |-\rangle = \frac{1}{\sqrt{2}}|0\rangle - \frac{1}{\sqrt{2}}|1\rangle \end{array}$$
 
 <h3>2. Physical Significance: Basis Change</h3>
 <p>On the Bloch sphere, the Hadamard gate represents a specific sequence of rotations (a $90^\circ$ rotation about the Y-axis followed by a $180^\circ$ rotation about the X-axis) that effectively swaps the Z-axis with the X-axis.</p>
@@ -491,7 +491,7 @@ $$\begin{array}{l} H|0\rangle = |+\rangle = \frac{1}{\sqrt{2}}|0\rangle + \frac{
 <p>Since $H$ is a valid quantum gate, it must be <strong>unitary</strong> (Postulate 2). The simplest way to show this is to prove that the gate is its own inverse, meaning applying it twice returns the original state.</p>
 <p>Prove that:</p>
 $$H^2 = I$$
-<p>where $I = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}$ is the Identity matrix.</p>
+<p>where $I = \begin{pmatrix} 1 & 0 \\\\ 0 & 1 \end{pmatrix}$ is the Identity matrix.</p>
 <p>Show the matrix multiplication $H \cdot H$ step-by-step.</p>
 """,
                     "position": 10,
@@ -508,9 +508,9 @@ $$H^2 = I$$
 <h3>1. Boolean Algebra: The Classical Baseline</h3>
 <p>Boolean Algebra is the math of logic. It describes the relationship between discrete states represented by a bit: True (1) or False (0). The entire classical computer is built from simple, truth-table driven gates:</p>
 <ul>
-  <li><strong>AND</strong> ($A \\land B$): Output is 1 only if both inputs are 1.</li>
-  <li><strong>OR</strong> ($A \\lor B$): Output is 1 if either input is 1.</li>
-  <li><strong>NOT</strong> ($\\neg A$): Flips the input.</li>
+  <li><strong>AND</strong> ($A \land B$): Output is 1 only if both inputs are 1.</li>
+  <li><strong>OR</strong> ($A \lor B$): Output is 1 if either input is 1.</li>
+  <li><strong>NOT</strong> ($\neg A$): Flips the input.</li>
   <li><strong>Bit values</strong>: <em>True</em> = 1, <em>False</em> = 0.</li>
 </ul>
 <div style=\"text-align:center; margin: 16px 0;\">
@@ -593,7 +593,7 @@ x = x + 1  // The old '5' is gone
 
 <h3>1. Landauer's Principle: Information is Physical</h3>
 <p>Why does this matter? Rolf Landauer proved that <strong>erasing</strong> information (irreversible computing) necessarily dissipates heat.</p>
-<p>$$E \\ge k_B T \\ln 2$$</p>
+<p>$$E \ge k_B T \\\\ln 2$$</p>
 <p>Every bit you \"delete\" costs energy.</p>
 
 <p>Quantum computers must operate with effectively zero energy dissipation during the calculation to maintain the delicate quantum state. Therefore, <strong>every step must be logically reversible.</strong></p>
@@ -601,8 +601,8 @@ x = x + 1  // The old '5' is gone
 <h3>2. The Consequence: \"Garbage\" Accumulation</h3>
 <p>Because you can't throw away intermediate data, quantum algorithms generate a massive amount of \"Garbage Qubits\" (ancilla bits holding intermediate results).</p>
 <p>If you compute $f(x)$ using temporary registers, you end up with:</p>
-<p>$$|x\\rangle \\to |x\\rangle |g(x)\\rangle |f(x)\\rangle$$</p>
-<p>where $|g(x)\\rangle$ is the garbage left over from the calculation.</p>
+<p>$$|x\rangle \to |x\rangle |g(x)\rangle |f(x)\rangle$$</p>
+<p>where $|g(x)\rangle$ is the garbage left over from the calculation.</p>
 
 <p><strong>The Trap:</strong> If you leave this garbage entangled with your result, it acts like a \"measurement\" by the environment. It will kill the interference pattern you are trying to create. You <strong>must</strong> clean it up.</p>
 
@@ -612,17 +612,17 @@ x = x + 1  // The old '5' is gone
 <p>The standard pattern for a clean quantum calculation is:</p>
 <ol>
   <li><strong>Compute:</strong> Calculate the result into a blank target register.<br>
-    $(|x\\rangle, |0\\rangle, |0\\rangle) \\xrightarrow{U} (|x\\rangle, |g\\rangle, |f(x)\\rangle)$
+    $(|x\rangle, |0\rangle, |0\rangle) \\\\xrightarrow{U} (|x\rangle, |g\rangle, |f(x)\rangle)$
   </li>
   <li><strong>Copy:</strong> Copy the answer to a safe \"readout\" register (usually via CNOTs).<br>
-    $(|x\\rangle, |g\\rangle, |f(x)\\rangle, |0\\rangle) \\to (|x\\rangle, |g\\rangle, |f(x)\\rangle, |f(x)\\rangle)$
+    $(|x\rangle, |g\rangle, |f(x)\rangle, |0\rangle) \to (|x\rangle, |g\rangle, |f(x)\rangle, |f(x)\rangle)$
   </li>
   <li><strong>Uncompute:</strong> Apply the <em>inverse</em> of the compute operation ($U^\dagger$). This reverses the calculation of the garbage and the original result, returning the working registers to zero.<br>
-    $(|x\\rangle, |g\\rangle, |f(x)\\rangle, |f(x)\\rangle) \\xrightarrow{U^\\dagger} (|x\\rangle, |0\\rangle, |0\\rangle, |f(x)\\rangle)$
+    $(|x\rangle, |g\rangle, |f(x)\rangle, |f(x)\rangle) \\\\xrightarrow{U^\dagger} (|x\rangle, |0\rangle, |0\rangle, |f(x)\rangle)$
   </li>
   </ol>
 
-<p>Now you have the clean result $|f(x)\\rangle$ and empty working space, without having thermally erased anything.</p>
+<p>Now you have the clean result $|f(x)\rangle$ and empty working space, without having thermally erased anything.</p>
 
 <div style=\"text-align:center; margin: 16px 0;\">
   <img src=\"/static/images/13.%20Classical%20Logic-%20Reversible%20Computing.jpeg\" alt=\"Reversible computing workflow schematic\" style=\"max-width: 720px; width: 100%; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.2);\" />
@@ -632,14 +632,14 @@ x = x + 1  // The old '5' is gone
 <hr>
 
 <h3>Your Task: The Uncomputation Workflow</h3>
-<p>You have a circuit $U$ that takes input $x$ and a workspace $0$, and produces $(x, x \\oplus 1)$.</p>
-<p>$$U(x, 0) \\to (x, x \\oplus 1)$$</p>
+<p>You have a circuit $U$ that takes input $x$ and a workspace $0$, and produces $(x, x \\\\oplus 1)$.</p>
+<p>$$U(x, 0) \to (x, x \\\\oplus 1)$$</p>
 <p>You want to isolate the result $x \oplus 1$ and return the workspace to $0$.</p>
 
 <ol>
-  <li><strong>Step 1 (Compute):</strong> Prepare the input qubit to $|1\\rangle$ (apply X on <code>q0</code>). Build <code>U</code> using CNOT(control <code>q0</code>, target <code>q1</code>) then X on <code>q1</code>. What is the state?</li>
-  <li><strong>Step 2 (Copy):</strong> Apply a CNOT where the \"work\" qubit <code>q1</code> is the control and a new third qubit <code>q2</code> (initialized to $|0\\rangle$) is the target. What is the state of the three qubits?</li>
-  <li><strong>Step 3 (Uncompute):</strong> Apply $U^\\dagger$ (the inverse of <code>U</code>) to the first two qubits: X on <code>q1</code> then CNOT(control <code>q0</code>, target <code>q1</code>). What is the final state?</li>
+  <li><strong>Step 1 (Compute):</strong> Prepare the input qubit to $|1\rangle$ (apply X on <code>q0</code>). Build <code>U</code> using CNOT(control <code>q0</code>, target <code>q1</code>) then X on <code>q1</code>. What is the state?</li>
+  <li><strong>Step 2 (Copy):</strong> Apply a CNOT where the \"work\" qubit <code>q1</code> is the control and a new third qubit <code>q2</code> (initialized to $|0\rangle$) is the target. What is the state of the three qubits?</li>
+  <li><strong>Step 3 (Uncompute):</strong> Apply $U^\dagger$ (the inverse of <code>U</code>) to the first two qubits: X on <code>q1</code> then CNOT(control <code>q0</code>, target <code>q1</code>). What is the final state?</li>
 </ol>
 
 <p><em>Hint:</em> <code>U</code> is its own inverse.</p>
@@ -665,40 +665,40 @@ x = x + 1  // The old '5' is gone
                     "content": r"""
 <h2>1. Postulates: State Space</h2>
 <p>We have finished the pre-requisites (Math and Logic). Now we enter <strong>Physics</strong>.</p>
-<p>Quantum Mechanics is built on four \"Postulates\"—axioms that cannot be proven, only verified by experiment. If you accept them, everything else follows.</p>
+<p>Quantum Mechanics is built on four "Postulates"—axioms that cannot be proven, only verified by experiment. If you accept them, everything else follows.</p>
 
 <h3>Postulate 1: The State Space</h3>
-<p><strong>The Rule:</strong> Associated to any isolated physical system is a complex vector space with an inner product (a Hilbert Space) known as the <strong>state space</strong> of the system. The system is completely described by its <strong>state vector</strong> ($|\\psi\\rangle$), which is a <strong>unit vector</strong> in the system's state space.</p>
+<p><strong>The Rule:</strong> Associated to any isolated physical system is a complex vector space with an inner product (a Hilbert Space) known as the <strong>state space</strong> of the system. The system is completely described by its <strong>state vector</strong> ($|\psi\rangle$), which is a <strong>unit vector</strong> in the system's state space.</p>
 
 <h4>1. The Requirement: Normalization</h4>
-<p>The most critical phrase above is \"unit vector.\" Because the coefficients of the vector represent probability amplitudes, and total probability must equal 100% (1.0), every valid quantum state must satisfy the <strong>Normalization Condition</strong>:</p>
-<p>$$\\langle \\psi | \\psi \\rangle = 1$$</p>
-<p>If $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$, then $|\\alpha|^2 + |\\beta|^2 = 1$.</p>
+<p>The most critical phrase above is "unit vector." Because the coefficients of the vector represent probability amplitudes, and total probability must equal 100% (1.0), every valid quantum state must satisfy the <strong>Normalization Condition</strong>:</p>
+<p>$$\langle \psi | \psi \rangle = 1$$</p>
+<p>If $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$, then $|\alpha|^2 + |\beta|^2 = 1$.</p>
 <p>If you have a vector where the squared magnitudes do not sum to 1, it is <strong>not</strong> a valid quantum state. It is just a mathematical abstraction until you normalize it.</p>
 
 <h4>2. The Implication: The Exponential Explosion</h4>
-<p>The state space for a single qubit is $\\mathbb{C}^2$ (2 complex dimensions). The state space for $N$ qubits is the tensor product of the individual spaces: $\\mathbb{C}^{2^N}$.</p>
+<p>The state space for a single qubit is $\mathbb{C}^2$ (2 complex dimensions). The state space for $N$ qubits is the tensor product of the individual spaces: $\mathbb{C}^{2^N}$.</p>
 <ul>
   <li>1 Qubit: 2 complex numbers.</li>
   <li>10 Qubits: $2^{10} = 1,024$ complex numbers.</li>
-  <li>50 Qubits: $2^{50} \\approx 1.1 \\times 10^{15}$ (Petabytes of RAM to simulate).</li>
+  <li>50 Qubits: $2^{50} \approx 1.1 \times 10^{15}$ (Petabytes of RAM to simulate).</li>
   <li>300 Qubits: $2^{300}$ (More numbers than atoms in the visible universe).</li>
   </ul>
 <p>This is why we build quantum computers. To simulate a 300-qubit system on a classical computer is physically impossible. Nature manages this information effortlessly.</p>
 
-<div style=\"text-align:center; margin: 16px 0;\">
-  <img src=\"/static/images/exponential%20growth%20graph.jpeg\" alt=\"Exponential growth of Hilbert space dimension (2^N)\" style=\"max-width: 720px; width: 100%; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.2);\" />
-  <p style=\"color: var(--text-muted); font-size: 0.9rem;\">Exponential growth: the state space dimension scales as $2^N$.</p>
+<div style="text-align:center; margin: 16px 0;">
+  <img src="/static/images/exponential%20growth%20graph.jpeg" alt="Exponential growth of Hilbert space dimension (2^N)" style="max-width: 720px; width: 100%; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.2);" />
+  <p style="color: var(--text-muted); font-size: 0.9rem;">Exponential growth: the state space dimension scales as $2^N$.</p>
 </div>
 
 <hr>
 
-<h3>Your Task: The \"Illegal\" State</h3>
+<h3>Your Task: The "Illegal" State</h3>
 <p>You are given the following vector representing a potential system state:</p>
-<p>$$|\\phi\\rangle = 3|0\\rangle + 4i|1\\rangle$$</p>
+<p>$$|\phi\rangle = 3|0\rangle + 4i|1\rangle$$</p>
 <ol>
   <li><strong>Check Validity:</strong> Calculate the squared magnitude of the vector (the sum of the squared moduli of the coefficients). Does it equal 1?</li>
-  <li><strong>Fix It:</strong> Normalize the vector. Find a constant $N$ such that if you multiply $|\\phi\\rangle$ by $\\frac{1}{N}$, the resulting vector is a valid unit vector. (Hint: $N = \\sqrt{\\langle \\phi | \\phi \\rangle}$).</li>
+  <li><strong>Fix It:</strong> Normalize the vector. Find a constant $N$ such that if you multiply $|\phi\rangle$ by $\frac{1}{N}$, the resulting vector is a valid unit vector. (Hint: $N = \sqrt{\langle \phi | \phi \rangle}$).</li>
 </ol>
 <p><strong>Warning:</strong> Don't forget that $|4i|^2$ is $16$, not $-16$. Modulus is always positive.</p>
                     """,
@@ -720,18 +720,18 @@ x = x + 1  // The old '5' is gone
 <h3>Postulate 2: Evolution (Unitary Dynamics)</h3>
 
 <p><strong>The Rule:</strong></p>
-<p>The evolution of a closed quantum system is described by a <strong>unitary transformation</strong>. That is, the state $|\\psi\\rangle$ of the system at time $t_1$ is related to the state $|\\psi'\\rangle$ at time $t_2$ by a unitary operator $U$ which depends only on the times $t_1$ and $t_2$.</p>
+<p>The evolution of a closed quantum system is described by a <strong>unitary transformation</strong>. That is, the state $|\psi\rangle$ of the system at time $t_1$ is related to the state $|\psi'\rangle$ at time $t_2$ by a unitary operator $U$ which depends only on the times $t_1$ and $t_2$.</p>
 
-<p>$$|\\psi'\\rangle = U|\\psi\\rangle$$</p>
+<p>$$|\psi'\rangle = U|\psi\rangle$$</p>
 
 <p>(Note: In continuous physics, this is derived from the Schrödinger equation. In Quantum Computing, we discretize this into "Gates".)</p>
 
 <h3>1. What is "Unitary"?</h3>
 
-<p>A matrix $U$ is unitary if its conjugate transpose ($U^\\dagger$) is also its inverse ($U^{-1}$).</p>
+<p>A matrix $U$ is unitary if its conjugate transpose ($U^\dagger$) is also its inverse ($U^{-1}$).</p>
 <p>Mathematically:</p>
 
-<p>$$U^\\dagger U = I$$</p>
+<p>$$U^\dagger U = I$$</p>
 
 <p>Where $I$ is the Identity matrix.</p>
 
@@ -750,21 +750,21 @@ x = x + 1  // The old '5' is gone
 
 <h3>3. Reversibility</h3>
 
-<p>Because $U^{-1} = U^\\dagger$, <strong>quantum mechanics is reversible</strong>. If you apply a gate $U$, you can always undo it by applying $U^\\dagger$. This is fundamentally different from classical computing, where $x = 0$ destroys the previous value of $x$. In quantum, nothing is ever truly deleted until measurement.</p>
+<p>Because $U^{-1} = U^\dagger$, <strong>quantum mechanics is reversible</strong>. If you apply a gate $U$, you can always undo it by applying $U^\dagger$. This is fundamentally different from classical computing, where $x = 0$ destroys the previous value of $x$. In quantum, nothing is ever truly deleted until measurement.</p>
 
 <hr>
 
 <h3>Your Task: verifying the Hadamard Gate</h3>
 
 <p>The <strong>Hadamard Gate ($H$)</strong> is the most important single-qubit gate. It creates superposition.</p>
-<p>$$H = \\frac{1}{\\sqrt{2}} \\begin{pmatrix} 1 & 1 \\\\ 1 & -1 \\end{pmatrix}$$</p>
+<p>$$H = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\\\ 1 & -1 \end{pmatrix}$$</p>
 
 <p>You need to prove it is a valid quantum operator.</p>
 
 <ol>
-    <li><strong>Find $H^\\dagger$:</strong> Calculate the conjugate transpose of $H$. (Note: Since $H$ has only real numbers, the complex conjugate is trivial).</li>
-    <li><strong>Multiply:</strong> Calculate the matrix product $H^\\dagger H$.</li>
-    <li><strong>Verify:</strong> Does the result equal the Identity matrix $\\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$?</li>
+    <li><strong>Find $H^\dagger$:</strong> Calculate the conjugate transpose of $H$. (Note: Since $H$ has only real numbers, the complex conjugate is trivial).</li>
+    <li><strong>Multiply:</strong> Calculate the matrix product $H^\dagger H$.</li>
+    <li><strong>Verify:</strong> Does the result equal the Identity matrix $\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \end{pmatrix}$?</li>
 </ol>
 
 <p>If it does, the gate preserves probability. If not, the math is broken.</p>
@@ -786,16 +786,16 @@ x = x + 1  // The old '5' is gone
 <p><strong>The Rule:</strong><br>
 Quantum measurements are governed by observables, which are described by Hermitian operators ($M$).</p>
 
-<p><strong>The Outcome (Eigenvalues):</strong> The only possible results of a measurement are the eigenvalues ($\\lambda_i$) of the observable $M$. (Since measurement results must be real, $M$ must be Hermitian, as all Hermitian operators have real eigenvalues).</p>
+<p><strong>The Outcome (Eigenvalues):</strong> The only possible results of a measurement are the eigenvalues ($\lambda_i$) of the observable $M$. (Since measurement results must be real, $M$ must be Hermitian, as all Hermitian operators have real eigenvalues).</p>
 
-<p><strong>The Probability (Born Rule):</strong> The probability of observing a specific eigenvalue $\\lambda_i$ is given by the squared magnitude of the projection of the state vector $|\\psi\\rangle$ onto the corresponding eigenvector $|e_i\\rangle$:</p>
+<p><strong>The Probability (Born Rule):</strong> The probability of observing a specific eigenvalue $\lambda_i$ is given by the squared magnitude of the projection of the state vector $|\psi\rangle$ onto the corresponding eigenvector $|e_i\rangle$:</p>
 
-$$P(\\lambda_i) = |\\langle e_i | \\psi \\rangle|^2$$
+$$P(\lambda_i) = |\langle e_i | \psi \rangle|^2$$
 
-<p><strong>The State Collapse:</strong> Immediately after the measurement yields the result $\\lambda_i$, the state of the system <strong>instantaneously collapses</strong> to the corresponding eigenvector $|e_i\\rangle$.</p>
+<p><strong>The State Collapse:</strong> Immediately after the measurement yields the result $\lambda_i$, the state of the system <strong>instantaneously collapses</strong> to the corresponding eigenvector $|e_i\rangle$.</p>
 
 <p><strong>The Trap: Non-Determinism</strong><br>
-Before measurement, the qubit exists in a superposition of all possible outcomes. The state is perfectly known ($\\alpha$ and $\\beta$ are known). However, the <strong>result</strong> is fundamentally non-deterministic. We only know the probabilities. After measurement, the amplitude information is gone; the system is forced into one definite classical state ($|0\\rangle$ or $|1\\rangle$).</p>
+Before measurement, the qubit exists in a superposition of all possible outcomes. The state is perfectly known ($\alpha$ and $\beta$ are known). However, the <strong>result</strong> is fundamentally non-deterministic. We only know the probabilities. After measurement, the amplitude information is gone; the system is forced into one definite classical state ($|0\rangle$ or $|1\rangle$).</p>
 
 <hr>
 
@@ -803,21 +803,21 @@ Before measurement, the qubit exists in a superposition of all possible outcomes
 
 <p>The standard measurement in quantum computing is performed with the <strong>Pauli-Z Observable</strong> ($M=Z$).</p>
 
-<p><strong>Z-Observable:</strong> $Z = \\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}$</p>
+<p><strong>Z-Observable:</strong> $Z = \begin{pmatrix} 1 & 0 \\\\ 0 & -1 \end{pmatrix}$</p>
 
 <p><strong>Eigenvectors/Outcomes:</strong></p>
 <ul>
-    <li>$|e_0\\rangle = |0\\rangle$ (Eigenvalue $\\lambda_0 = +1$)</li>
-    <li>$|e_1\\rangle = |1\\rangle$ (Eigenvalue $\\lambda_1 = -1$)</li>
+    <li>$|e_0\rangle = |0\rangle$ (Eigenvalue $\lambda_0 = +1$)</li>
+    <li>$|e_1\rangle = |1\rangle$ (Eigenvalue $\lambda_1 = -1$)</li>
 </ul>
 
-<p>Suppose you prepare the qubit in the balanced superposition state $|+\\rangle$:</p>
+<p>Suppose you prepare the qubit in the balanced superposition state $|+\rangle$:</p>
 
-$$|+\\rangle = \\frac{1}{\\sqrt{2}}|0\\rangle + \\frac{1}{\\sqrt{2}}|1\\rangle$$
+$$|+\rangle = \frac{1}{\sqrt{2}}|0\rangle + \frac{1}{\sqrt{2}}|1\rangle$$
 
-<p><strong>Calculate the Probability:</strong> What is the probability $P(+1)$ of measuring the eigenvalue $+1$ (i.e., collapsing to $|0\\rangle$)?</p>
+<p><strong>Calculate the Probability:</strong> What is the probability $P(+1)$ of measuring the eigenvalue $+1$ (i.e., collapsing to $|0\rangle$)?</p>
 
-$$P(+1) = |\\langle 0 | + \\rangle|^2$$
+$$P(+1) = |\langle 0 | + \rangle|^2$$
 
 <p><strong>State After Measurement:</strong> If you perform the measurement and the result is $+1$, what is the state of the qubit <strong>immediately</strong> after the collapse?</p>
 """,
@@ -837,19 +837,19 @@ $$P(+1) = |\\langle 0 | + \\rangle|^2$$
 <p>You have accepted the rules. Now, let’s define the key resource: the **Qubit**.</p>
 
 <h3>The Qubit: Superposition</h3>
-<p>A **Qubit** (Quantum bit) is the physical realization of a two-level quantum system. While a classical bit stores a value of 0 or 1, a qubit exists in a **superposition** of the two basis states, $|0\\rangle$ and $|1\\rangle$.</p>
+<p>A **Qubit** (Quantum bit) is the physical realization of a two-level quantum system. While a classical bit stores a value of 0 or 1, a qubit exists in a **superposition** of the two basis states, $|0\rangle$ and $|1\rangle$.</p>
 
-<p><strong>The Hard Truth:</strong> Superposition is the result of Postulate 1 (State Space). It simply means the state of the qubit is a **unit vector** that is a linear combination of the basis vectors $|0\\rangle$ and $|1\\rangle$:</p>
-$$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
-<p>where $\\alpha$ and $\\beta$ are the complex **probability amplitudes** you mastered earlier.</p>
+<p><strong>The Hard Truth:</strong> Superposition is the result of Postulate 1 (State Space). It simply means the state of the qubit is a **unit vector** that is a linear combination of the basis vectors $|0\rangle$ and $|1\rangle$:</p>
+$$|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$$
+<p>where $\alpha$ and $\beta$ are the complex **probability amplitudes** you mastered earlier.</p>
 
 <h3>⚠️ The Misconception</h3>
 <p>You must avoid the naive interpretation that a qubit is "simultaneously 0 and 1." This analogy is fundamentally misleading.</p>
 <ul>
-    <li>A qubit is **one single state** ($|\\psi\\rangle$) that exists in the Hilbert space. It is a single vector, not two separate bits.</li>
+    <li>A qubit is **one single state** ($|\psi\rangle$) that exists in the Hilbert space. It is a single vector, not two separate bits.</li>
     <li>The "mixture" only reflects the **potential** outcomes upon measurement.</li>
 </ul>
-<p>Until the moment you apply the measurement operator (Postulate 3), the state $|\\psi\\rangle$ is **pure** and single. It is the ability to manipulate the relationship between $\\alpha$ and $\\beta$ (especially their **relative phase**) that enables quantum computation.</p>
+<p>Until the moment you apply the measurement operator (Postulate 3), the state $|\psi\rangle$ is **pure** and single. It is the ability to manipulate the relationship between $\alpha$ and $\beta$ (especially their **relative phase**) that enables quantum computation.</p>
 
 <p>Every point on the surface of the sphere (except the poles) is a valid superposition state.</p>
 <div style="text-align: center; margin: 20px;">
@@ -858,13 +858,13 @@ $$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
 
 <h3>Your Task: Constructing Bias</h3>
 <p>You must be able to translate desired measurement probabilities directly into a valid state vector.</p>
-<p>Construct a superposition state $|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$ that meets the following criteria:</p>
+<p>Construct a superposition state $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$ that meets the following criteria:</p>
 <ol>
-    <li>The probability of measuring **$|0\\rangle$** is $P_0 = 1/3$.</li>
-    <li>The probability of measuring **$|1\\rangle$** is $P_1 = 2/3$.</li>
-    <li>Assume the coefficients $\\alpha$ and $\\beta$ are **real numbers** (ignore complex phase for simplicity here).</li>
+    <li>The probability of measuring **$|0\rangle$** is $P_0 = 1/3$.</li>
+    <li>The probability of measuring **$|1\rangle$** is $P_1 = 2/3$.</li>
+    <li>Assume the coefficients $\alpha$ and $\beta$ are **real numbers** (ignore complex phase for simplicity here).</li>
 </ol>
-<p>What are the specific numerical values for $\\alpha$ and $\\beta$ that define this state?</p>
+<p>What are the specific numerical values for $\alpha$ and $\beta$ that define this state?</p>
                     """,
                     "position": 4,
                     "task_json": json.dumps({
@@ -884,39 +884,39 @@ $$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$$
 <h3>1. The Mapping</h3>
 <p>A state vector is a 2-dimensional complex vector, but the Bloch Sphere allows us to map it uniquely onto the surface of a 3-dimensional real sphere (the unit sphere).</p>
 <ul>
-    <li><strong>Poles (The Classical Basis):</strong> The North Pole is the state $|0\\rangle$. The South Pole is the state $|1\\rangle$.</li>
-    <li><strong>Surface (Superposition):</strong> Every single point on the surface represents a valid pure superposition state $|\\psi\\rangle$.</li>
-    <li><strong>Vector Length (Normalization):</strong> The vector from the center to any point on the surface has a length of 1, satisfying the normalization condition $\\langle \\psi | \\psi \\rangle = 1$.</li>
+    <li><strong>Poles (The Classical Basis):</strong> The North Pole is the state $|0\rangle$. The South Pole is the state $|1\rangle$.</li>
+    <li><strong>Surface (Superposition):</strong> Every single point on the surface represents a valid pure superposition state $|\psi\rangle$.</li>
+    <li><strong>Vector Length (Normalization):</strong> The vector from the center to any point on the surface has a length of 1, satisfying the normalization condition $\langle \psi | \psi \rangle = 1$.</li>
 </ul>
 <img src="/static/images/Sphere.jpeg" alt="Bloch Sphere" style="max-width:100%; margin: 20px 0;">
 
 <h3>2. The Spherical Coordinates</h3>
-<p>The position of any pure state $|\\psi\\rangle$ on the sphere is defined by two real angles, $\\theta$ (polar) and $\\phi$ (azimuthal), which directly map to probability and phase:</p>
-$$|\\psi\\rangle = \\cos(\\frac{\\theta}{2})|0\\rangle + e^{i\\phi}\\sin(\\frac{\\theta}{2})|1\\rangle$$
+<p>The position of any pure state $|\psi\rangle$ on the sphere is defined by two real angles, $\theta$ (polar) and $\phi$ (azimuthal), which directly map to probability and phase:</p>
+$$|\psi\rangle = \cos(\frac{\theta}{2})|0\rangle + e^{i\phi}\sin(\frac{\theta}{2})|1\rangle$$
 
 <ul>
-    <li><strong>Angle $\\theta$ (Polar, $0 \\le \\theta \\le \\pi$):</strong> This angle, measured from the Z-axis (North Pole), controls the probability bias.
-    $$P(|0\\rangle) = \\cos^2(\\theta/2)$$
-    $$P(|1\\rangle) = \\sin^2(\\theta/2)$$
+    <li><strong>Angle $\theta$ (Polar, $0 \le \theta \le \pi$):</strong> This angle, measured from the Z-axis (North Pole), controls the probability bias.
+    $$P(|0\rangle) = \cos^2(\theta/2)$$
+    $$P(|1\rangle) = \sin^2(\theta/2)$$
     </li>
-    <li><strong>Angle $\\phi$ (Azimuthal, $0 \\le \\phi < 2\\pi$):</strong> This angle, measured from the X-axis, controls the crucial relative phase $e^{i\\phi}$ between the $|0\\rangle$ and $|1\\rangle$ components.</li>
+    <li><strong>Angle $\phi$ (Azimuthal, $0 \le \phi < 2\pi$):</strong> This angle, measured from the X-axis, controls the crucial relative phase $e^{i\phi}$ between the $|0\rangle$ and $|1\rangle$ components.</li>
 </ul>
 
 <h3>3. Gates as Rotations</h3>
 <p>Unitary gates (Postulate 2) are represented as rotations of the state vector on the sphere.</p>
 <ul>
-    <li>The <strong>Pauli-X</strong> gate is a $180^\\circ$ rotation about the X-axis.</li>
-    <li>The <strong>Pauli-Z</strong> gate is a rotation about the Z-axis (changing $\\phi$).</li>
-    <li>The <strong>Hadamard</strong> gate is a rotation that maps the Z-axis states ($|0\\rangle, |1\\rangle$) to the X-axis states ($|+\\rangle, |-\\rangle$).</li>
+    <li>The <strong>Pauli-X</strong> gate is a $180^\circ$ rotation about the X-axis.</li>
+    <li>The <strong>Pauli-Z</strong> gate is a rotation about the Z-axis (changing $\phi$).</li>
+    <li>The <strong>Hadamard</strong> gate is a rotation that maps the Z-axis states ($|0\rangle, |1\rangle$) to the X-axis states ($|+\rangle, |-\rangle$).</li>
 </ul>
 
 <h3>Your Task: Mapping the Superposition</h3>
-<p>The balanced superposition state $|+\\rangle$ is created by applying the Hadamard gate to $|0\\rangle$. Its vector form is:</p>
-$$|+\\rangle = \\frac{1}{\\sqrt{2}}|0\\rangle + \\frac{1}{\\sqrt{2}}|1\\rangle$$
-<p>Find the corresponding spherical coordinates $(\\theta, \\phi)$ for this state.</p>
+<p>The balanced superposition state $|+\rangle$ is created by applying the Hadamard gate to $|0\rangle$. Its vector form is:</p>
+$$|+\rangle = \frac{1}{\sqrt{2}}|0\rangle + \frac{1}{\sqrt{2}}|1\rangle$$
+<p>Find the corresponding spherical coordinates $(\theta, \phi)$ for this state.</p>
 <ul>
-    <li><strong>Determine $\\theta$:</strong> What value for $\\theta$ makes $\\cos(\\theta/2) = 1/\\sqrt{2}$?</li>
-    <li><strong>Determine $\\phi$:</strong> Since the coefficient of $|1\\rangle$ is real, what must the phase factor $e^{i\\phi}$ equal?</li>
+    <li><strong>Determine $\theta$:</strong> What value for $\theta$ makes $\cos(\theta/2) = 1/\sqrt{2}$?</li>
+    <li><strong>Determine $\phi$:</strong> Since the coefficient of $|1\rangle$ is real, what must the phase factor $e^{i\phi}$ equal?</li>
 </ul>
                     """,
                     "position": 5,
@@ -938,24 +938,24 @@ $$|+\\rangle = \\frac{1}{\\sqrt{2}}|0\\rangle + \\frac{1}{\\sqrt{2}}|1\\rangle$$
 <p>When you have two separate classical coins, you describe them separately: "Coin A is Heads, Coin B is Tails."</p>
 <p>In Quantum Mechanics, when you bring two systems together, they cease to be separate mathematical entities. They merge into a <strong>single, larger state vector</strong> residing in a larger Hilbert Space.</p>
 
-<p>The tool we use to glue these spaces together is the <strong>Tensor Product</strong> (denoted by the symbol $\\otimes$).</p>
+<p>The tool we use to glue these spaces together is the <strong>Tensor Product</strong> (denoted by the symbol $\otimes$).</p>
 
-<p>If system A is in state $|\\psi\\rangle$ and system B is in state $|\\phi\\rangle$, the combined system is:</p>
-$$|\\Psi_{AB}\\rangle = |\\psi\\rangle \\otimes |\\phi\\rangle$$
+<p>If system A is in state $|\psi\rangle$ and system B is in state $|\phi\rangle$, the combined system is:</p>
+$$|\Psi_{AB}\rangle = |\psi\rangle \otimes |\phi\rangle$$
 
 <h3>2. The Math: The Kronecker Product</h3>
-<p>How do we actually calculate this? We use the Kronecker Product rule. It takes a vector of size $M$ and a vector of size $N$ and creates a new vector of size $M \\times N$.</p>
+<p>How do we actually calculate this? We use the Kronecker Product rule. It takes a vector of size $M$ and a vector of size $N$ and creates a new vector of size $M \times N$.</p>
 
-$$\\begin{pmatrix} a \\\\ b \\end{pmatrix} \\otimes \\begin{pmatrix} c \\\\ d \\end{pmatrix} = \\begin{pmatrix} a \\cdot \\begin{pmatrix} c \\\\ d \\end{pmatrix} \\\\ b \\cdot \\begin{pmatrix} c \\\\ d \\end{pmatrix} \\end{pmatrix} = \\begin{pmatrix} ac \\\\ ad \\\\ bc \\\\ bd \\end{pmatrix}$$
+$$\begin{pmatrix} a \\\\ b \end{pmatrix} \otimes \begin{pmatrix} c \\\\ d \end{pmatrix} = \begin{pmatrix} a \cdot \begin{pmatrix} c \\\\ d \end{pmatrix} \\\\ b \cdot \begin{pmatrix} c \\\\ d \end{pmatrix} \end{pmatrix} = \begin{pmatrix} ac \\\\ ad \\\\ bc \\\\ bd \end{pmatrix}$$
 
 <h3>3. The New Basis (The Computational Basis)</h3>
-<p>For two qubits, we tensor their individual basis states ($|0\\rangle, |1\\rangle$) to form the new <strong>4-dimensional</strong> basis for the combined system.</p>
+<p>For two qubits, we tensor their individual basis states ($|0\rangle, |1\rangle$) to form the new <strong>4-dimensional</strong> basis for the combined system.</p>
 
 <ul>
-    <li>$|00\\rangle = |0\\rangle \\otimes |0\\rangle = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} \\otimes \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 1 \\\\ 0 \\\\ 0 \\\\ 0 \\end{pmatrix}$</li>
-    <li>$|01\\rangle = |0\\rangle \\otimes |1\\rangle = \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} \\otimes \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 1 \\\\ 0 \\\\ 0 \\end{pmatrix}$</li>
-    <li>$|10\\rangle = |1\\rangle \\otimes |0\\rangle = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} \\otimes \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 0 \\\\ 1 \\\\ 0 \\end{pmatrix}$</li>
-    <li>$|11\\rangle = |1\\rangle \\otimes |1\\rangle = \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} \\otimes \\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix} = \\begin{pmatrix} 0 \\\\ 0 \\\\ 0 \\\\ 1 \\end{pmatrix}$</li>
+    <li>$|00\rangle = |0\rangle \otimes |0\rangle = \begin{pmatrix} 1 \\\\ 0 \end{pmatrix} \otimes \begin{pmatrix} 1 \\\\ 0 \end{pmatrix} = \begin{pmatrix} 1 \\\\ 0 \\\\ 0 \\\\ 0 \end{pmatrix}$</li>
+    <li>$|01\rangle = |0\rangle \otimes |1\rangle = \begin{pmatrix} 1 \\\\ 0 \end{pmatrix} \otimes \begin{pmatrix} 0 \\\\ 1 \end{pmatrix} = \begin{pmatrix} 0 \\\\ 1 \\\\ 0 \\\\ 0 \end{pmatrix}$</li>
+    <li>$|10\rangle = |1\rangle \otimes |0\rangle = \begin{pmatrix} 0 \\\\ 1 \end{pmatrix} \otimes \begin{pmatrix} 1 \\\\ 0 \end{pmatrix} = \begin{pmatrix} 0 \\\\ 0 \\\\ 1 \\\\ 0 \end{pmatrix}$</li>
+    <li>$|11\rangle = |1\rangle \otimes |1\rangle = \begin{pmatrix} 0 \\\\ 1 \end{pmatrix} \otimes \begin{pmatrix} 0 \\\\ 1 \end{pmatrix} = \begin{pmatrix} 0 \\\\ 0 \\\\ 0 \\\\ 1 \end{pmatrix}$</li>
 </ul>
 
 <p>Notice the pattern? The vector has a $1$ in the position corresponding to the binary value (00 is index 0, 11 is index 3).</p>
@@ -963,15 +963,15 @@ $$\\begin{pmatrix} a \\\\ b \\end{pmatrix} \\otimes \\begin{pmatrix} c \\\\ d \\
 <h3>Your Task: The Product State</h3>
 <p>You have two qubits.</p>
 <ul>
-    <li><strong>Qubit 1</strong> is in state $|1\\rangle$.</li>
-    <li><strong>Qubit 2</strong> is in the superposition state $|+\\rangle = \\frac{1}{\\sqrt{2}}\\begin{pmatrix} 1 \\\\ 1 \\end{pmatrix}$.</li>
+    <li><strong>Qubit 1</strong> is in state $|1\rangle$.</li>
+    <li><strong>Qubit 2</strong> is in the superposition state $|+\rangle = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\\\ 1 \end{pmatrix}$.</li>
 </ul>
 
-<p>Calculate the state vector of the combined system $|\\Psi\\rangle = |1\\rangle \\otimes |+\\rangle$.</p>
+<p>Calculate the state vector of the combined system $|\Psi\rangle = |1\rangle \otimes |+\rangle$.</p>
 <ol>
     <li>Set up the tensor product of the column vectors.</li>
     <li>Perform the multiplication to find the resulting 4-element column vector.</li>
-    <li>Rewrite this vector in Dirac notation (e.g., $\\alpha|00\\rangle + \\beta|01\\rangle...$).</li>
+    <li>Rewrite this vector in Dirac notation (e.g., $\alpha|00\rangle + \beta|01\rangle...$).</li>
 </ol>
 <p><em>(Hint: You will see that only the bottom half of the vector is populated.)</em></p>
 """,
@@ -990,7 +990,7 @@ $$\\begin{pmatrix} a \\\\ b \\end{pmatrix} \\otimes \\begin{pmatrix} c \\\\ d \\
 <h2>Entanglement</h2>
 <p>This is the point where your intuition will try to fail you. Do not let it.</p>
 
-<p>You just learned about Tensor Products, which allow us to combine independent qubits into a larger system (e.g., $|\Psi\\rangle = |a\\rangle \\otimes |b\\rangle$).</p>
+<p>You just learned about Tensor Products, which allow us to combine independent qubits into a larger system (e.g., $|\Psi\rangle = |a\rangle \otimes |b\rangle$).</p>
 
 <p><strong>Entanglement</strong> is simply the realization that <strong>not all states in the larger system can be created this way.</strong></p>
 
@@ -998,26 +998,26 @@ $$\\begin{pmatrix} a \\\\ b \\end{pmatrix} \\otimes \\begin{pmatrix} c \\\\ d \\
 <p>In the 4-dimensional space of two qubits ($\mathbb{C}^4$), most vectors <strong>cannot</strong> be factored back into two smaller vectors.</p>
 
 <ul>
-    <li><strong>Product State:</strong> A state that can be written as $|\\psi\\rangle_1 \\otimes |\\phi\\rangle_2$. The qubits are independent. Measuring one tells you nothing about the other.</li>
+    <li><strong>Product State:</strong> A state that can be written as $|\psi\rangle_1 \otimes |\phi\rangle_2$. The qubits are independent. Measuring one tells you nothing about the other.</li>
     <li><strong>Entangled State:</strong> A state where <strong>no such factorization exists</strong>. The qubits have lost their individual identity. They are no longer "Qubit A" and "Qubit B"; they are a single system sharing a probability distribution.</li>
 </ul>
 
-<h3>2. The Bell State ($|\\Phi^+\\rangle$)</h3>
+<h3>2. The Bell State ($|\Phi^+\rangle$)</h3>
 <p>The canonical example of entanglement is the <strong>Bell State</strong>:</p>
 
-$$|\\Phi^+\\rangle = \\frac{1}{\\sqrt{2}} (|00\\rangle + |11\\rangle) = \\frac{1}{\\sqrt{2}} \\begin{pmatrix} 1 \\\\ 0 \\\\ 0 \\\\ 1 \\end{pmatrix}$$
+$$|\Phi^+\rangle = \frac{1}{\sqrt{2}} (|00\rangle + |11\rangle) = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 \\\\ 0 \\\\ 0 \\\\ 1 \end{pmatrix}$$
 
 <p>Look closely at this vector. It is a superposition of "Both Zero" and "Both One".</p>
-<p>It contains <strong>zero</strong> probability for the states $|01\\rangle$ and $|10\\rangle$.</p>
+<p>It contains <strong>zero</strong> probability for the states $|01\rangle$ and $|10\rangle$.</p>
 
 <h3>3. The Consequence: Correlation</h3>
-<p>If you measure the first qubit of the $|\\Phi^+\\rangle$ state:</p>
+<p>If you measure the first qubit of the $|\Phi^+\rangle$ state:</p>
 <ol>
     <li><strong>Randomness:</strong> You have a 50% chance of measuring $0$ and a 50% chance of measuring $1$.</li>
     <li><strong>Collapse:</strong>
         <ul>
-            <li>If you measure <strong>0</strong>, the state collapses to $|00\\rangle$. The second qubit <em>instantly</em> becomes $|0\\rangle$.</li>
-            <li>If you measure <strong>1</strong>, the state collapses to $|11\\rangle$. The second qubit <em>instantly</em> becomes $|1\\rangle$.</li>
+            <li>If you measure <strong>0</strong>, the state collapses to $|00\rangle$. The second qubit <em>instantly</em> becomes $|0\rangle$.</li>
+            <li>If you measure <strong>1</strong>, the state collapses to $|11\rangle$. The second qubit <em>instantly</em> becomes $|1\rangle$.</li>
         </ul>
     </li>
 </ol>
@@ -1027,33 +1027,33 @@ $$|\\Phi^+\\rangle = \\frac{1}{\\sqrt{2}} (|00\\rangle + |11\\rangle) = \\frac{1
 <hr>
 
 <h3>Your Task: The Proof of Impossibility</h3>
-<p>You need to prove to yourself that $|\\Phi^+\\rangle$ cannot be broken down.</p>
+<p>You need to prove to yourself that $|\Phi^+\rangle$ cannot be broken down.</p>
 
-<p>Assume that $|\\Phi^+\\rangle$ <em>could</em> be written as a product of two independent qubits:</p>
-$$(\\alpha|0\\rangle + \\beta|1\\rangle) \\otimes (\\gamma|0\\rangle + \\delta|1\\rangle) = \\frac{1}{\\sqrt{2}}|00\\rangle + \\frac{1}{\\sqrt{2}}|11\\rangle$$
+<p>Assume that $|\Phi^+\rangle$ <em>could</em> be written as a product of two independent qubits:</p>
+$$(\alpha|0\rangle + \beta|1\rangle) \otimes (\gamma|0\rangle + \delta|1\rangle) = \frac{1}{\sqrt{2}}|00\rangle + \frac{1}{\sqrt{2}}|11\rangle$$
 
 <p>Expand the tensor product on the left:</p>
-$$\\alpha\\gamma|00\\rangle + \\alpha\\delta|01\\rangle + \\beta\\gamma|10\\rangle + \\beta\\delta|11\\rangle$$
+$$\alpha\gamma|00\rangle + \alpha\delta|01\rangle + \beta\gamma|10\rangle + \beta\delta|11\rangle$$
 
 <p>Now, match the coefficients with the Bell State on the right:</p>
 <ol>
-    <li>$\\alpha\\gamma = \\frac{1}{\\sqrt{2}}$ (Must be non-zero)</li>
-    <li>$\\beta\\delta = \\frac{1}{\\sqrt{2}}$ (Must be non-zero)</li>
-    <li>$\\alpha\\delta = 0$ (Middle terms must vanish)</li>
-    <li>$\\beta\\gamma = 0$ (Middle terms must vanish)</li>
+    <li>$\alpha\gamma = \frac{1}{\sqrt{2}}$ (Must be non-zero)</li>
+    <li>$\beta\delta = \frac{1}{\sqrt{2}}$ (Must be non-zero)</li>
+    <li>$\alpha\delta = 0$ (Middle terms must vanish)</li>
+    <li>$\beta\gamma = 0$ (Middle terms must vanish)</li>
 </ol>
 
 <p><strong>The Logic Puzzle:</strong></p>
-<p>Look at equations 3 and 4. For $\\alpha\\delta$ to be 0, either $\\alpha$ or $\\delta$ must be 0.</p>
+<p>Look at equations 3 and 4. For $\alpha\delta$ to be 0, either $\alpha$ or $\delta$ must be 0.</p>
 <ul>
-    <li>If $\\alpha = 0$, then equation 1 ($\\alpha\\gamma$) becomes 0. <strong>Contradiction.</strong></li>
-    <li>If $\\delta = 0$, then equation 2 ($\\beta\\delta$) becomes 0. <strong>Contradiction.</strong></li>
+    <li>If $\alpha = 0$, then equation 1 ($\alpha\gamma$) becomes 0. <strong>Contradiction.</strong></li>
+    <li>If $\delta = 0$, then equation 2 ($\beta\delta$) becomes 0. <strong>Contradiction.</strong></li>
 </ul>
 
 <p><strong>Conclusion:</strong> The system of equations has <strong>no solution</strong>.</p>
 
 <p><strong>Question for you:</strong><br>
-Since you cannot describe the Bell State using individual qubit coefficients ($\\alpha, \\beta, \\gamma, \\delta$), what does this imply about the "state" of Qubit 1 before it is measured? Does Qubit 1 even <em>have</em> a state?</p>
+Since you cannot describe the Bell State using individual qubit coefficients ($\alpha, \beta, \gamma, \delta$), what does this imply about the "state" of Qubit 1 before it is measured? Does Qubit 1 even <em>have</em> a state?</p>
                     """,
                     "position": 7,
                     "task_json": json.dumps({
@@ -1068,15 +1068,15 @@ Since you cannot describe the Bell State using individual qubit coefficients ($\
                     "title": "8. Multi-Qubit: The Bell States",
                     "content": r"""
 <h2>The Bell States</h2>
-<p>You have analyzed the concept of entanglement (the "what"). Now you need the <strong>toolkit</strong> (the "how"). The <strong>Bell States</strong> are not just random entangled vectors. They are the <strong>four specific, maximally entangled states</strong> that form a complete orthonormal basis for the two-qubit Hilbert space. Just as $|00\\rangle, |01\\rangle, |10\\rangle, |11\\rangle$ form the standard "Computational Basis," the four Bell states form the "Bell Basis."</p>
+<p>You have analyzed the concept of entanglement (the "what"). Now you need the <strong>toolkit</strong> (the "how"). The <strong>Bell States</strong> are not just random entangled vectors. They are the <strong>four specific, maximally entangled states</strong> that form a complete orthonormal basis for the two-qubit Hilbert space. Just as $|00\rangle, |01\rangle, |10\rangle, |11\rangle$ form the standard "Computational Basis," the four Bell states form the "Bell Basis."</p>
 
 <h3>1. The Four Bell States</h3>
 <p>These are the "North, South, East, and West" of the entangled world.</p>
 <ol>
-    <li><strong>$|\\Phi^+\\rangle$ (Phi-Plus):</strong> The standard Bell state. $$|\\Phi^+\\rangle = \\frac{|00\\rangle + |11\\rangle}{\\sqrt{2}}$$ <em>(Correlation: Same results. If you measure 0, they measure 0.)</em></li>
-    <li><strong>$|\\Phi^-\\rangle$ (Phi-Minus):</strong> The phase-flipped version. $$|\\Phi^-\\rangle = \\frac{|00\\rangle - |11\\rangle}{\\sqrt{2}}$$ <em>(Correlation: Same results, but carries a phase difference).</em></li>
-    <li><strong>$|\\Psi^+\\rangle$ (Psi-Plus):</strong> The "parity" flip. $$|\\Psi^+\\rangle = \\frac{|01\\rangle + |10\\rangle}{\\sqrt{2}}$$ <em>(Correlation: Opposite results. If you measure 0, they measure 1.)</em></li>
-    <li><strong>$|\\Psi^-\\rangle$ (Psi-Minus):</strong> The "singlet" state (crucial in physics). $$|\\Psi^-\\rangle = \\frac{|01\\rangle - |10\\rangle}{\\sqrt{2}}$$ <em>(Correlation: Opposite results, with a phase difference).</em></li>
+    <li><strong>$|\\\\Phi^+\rangle$ (Phi-Plus):</strong> The standard Bell state. $$|\\\\Phi^+\rangle = \frac{|00\rangle + |11\rangle}{\sqrt{2}}$$ <em>(Correlation: Same results. If you measure 0, they measure 0.)</em></li>
+    <li><strong>$|\\\\Phi^-\rangle$ (Phi-Minus):</strong> The phase-flipped version. $$|\\\\Phi^-\rangle = \frac{|00\rangle - |11\rangle}{\sqrt{2}}$$ <em>(Correlation: Same results, but carries a phase difference).</em></li>
+    <li><strong>$|\\\\Psi^+\rangle$ (Psi-Plus):</strong> The "parity" flip. $$|\\\\Psi^+\rangle = \frac{|01\rangle + |10\rangle}{\sqrt{2}}$$ <em>(Correlation: Opposite results. If you measure 0, they measure 1.)</em></li>
+    <li><strong>$|\\\\Psi^-\rangle$ (Psi-Minus):</strong> The "singlet" state (crucial in physics). $$|\\\\Psi^-\rangle = \frac{|01\rangle - |10\rangle}{\sqrt{2}}$$ <em>(Correlation: Opposite results, with a phase difference).</em></li>
 </ol>
 
 <h3>2. The Circuit: How to Make Them</h3>
@@ -1087,15 +1087,15 @@ Since you cannot describe the Bell State using individual qubit coefficients ($\
     <li>One <strong>Hadamard (H)</strong> gate.</li>
     <li>One <strong>CNOT</strong> gate.</li>
 </ol>
-<p><strong>The Process (to create $|\\Phi^+\\rangle$):</strong></p>
+<p><strong>The Process (to create $|\\\\Phi^+\rangle$):</strong></p>
 <ol>
-    <li><strong>Start:</strong> Initialize both qubits to $|00\\rangle$ (Qubit A is left, Qubit B is right).</li>
-    <li><strong>Superposition:</strong> Apply $H$ to <strong>Qubit A</strong>. $$|00\\rangle \\xrightarrow{H \\otimes I} \\frac{(|0\\rangle + |1\\rangle)}{\\sqrt{2}} \\otimes |0\\rangle = \\frac{|00\\rangle + |10\\rangle}{\\sqrt{2}}$$</li>
+    <li><strong>Start:</strong> Initialize both qubits to $|00\rangle$ (Qubit A is left, Qubit B is right).</li>
+    <li><strong>Superposition:</strong> Apply $H$ to <strong>Qubit A</strong>. $$|00\rangle \\\\xrightarrow{H \otimes I} \frac{(|0\rangle + |1\rangle)}{\sqrt{2}} \otimes |0\rangle = \frac{|00\rangle + |10\rangle}{\sqrt{2}}$$</li>
     <li><strong>Entanglement:</strong> Apply CNOT with <strong>Qubit A as Control</strong> and <strong>Qubit B as Target</strong>.
         <ul>
-            <li>$|00\\rangle \\to |00\\rangle$ (Control is 0, do nothing).</li>
-            <li>$|10\\rangle \\to |11\\rangle$ (Control is 1, flip target).</li>
-            <li><strong>Result:</strong> $\\frac{|00\\rangle + |11\\rangle}{\\sqrt{2}}$</li>
+            <li>$|00\rangle \to |00\rangle$ (Control is 0, do nothing).</li>
+            <li>$|10\rangle \to |11\rangle$ (Control is 1, flip target).</li>
+            <li><strong>Result:</strong> $\frac{|00\rangle + |11\rangle}{\sqrt{2}}$</li>
         </ul>
     </li>
 </ol>
@@ -1106,19 +1106,19 @@ Since you cannot describe the Bell State using individual qubit coefficients ($\
 
 <hr>
 
-<h3>Your Task: Deriving the "Singlet" ($|\\Psi^-\\rangle$)</h3>
-<p>To master quantum circuits, you must be able to trace the state vector step-by-step. You want to generate the state $|\\Psi^-\\rangle = \\frac{|01\\rangle - |10\\rangle}{\\sqrt{2}}$.</p>
+<h3>Your Task: Deriving the "Singlet" ($|\\\\Psi^-\rangle$)</h3>
+<p>To master quantum circuits, you must be able to trace the state vector step-by-step. You want to generate the state $|\\\\Psi^-\rangle = \frac{|01\rangle - |10\rangle}{\sqrt{2}}$.</p>
 
 <p><strong>The Setup:</strong></p>
 <ul>
-    <li><strong>Input State:</strong> $|11\\rangle$ (Qubit A is 1, Qubit B is 1).</li>
+    <li><strong>Input State:</strong> $|11\rangle$ (Qubit A is 1, Qubit B is 1).</li>
     <li><strong>Gate Sequence:</strong> Apply $H$ to Qubit A, then apply CNOT (Control A, Target B).</li>
 </ul>
 
 <p><strong>Derive the final state:</strong></p>
 <ol>
-    <li><strong>After H on A:</strong> Apply the Hadamard to the first $|1\\rangle$. Recall that $H|1\\rangle = \\frac{|0\\rangle - |1\\rangle}{\\sqrt{2}}$. What is the combined 2-qubit state vector at this midpoint?</li>
-    <li><strong>After CNOT:</strong> Take the result from step 1 and apply the CNOT logic. (Remember: flip the second bit <em>only</em> if the first bit is 1). Does your result match the definition of $|\\Psi^-\\rangle$ above?</li>
+    <li><strong>After H on A:</strong> Apply the Hadamard to the first $|1\rangle$. Recall that $H|1\rangle = \frac{|0\rangle - |1\rangle}{\sqrt{2}}$. What is the combined 2-qubit state vector at this midpoint?</li>
+    <li><strong>After CNOT:</strong> Take the result from step 1 and apply the CNOT logic. (Remember: flip the second bit <em>only</em> if the first bit is 1). Does your result match the definition of $|\\\\Psi^-\rangle$ above?</li>
 </ol>
                     """,
                     "position": 8,
@@ -1134,36 +1134,36 @@ Since you cannot describe the Bell State using individual qubit coefficients ($\
                     "title": "9. Gates: Pauli Matrices",
                     "content": r"""
 <h2>The Pauli Matrices</h2>
-<p>The <strong>Pauli Matrices</strong> are the alphabet of single-qubit quantum operations. Any single-qubit gate you ever see is a function or rotation based on these three matrices and the Identity matrix ($I$). They are the simplest, non-trivial, $2 \\times 2$ <strong>Hermitian</strong> matrices (Postulate 3: they can act as observables) and they are <strong>unitary</strong> (Postulate 2: they are valid gates).</p>
+<p>The <strong>Pauli Matrices</strong> are the alphabet of single-qubit quantum operations. Any single-qubit gate you ever see is a function or rotation based on these three matrices and the Identity matrix ($I$). They are the simplest, non-trivial, $2 \times 2$ <strong>Hermitian</strong> matrices (Postulate 3: they can act as observables) and they are <strong>unitary</strong> (Postulate 2: they are valid gates).</p>
 
-<h3>1. The Pauli Group ($\\{I, X, Y, Z\\}$)</h3>
+<h3>1. The Pauli Group ($\\\\{I, X, Y, Z\\\\}$)</h3>
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>Gate</th>
-            <th>Matrix ($\\sigma$)</th>
+            <th>Matrix ($\sigma$)</th>
             <th>Description</th>
         </tr>
     </thead>
     <tbody>
         <tr>
             <td><strong>I</strong></td>
-            <td>$\\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$</td>
+            <td>$\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \end{pmatrix}$</td>
             <td><strong>Identity:</strong> Do nothing.</td>
         </tr>
         <tr>
-            <td><strong>$X$</strong> ($\\sigma_x$)</td>
-            <td>$\\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$</td>
-            <td><strong>Bit-Flip (NOT):</strong> Flips $|0\\rangle \\leftrightarrow |1\\rangle$. (Rotation about X-axis).</td>
+            <td><strong>$X$</strong> ($\sigma_x$)</td>
+            <td>$\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \end{pmatrix}$</td>
+            <td><strong>Bit-Flip (NOT):</strong> Flips $|0\rangle \leftrightarrow |1\rangle$. (Rotation about X-axis).</td>
         </tr>
         <tr>
-            <td><strong>$Z$</strong> ($\\sigma_z$)</td>
-            <td>$\\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}$</td>
-            <td><strong>Phase-Flip:</strong> Flips the phase of $|1\\rangle$. (Rotation about Z-axis).</td>
+            <td><strong>$Z$</strong> ($\sigma_z$)</td>
+            <td>$\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \end{pmatrix}$</td>
+            <td><strong>Phase-Flip:</strong> Flips the phase of $|1\rangle$. (Rotation about Z-axis).</td>
         </tr>
         <tr>
-            <td><strong>$Y$</strong> ($\\sigma_y$)</td>
-            <td>$\\begin{pmatrix} 0 & -i \\\\ i & 0 \\end{pmatrix}$</td>
+            <td><strong>$Y$</strong> ($\sigma_y$)</td>
+            <td>$\begin{pmatrix} 0 & -i \\\\ i & 0 \end{pmatrix}$</td>
             <td><strong>Bit & Phase Flip:</strong> Combination of $X$ and $Z$.</td>
         </tr>
     </tbody>
@@ -1171,9 +1171,9 @@ Since you cannot describe the Bell State using individual qubit coefficients ($\
 
 <h3>2. Physical and Mathematical Significance</h3>
 <ul>
-    <li><strong>Observables:</strong> Since they are Hermitian ($M = M^\\dagger$), they represent measurable physical properties (like spin).</li>
-    <li><strong>Rotations:</strong> On the Bloch sphere (Postulate 2), $X, Y, Z$ are the axes of rotation. Applying any Pauli matrix is a $180^\\circ$ rotation about its respective axis.</li>
-    <li><strong>Eigenstates:</strong> The eigenstates of $X$ ($|+\\rangle, |-\\rangle$) and $Y$ ($|i+\\rangle, |i-\\rangle$) form alternative measurement bases.</li>
+    <li><strong>Observables:</strong> Since they are Hermitian ($M = M^\dagger$), they represent measurable physical properties (like spin).</li>
+    <li><strong>Rotations:</strong> On the Bloch sphere (Postulate 2), $X, Y, Z$ are the axes of rotation. Applying any Pauli matrix is a $180^\\\\circ$ rotation about its respective axis.</li>
+    <li><strong>Eigenstates:</strong> The eigenstates of $X$ ($|+\rangle, |-\rangle$) and $Y$ ($|i+\rangle, |i-\rangle$) form alternative measurement bases.</li>
 </ul>
 
 <h3>3. The Relationship: Anti-Commutation</h3>
@@ -1184,12 +1184,12 @@ $$XY = -YX$$
 <hr>
 
 <h3>Your Task: Analyzing Pauli-Y</h3>
-<p>The Pauli-Y gate is the only one that explicitly contains the complex number $i$. This is where complex arithmetic is unavoidable. Apply the Pauli-Y gate to the computational basis state $|0\\rangle$:</p>
-$$Y|0\\rangle = \\begin{pmatrix} 0 & -i \\\\ i & 0 \\end{pmatrix} \\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$$
+<p>The Pauli-Y gate is the only one that explicitly contains the complex number $i$. This is where complex arithmetic is unavoidable. Apply the Pauli-Y gate to the computational basis state $|0\rangle$:</p>
+$$Y|0\rangle = \begin{pmatrix} 0 & -i \\\\ i & 0 \end{pmatrix} \begin{pmatrix} 1 \\\\ 0 \end{pmatrix}$$
 <ol>
     <li>What is the resulting column vector?</li>
-    <li>Rewrite the result in Dirac notation (e.g., $\\alpha|0\\rangle + \\beta|1\\rangle$).</li>
-    <li>Based on the final state, describe the physical effect of $Y|0\\rangle$ in terms of bit flip and phase shift.</li>
+    <li>Rewrite the result in Dirac notation (e.g., $\alpha|0\rangle + \beta|1\rangle$).</li>
+    <li>Based on the final state, describe the physical effect of $Y|0\rangle$ in terms of bit flip and phase shift.</li>
 </ol>
                     """,
                     "position": 9,
@@ -1208,7 +1208,7 @@ $$Y|0\\rangle = \\begin{pmatrix} 0 & -i \\\\ i & 0 \\end{pmatrix} \\begin{pmatri
 
 <h3>1. The Matrix and the Operation</h3>
 <p>The Hadamard gate is a $2\times 2$ unitary matrix:</p>
-$$H = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}$$
+$$H = \frac{1}{\sqrt{2}} \begin{pmatrix} 1 & 1 \\\\ 1 & -1 \end{pmatrix}$$
 <p>Its action is to map the computational basis states ($|0\rangle, |1\rangle$) to the new basis states, often called the <strong>Hadamard Basis</strong> or the <strong>X-Basis</strong> states ($|+\rangle, |-\rangle$):</p>
 $$H|0\rangle = |+\rangle = \frac{|0\rangle + |1\rangle}{\sqrt{2}}$$
 $$H|1\rangle = |-\rangle = \frac{|0\rangle - |1\rangle}{\sqrt{2}}$$
@@ -1231,7 +1231,7 @@ $$H|1\rangle = |-\rangle = \frac{|0\rangle - |1\rangle}{\sqrt{2}}$$
 <p>Since $H$ is a valid quantum gate, it must be <strong>unitary</strong> (Postulate 2). The simplest way to show this is to prove that the gate is its own inverse, meaning applying it twice returns the original state.</p>
 <p>Prove that:</p>
 $$H^2 = I$$
-<p>where $I = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}$ is the Identity matrix.</p>
+<p>where $I = \begin{pmatrix} 1 & 0 \\\\ 0 & 1 \end{pmatrix}$ is the Identity matrix.</p>
 <p>Show the matrix multiplication $H \cdot H$ step-by-step.</p>
 """,
                     "position": 10,
@@ -1257,7 +1257,7 @@ $$H^2 = I$$
 
 <p><strong>The Matrix (Control Qubit 0, Target Qubit 1):</strong></p>
 <p>The CNOT is a $4 \times 4$ unitary matrix:</p>
-$$CNOT = \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & 1 & 0 \end{pmatrix}$$
+$$CNOT = \begin{pmatrix} 1 & 0 & 0 & 0 \\\\ 0 & 1 & 0 & 0 \\\\ 0 & 0 & 0 & 1 \\\\ 0 & 0 & 1 & 0 \end{pmatrix}$$
 <p>The $2 \times 2$ blocks along the diagonal show the conditional action:</p>
 <ul>
     <li>The upper-left $2 \times 2$ block is the <strong>Identity ($I$)</strong> matrix, acting when the Control is $|0\rangle$.</li>
@@ -1329,21 +1329,21 @@ $$R_z(\theta) (\alpha|0\rangle + \beta|1\rangle) \sim \alpha|0\rangle + \beta e^
 <td style="text-align: center;"><strong>Z</strong></td>
 <td style="text-align: center;">Pauli-Z</td>
 <td style="text-align: center;">$\pi$ ($180^\circ$)</td>
-<td style="text-align: center;">$\begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}$</td>
+<td style="text-align: center;">$\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \end{pmatrix}$</td>
 <td style="text-align: center;">Flips sign of $|1\rangle$ coefficient.</td>
 </tr>
 <tr>
 <td style="text-align: center;"><strong>S</strong></td>
 <td style="text-align: center;">Phase Gate</td>
 <td style="text-align: center;">$\pi/2$ ($90^\circ$)</td>
-<td style="text-align: center;">$\begin{pmatrix} 1 & 0 \\ 0 & i \end{pmatrix}$</td>
+<td style="text-align: center;">$\begin{pmatrix} 1 & 0 \\\\ 0 & i \end{pmatrix}$</td>
 <td style="text-align: center;">Applies a $90^\circ$ rotation about Z-axis.</td>
 </tr>
 <tr>
 <td style="text-align: center;"><strong>T</strong></td>
 <td style="text-align: center;">$\pi/8$ Gate</td>
 <td style="text-align: center;">$\pi/4$ ($45^\circ$)</td>
-<td style="text-align: center;">$\begin{pmatrix} 1 & 0 \\ 0 & e^{i\pi/4} \end{pmatrix}$</td>
+<td style="text-align: center;">$\begin{pmatrix} 1 & 0 \\\\ 0 & e^{i\pi/4} \end{pmatrix}$</td>
 <td style="text-align: center;">The smallest rotation, crucial for <strong>universality</strong>.</td>
 </tr>
 </tbody>
@@ -2289,7 +2289,7 @@ $$E(\theta) = \frac{\langle \psi(\theta) | H | \psi(\theta) \rangle}{\langle \ps
         existing_quiz = cur.fetchone()
         if not existing_quiz:
             # Q1
-            q1_text = "The S gate applies a phase rotation of 90 degrees (π/2). If you apply the S gate twice (S^2), which gate is it equivalent to?"
+            q1_text = "The S gate applies a phase rotation of 90 degrees ($\\pi/2$). If you apply the S gate twice ($S^2$), which gate is it equivalent to?"
             q1_options = json.dumps([
                 "The Identity (I)",
                 "The Pauli-Z (Z)",
@@ -2442,17 +2442,17 @@ $$E(\theta) = \frac{\langle \psi(\theta) | H | \psi(\theta) \rangle}{\langle \ps
         
         existing_quiz = cur.fetchone()
         if not existing_quiz:
-            question_text = "What is the value of the phase factor e^{iπ}, and consequently, what does the Z gate do to the |1> component?"
+            question_text = "What is the value of the phase factor $e^{i\\pi}$, and consequently, what does the Z gate do to the $|1\\rangle$ component?"
             # Options: 
             # 1. e^{iπ} = 1, so it leaves |1> unchanged.
             # 2. e^{iπ} = -1, so it flips the sign (phase) of |1>. (Correct)
             # 3. e^{iπ} = i, so it rotates |1> by 90 degrees.
             # 4. e^{iπ} = 0, so it destroys the |1> component.
             options = json.dumps([
-                "e^{iπ} = 1, so it leaves |1> unchanged.", 
-                "e^{iπ} = -1, so it flips the sign (phase) of |1>.", 
-                "e^{iπ} = i, so it rotates |1> by 90 degrees.", 
-                "e^{iπ} = 0, so it destroys the |1> component."
+                "$e^{i\\pi} = 1$, so it leaves $|1\\rangle$ unchanged.", 
+                "$e^{i\\pi} = -1$, so it flips the sign (phase) of $|1\\rangle$.", 
+                "$e^{i\\pi} = i$, so it rotates $|1\\rangle$ by 90 degrees.", 
+                "$e^{i\\pi} = 0$, so it destroys the $|1\\rangle$ component."
             ])
             correct_idx = 1
             
@@ -2607,7 +2607,7 @@ $$E(\theta) = \frac{\langle \psi(\theta) | H | \psi(\theta) \rangle}{\langle \ps
 
         existing_quiz = cur.fetchone()
         if not existing_quiz:
-            q1_text = "Treating amplitudes as separate probabilities: what is |A|^2 + |B|^2 + |C|^2 for A=1/2, B=i/2, C=-(1/2)-(i/2)?"
+            q1_text = "Treating amplitudes as separate probabilities: what is $|A|^2 + |B|^2 + |C|^2$ for $A=1/2, B=i/2, C=-(1/2)-(i/2)$?"
             q1_options = json.dumps([
                 "1.0 (sum of 0.25 + 0.25 + 0.5)",
                 "0.5",
@@ -2616,7 +2616,7 @@ $$E(\theta) = \frac{\langle \psi(\theta) | H | \psi(\theta) \rangle}{\langle \ps
             ])
             q1_correct = 0
 
-            q2_text = "Add A+B+C first to get the total amplitude. What is the actual probability |α_total|^2 of measuring |1⟩?"
+            q2_text = "Add $A+B+C$ first to get the total amplitude. What is the actual probability $|\\alpha_{total}|^2$ of measuring $|1\\rangle$?"
             q2_options = json.dumps([
                 "1.0",
                 "0.0",
@@ -3499,7 +3499,7 @@ $$E(\theta) = \frac{\langle \psi(\theta) | H | \psi(\theta) \rangle}{\langle \ps
 
         existing_quiz = cur.fetchone()
         if not existing_quiz:
-            q1_text = "Why do we use controlled-U^(2^j) gates instead of just repeating controlled-U?"
+            q1_text = "Why do we use controlled-$U^{2^j}$ gates instead of just repeating controlled-$U$?"
             q1_options = json.dumps([
                 "To save energy by running fewer gates.",
                 "To encode phase information into higher bits for exponential precision.",
