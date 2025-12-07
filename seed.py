@@ -290,7 +290,11 @@ $$|+\rangle = \frac{1}{\sqrt{2}}|0\rangle + \frac{1}{\sqrt{2}}|1\rangle = \frac{
 </ol>
                     """,
                     "position": 4,
-                    "task_json": None,
+                    "task_json": json.dumps({
+                        "description": "Initialize the qubit in the |+> state (using the Hadamard gate). Run the simulation and observe the probability of measuring |0>.",
+                        "criteria": "inner_product_plus_prob",
+                        "qubits": 1
+                    }),
                     "section": "linear-algebra"
                 },
                 {

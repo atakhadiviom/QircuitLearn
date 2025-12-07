@@ -1556,6 +1556,30 @@ function validateTask(data) {
                       message = "First, create a superposition with the H gate, then apply S.";
                   }
              }
+        } else if (criteria === 'inner_product_plus_prob') {
+             // Goal: Create |+> = H|0>. Prob of |0> should be 0.5.
+             if (data.probabilities && data.probabilities.length >= 2) {
+                  const p0 = data.probabilities[0];
+                  // Check if H is present
+                  const hasH = state.gates.some(g => g.type === 'H');
+                  
+                  if (Math.abs(p0 - 0.5) < 0.1) {
+                      if (hasH) {
+                          success = true;
+                          message = "Correct! The probability of measuring |0> is 0.5 (50%), matching the inner product calculation.";
+                      } else {
+                          message = "Probabilities look right, but did you use the H gate to create the superposition.";
+                      }
+                  } else {
+                      if (p0 > 0.9) {
+                           message = "The state is currently |0>. Apply the Hadamard (H) gate to create a superposition.";
+                      } else if (p0 < 0.1) {
+                           message = "The state is |1>. You need the |+> state.";
+                      } else {
+                           message = `Probability of |0> is ${(p0*100).toFixed(1)}%. Aim for 50%.`;
+                      }
+                  }
+             }
         } else if (criteria === 'verify_hadamard_unitary') {
              // Goal: Verify H†H = I. In simulation, this means applying H then H† (which is H).
              // Result should be |0> (identity operation on |0>) with 100% probability.
