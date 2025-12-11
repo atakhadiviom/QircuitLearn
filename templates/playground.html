@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Python Playground - QircuitLearn</title>
+    <link rel="stylesheet" href="/static/css/main.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    
+    <!-- Pyodide (Must be loaded before Monaco to avoid AMD conflict) -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+
+    <!-- Monaco Editor requires a specific loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
+
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* Prevent scrolling on body, let playground handle it */
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .playground-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            background: #1e293b;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        
+        .header a:hover {
+            color: #fff;
+        }
+
+        .workspace {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .editor-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #334155;
+            position: relative;
+        }
+
+        .output-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0f172a;
+            min-width: 300px;
+        }
+
+        #editor-container {
+            flex: 1;
+            width: 100%;
+        }
+
+        #output {
+            flex: 1;
+            padding: 1rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            color: #cbd5e1;
+        }
+
+        .pane-header {
+            padding: 0.5rem 1rem;
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .run-btn {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.2s;
+        }
+
+        .run-btn:hover {
+            background: #15803d;
+        }
+        
+        .run-btn:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+        }
+        
+        .status-indicator {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        /* Syntax Highlighting overrides for output if needed */
+        .output-error { color: #ef4444; }
+        .output-success { color: #22c55e; }
+        .output-info { color: #3b82f6; }
+    </style>
+</head>
+<body>
+
+<div class="playground-container">
+    <header class="header">
+        <h1>
+            <span>🐍</span> Python Playground
+        </h1>
+        <nav>
+            <a href="/">← Back to Course</a>
+        </nav>
+    </header>
+
+    <div class="workspace">
+        <div class="editor-pane">
+            <div class="pane-header">
+                <span>EDITOR</span>
+                <button id="run-btn" class="run-btn" onclick="runPython()">
+                    <span>▶</span> Run
+                </button>
+            </div>
+            <div id="editor-container"></div>
+        </div>
+        
+        <div class="output-pane">
+            <div class="pane-header">
+                <span>OUTPUT</span>
+                <span id="status" class="status-indicator">Initializing Python...</span>
+            </div>
+            <div id="output"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let pyodide = null;
+    let editor = null;
+    const outputElement = document.getElementById('output');
+    const statusElement = document.getElementById('status');
+    const runBtn = document.getElementById('run-btn');
+
+    // Initialize Monaco Editor
+    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs' }});
+    require(['vs/editor/editor.main'], function() {
+        editor = monaco.editor.create(document.getElementById('editor-container'), {
+            value: [
+                '# Welcome to the QircuitLearn Python Playground!',
+                '# You can write and run Python code directly in your browser.',
+                '',
+                'import sys',
+                '',
+                'def greet(name):',
+                '    return f"Hello, {name}!"',
+                '',
+                'print(greet("Quantum Explorer"))',
+                'print(f"Python version: {sys.version}")',
+                '',
+                '# Try complex numbers (essential for Quantum Computing)',
+                'z = 1 + 2j',
+                'print(f"Complex number z: {z}")',
+                'print(f"Conjugate of z: {z.conjugate()}")'
+            ].join('\n'),
+            language: 'python',
+            theme: 'vs-dark',
+            automaticLayout: true,
+            minimap: { enabled: false },
+            fontSize: 14,
+            scrollBeyondLastLine: false
+        });
+    });
+
+    // Initialize Pyodide
+    async function main() {
+        try {
+            pyodide = await loadPyodide();
+            statusElement.textContent = 'Ready';
+            statusElement.style.color = '#22c55e';
+            runBtn.disabled = false;
+            
+            // Redirect stdout/stderr
+            pyodide.setStdout({ batched: (msg) => addToOutput(msg) });
+            pyodide.setStderr({ batched: (msg) => addToOutput(msg, 'error') });
+            
+            addToOutput("Python environment initialized successfully.\n", 'info');
+        } catch (err) {
+            statusElement.textContent = 'Error loading Python';
+            statusElement.style.color = '#ef4444';
+            addToOutput(`Failed to load Pyodide: ${err}`, 'error');
+        }
+    }
+
+    function addToOutput(text, type = 'normal') {
+        const span = document.createElement('div');
+        span.textContent = text;
+        if (type === 'error') span.className = 'output-error';
+        else if (type === 'info') span.className = 'output-info';
+        
+        outputElement.appendChild(span);
+        outputElement.scrollTop = outputElement.scrollHeight;
+    }
+
+    async function runPython() {
+        if (!pyodide || !editor) return;
+        
+        const code = editor.getValue();
+        outputElement.innerHTML = ''; // Clear previous output
+        statusElement.textContent = 'Running...';
+        runBtn.disabled = true;
+
+        try {
+            await pyodide.runPythonAsync(code);
+            statusElement.textContent = 'Ready';
+        } catch (err) {
+            addToOutput(err, 'error');
+            statusElement.textContent = 'Error';
+        } finally {
+            runBtn.disabled = false;
+        }
+    }
+
+    // Start initialization
+    runBtn.disabled = true;
+    main();
+</script>
+
+</body>
+</html>
