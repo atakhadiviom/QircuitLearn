@@ -31,5 +31,8 @@ instance/
 .DS_Store
 Thumbs.db
 
-# Logs
+# Logs and temporary files
 *.log
+*cookie*.txt
+output.txt
+
